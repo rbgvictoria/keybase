@@ -1,0 +1,271 @@
+/* 
+    Document   : keypanel
+    Created on : 14/03/2013, 10:53:20 AM
+    Author     : nklaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#keymenu {
+    float: right;
+    font-size: 12px;
+    font-weight: normal;
+    color: #000000;
+    height: 20px;
+}
+
+#keymenu #back, #keymenu #startover {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    top: -3px;
+    background-image: url('media/button_face.png');
+    background-repeat: no-repeat;
+    margin-left: 3px;
+}
+
+#keymenu #back a {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    background-image: url('media/button_icon_step_back.png');
+    background-repeat: no-repeat;
+}
+
+#keymenu #startover a {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    background-image: url('media/button_icon_restart.png');
+    background-repeat: no-repeat;
+}
+
+#keypanel_filter {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+    top: -3px;
+    float: right;
+    background-image: url('media/button_face.png');
+    background-repeat: no-repeat;
+}
+
+#keypanel_filter a {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    background-image: url('media/filter(buttoned).png');
+    background-repeat: no-repeat;
+}
+
+#remaining>h3 {
+    height: 17px;
+    overflow-y: hidden; 
+}
+
+#remaining>div {
+    clear: both;
+}
+
+#keypanel {
+    padding: 0px;
+    position: absolute;
+    height: 610px;
+    width: 890px;
+}
+
+#keypanel #leftpane {
+    width: 610px;
+    height: 610px;
+    position: absolute;
+    left: 0px;
+    overflow: hidden;
+}
+
+#keypanel .drag_leftright {
+    height: 610px;
+    width: 5px;
+    /*border-left: solid 1px #cccccc;
+    border-right: solid 1px #cccccc;*/
+    position: absolute;
+    left: 612px;
+    cursor: col-resize;
+}
+
+.drag_updown {
+    height: 5px;
+    /*border-top: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;*/
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 300px;
+    cursor: row-resize;
+    z-index: 10;
+    background-color: #fff;
+}
+
+#keypanel>#rightpane {
+    height: 610px;
+    position: absolute;
+    right: 0px;
+    left: 617px;
+    overflow: hidden;
+}
+
+#keypanel h3 {
+    margin: 0;
+    padding: 5px;
+    background-image: url('media/box_header_gradient.jpg');
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#currentnode, #path, #remaining, #discarded {
+    border: solid 1px #cccccc;
+    padding: 0px;
+    margin: 0px;
+}
+
+#currentnode, #remaining {
+    height: 298px;
+    position: absolute;
+}
+
+#path, #discarded {
+    position: absolute;
+    top: 305px;
+    bottom: 0px;
+}
+
+#currentnode, #path {
+    width: 608px;
+}
+
+#remaining, #discarded {
+    left: 0px;
+    right: 0px;
+}
+
+#currentnode div, 
+#path>div,
+#remaining div, 
+#discarded div {
+    padding: 5px;
+    overflow: auto;
+    background-color: #ffffff;
+}
+
+#currentnode div, #remaining div {
+    height: 263px;
+}
+
+#path div, #discarded div {
+    overflow: auto;
+    
+}
+
+#currentnode div p {
+    margin-top: 0px;
+    min-height: 40px;
+}
+
+#currentnode div a.lead {
+    display: block;
+    margin-top: 0px;
+    min-height: 40px;
+    border: solid 1px #cccccc;
+    border-radius: 10px;
+    padding: 5px;
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    background-color: #f4f4f4;
+    color: #000000;
+}
+
+#currentnode div a.lead:hover {
+    color: #2688cb;
+    border-color: #2688cb;
+}
+
+#currentnode a:link,
+#currentnode a:visited {
+    color: #2688cb;
+    text-decoration: none;
+}
+
+#currentnode .result {
+    font-style: italic;
+    font-weight: bold;
+    color: #006600;
+}
+
+#currentnode div.featureimg {
+    text-align: center;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+#path ol {
+    margin-left: 5px;
+    margin-top: 0px;
+    padding-left: 15px;
+    padding-top: 0px;
+}
+
+#path ol li {
+    margin-left: 0px;
+}
+
+#path ol li a {
+    text-decoration: none;
+    color: #000000;
+}
+
+#path ol li.pending {
+    color: #2688cb;
+    font-weight: bold;
+}
+
+#path ol li.pending a {
+    color: #2688cb;
+    font-weight: normal;
+}
+
+/*#path div.lead {
+    padding-left: 15px;
+    background-image: url('../images/right_arrow.png');
+    background-repeat: no-repeat;
+    background-position: 0px 2px;
+}
+
+#path div.lead a {
+    text-decoration: none;
+    color: #000000;
+}
+*/
+
+
+.entity {
+    display: block;
+}
+
+.entity img {
+    vertical-align: middle;
+    margin: 2px;
+}
+
+.entity a {
+    color: #6599C1;
+    text-decoration: none;
+}
+
+#discarded .entity {
+    color: #999999;
+}
+
+#discarded .entity a {
+    color: #88a4cb;
+}

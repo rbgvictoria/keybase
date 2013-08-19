@@ -1,0 +1,160 @@
+/* 
+    Document   : htmlkeys
+    Created on : 14/03/2013, 5:57:09 PM
+    Author     : nklaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#bracketedkey h3, #indentedkey h3 {
+    height: 17px;
+    overflow-y: hidden; 
+    background-image: url('media/box_header_gradient.jpg');
+    color: #ffffff;
+    font-weight: bold;
+    padding: 5px;
+    margin: 0px 0px 5px 0px;
+}
+
+#bracketedkey table {
+    border: none;
+    width: 100%;
+}
+
+#bracketedkey tbody.odd {
+    background-color: #ffffff;
+}
+
+#bracketedkey tbody.even {
+    /*background-color: #f6f6f6;*/
+}
+
+#bracketedkey td {
+    border: none;
+}
+
+#bracketedkey td.from {
+    font-weight: bold;
+    vertical-align: top;
+}
+
+#bracketedkey td.text {
+    vertical-align: top;
+}
+
+#bracketedkey td.to {
+    vertical-align: bottom;
+    text-align: right;
+    font-weight: bold;
+    width: 20%;
+}
+
+#bracketedkey tbody>tr:first-child>td {
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+#bracketedkey tbody>tr:last-child td {
+    padding-top: 1px;
+    padding-bottom: 10px;
+}
+
+#bracketedkey tbody.selected tr {
+    background-color: #eeeeee;
+    color: #0000ff;
+}
+
+#bracketedkey tbody.selected tr:hover {
+    background-color: blue;
+    color: white;
+}
+
+#bracketedkey .followed * {
+    color: blue;
+}
+
+#bracketedkey a, #indentedkey a {
+/*    display: inline-block;
+    width: 100%;*/
+    text-decoration: none;
+    color: #6599C1;
+    font-weight: bold;
+}
+
+#bracketedkey tr.backlinked td {
+    background-color: #eeeeee;
+}
+
+#bracketedkey tbody.selected tr a {
+    color: #0000ff;
+}
+
+#bracketedkey tbody.selected tr:hover a {
+    color: white;
+}
+
+#indentedkey {
+    width: 100%;
+    /*overflow: auto;*/
+}
+
+#indentedkey table {
+    width: 100%;
+    border: 0px;
+}
+
+#indentedkey td {
+    padding: 0px;
+    border: none;
+}
+
+#indentedkey td.from {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 0px;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+#indentedkey tr.level_1 td:nth-child(2), 
+#indentedkey tr.level_2 td:nth-child(3), 
+#indentedkey tr.level_3 td:nth-child(4), 
+#indentedkey tr.level_4 td:nth-child(5), 
+#indentedkey tr.level_5 td:nth-child(6) {
+    border-left: solid 3px #ccc;
+}
+
+#indentedkey td.text {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    vertical-align: top;
+    width: 100%;
+}
+
+#indentedkey span.to {
+    display: inline-block;
+    font-weight: bold;
+    width: 100%;
+    text-align: right;
+}
+
+
+#indentedkey table.moveleft {
+    border-top: solid 2px red;
+    border-bottom: solid 2px red;
+}
+
+#indentedkey tr.selected td.from,
+#indentedkey tr.selected td.text {
+    background-color: blue;
+    color: white;
+}
+
+#indentedkey tr.alternative td.from,
+#indentedkey tr.alternative td.text {
+    background-color: #eeeeee;
+    color: blue;
+}

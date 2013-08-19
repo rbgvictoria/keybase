@@ -1,0 +1,36 @@
+/* 
+    Document   : dynatree.custom
+    Created on : Mar 3, 2013, 10:38:05 PM
+    Author     : Niels
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+div#linkedkeys, div#orphanedkeys {
+    max-height: none;
+    border: solid 1px white;
+}
+
+ul.dynatree-container {
+    max-height: 300px;
+    padding-top: 0px;
+    border: solid 1px #cccccc;
+    border-top-width: 0px;
+}
+
+#linkedkeys ul li, #orphanedkeys ul li {
+    line-height: auto;
+    margin-left: auto;
+    list-style-image: none;
+}
+
+.dynatree-exp-e span.dynatree-expander, .dynatree-exp-el span.dynatree-expander {
+    background-image: url('media/collapse.png');
+    background-position: 0 0;
+}
+
+.dynatree-exp-c span.dynatree-expander, .dynatree-exp-cl span.dynatree-expander {
+    background-image: url('media/expand.png');
+    background-position: 0 0;
+}
+

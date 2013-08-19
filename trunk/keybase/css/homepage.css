@@ -1,0 +1,76 @@
+/* 
+    Document   : homepage
+    Created on : 14/03/2013, 6:40:01 PM
+    Author     : nklaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#column-box {
+    
+}
+
+#column1, #column2 {
+    width: 430px;
+    float: left;
+}
+
+#column1 {
+    margin-right: 20px;
+}
+
+#column2 {
+    padding-top: 50px;
+}
+
+#project-box {
+    height: 400px;
+}
+
+#project-box .project {
+    clear: both;
+}
+
+.project a.project_link {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: none;
+}
+
+.project .projectbutton {
+    display: block;
+    float: left;
+    width: 82px;
+    height: 82px;
+    background-image: url('media/project_button_face.jpg');
+    background-repeat: no-repeat; 
+}
+
+.project .projectbutton img {
+    padding: 11px;
+}
+
+.project .projectdata {
+    display: block;
+    float: left;
+    padding-left: 10px;
+    height: 100%;
+}
+
+.project .pstats, .project .pname {
+    display: block;
+}
+
+span.pname {
+    color: #2688cb;
+    font-weight: bold;
+    padding-top: 15px;
+}
+
+span.pstats {
+    color: #88a4cb;
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
