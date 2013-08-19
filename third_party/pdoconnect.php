@@ -6,7 +6,7 @@
 
 $dsn = 'mysql:dbname=keybase;host=203.55.15.78';
 $user = 'keybase';
-$password = 'fb5c59c2c634';
+$password = '********';
 
 try {
     $db = new PDO($dsn, $user, $password);
