@@ -50,7 +50,7 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = '203.55.15.78';
 $db['default']['username'] = 'keybase';
-$db['default']['password'] = 'fb5c59c2c634';
+$db['default']['password'] = '********';
 $db['default']['database'] = 'keybase';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
