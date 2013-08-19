@@ -1,0 +1,71 @@
+/* 
+    Document   : tabmenu
+    Created on : 14/03/2013, 10:57:01 AM
+    Author     : nklaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+div#keymainmenu {
+    clear: both;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    text-align: right;
+    border-bottom: solid 3px #f1f1f1;
+}
+
+span.button, span.buttoncurrent {
+    display: inline-block;
+    position: relative;
+    top: 3px;
+    height: 22px;
+    width: 144px;
+    background-repeat: no-repeat;
+    text-align: left;
+    padding-top: 5px;
+}
+
+span.button {
+    background-image: url('media/tab_inactive.png');
+}
+
+span.buttoncurrent {
+    background-image: url('media/tab_active.png');
+}
+
+span.button a, span.buttoncurrent span {
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-position: 8px 0px;
+    padding-left: 40px;
+    padding-top: 2px;
+    padding-bottom: 5px;
+    color: #6599C1;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+span#tab_player a, span#tab_player span {
+    background-image: url('media/tab_icon_player.png');
+}
+
+span#tab_bracketed a, span#tab_bracketed span {
+    background-image: url('media/tab_icon_bracketed.png');
+}
+
+span#tab_indented a, span#tab_indented span {
+    background-image: url('media/tab_icon_indented.png');
+}
+
+span#tab_about a, span#tab_about span {
+    background-image: url('media/tab_icon_about.png');
+}
+
+span.button a {
+}
+
+span.button:hover {
+}
+
+span.button:hover a {
+}

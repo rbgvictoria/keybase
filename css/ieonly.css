@@ -1,0 +1,15 @@
+/* 
+    Document   : ieonly
+    Created on : 15/03/2013, 12:53:38 PM
+    Author     : nklaze
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#container {
+    width: 920px;
+}
+
+#keypanel {
+    width: 900px;
+}
