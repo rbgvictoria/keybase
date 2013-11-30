@@ -99,8 +99,9 @@ class Export {
         
         
         foreach ($key['Steps'] as $step) {
-            foreach ($step['leads'] as $lead)
+            foreach ($step['leads'] as $lead) {
                 fputcsv($handle, array($lead['fromnode'], $lead['leadtext'], $lead['tonode']), $delimiter);
+            }
         }
         fclose($handle);
         return $filename;

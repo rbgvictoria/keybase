@@ -167,6 +167,7 @@ class NothophoenixModel extends PlayerModel {
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
+        $this->db->where('l.KeysID', $key);
         $this->db->where('!isnull(l.ItemsID)', false, false);
         $this->db->where_in('l.ItemsID', $remaining);
         if ($this->FilterItems)
