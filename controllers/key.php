@@ -10,7 +10,7 @@ class Key extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->output->enable_profiler(true);
+        $this->output->enable_profiler(FALSE);
         $this->load->model('keymodel');
         
         // Allow for custom style sheets and javascript
@@ -172,7 +172,7 @@ class Key extends CI_Controller {
     }
 
     public function nothophoenix($key, $node=null, $highestnode=null) {
-        $this->output->enable_profiler(false);
+        $this->output->enable_profiler(FALSE);
         $this->load->model('nothophoenixmodel', 'phoenix');
         $this->data['js'][] = base_url() . 'js/jquery.keypanel.js';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
@@ -226,7 +226,7 @@ class Key extends CI_Controller {
         $this->htmlkeymodel->GlobalFilter($project, $key);
         $this->data['keyname'] = $this->htmlkeymodel->getKeyName($key);
         $this->data['project'] = $this->keymodel->getProjectDetails($key);
-        $this->data['key'] = $this->htmlkeymodel->createBracketedKey($key);
+        $this->data['key'] = $this->htmlkeymodel->createBracketedKey($key, $this->data['project']['ProjectsID']);
         $this->data['citation'] = $this->keymodel->getCitation($key);
         $this->data['breadcrumbs'] = $this->htmlkeymodel->getBreadCrumbs($key);
         $this->load->view('bracketedkey_view', $this->data);
@@ -244,7 +244,7 @@ class Key extends CI_Controller {
         $this->htmlkeymodel->GlobalFilter($project, $key);
         $this->data['keyname'] = $this->htmlkeymodel->getKeyName($key);
         $this->data['project'] = $this->keymodel->getProjectDetails($key);
-        $this->data['key'] = $this->htmlkeymodel->createIndentedKey($key, 15);
+        $this->data['key'] = $this->htmlkeymodel->createIndentedKey($key, $this->data['project']['ProjectsID'], 15);
         $this->data['citation'] = $this->keymodel->getCitation($key);
         $this->data['breadcrumbs'] = $this->htmlkeymodel->getBreadCrumbs($key);
         $this->load->view('indentedkey_view', $this->data);

@@ -137,7 +137,7 @@ class Exportmodel extends CI_Model {
                 $tonode = $k + 1;
                 if ($result[$lead]->NodeName) {
                     $tonode = $result[$lead]->NodeName;
-                    $tonode .= ($result[$lead]->LinkToItem) ? ' (' . $result[$lead]->LinkToItem . ')' : '';
+                    $tonode .= ($result[$lead]->LinkToItem) ? ' {' . $result[$lead]->LinkToItem . '}' : '';
                 }
                 
                 $steps['leads'][] = array(

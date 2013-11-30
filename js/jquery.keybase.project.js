@@ -99,9 +99,9 @@ $(function(){
                     });
                     $('input[type="submit"], button').button();
                     $('input.ok').focus();
-                    $('input.ok').click(function(e) {
-                        $.colorbox.close();
-                    });
+                    /*$('input.ok').click(function(e) {
+                        $('form').submit();
+                    });*/
                 }
             });
             
