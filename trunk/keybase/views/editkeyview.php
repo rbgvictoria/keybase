@@ -38,6 +38,7 @@
                 //'name'=>$key['Name'], 
                 'projectid'=>$key['ProjectsID'],
                 'createdbyid'=>$key['CreatedByID'],
+                'taxonomicscope_old'=>(isset($key['TaxonomicScope'])) ? $key['TaxonomicScope'] : FALSE,
                 'referer'=>$referer
             ));
             $data = array(
@@ -337,6 +338,11 @@
     <?=form_label('load images', 'loadimages') ?>
     </p-->
     </div>
+
+    <div>
+        <?=form_checkbox(array('name'=>'skip_hierarchy','id'=>'skip_hierarchy','value'=>1))?>
+        <?=form_label('Skip hierarchy update', 'skip_hierarchy')?>
+    </div>    
     
     <p style="text-align: right">
         <?=form_submit('submit', 'Submit')?>

@@ -132,6 +132,8 @@ class Key extends CI_Controller {
         $this->data['css'][] = base_url() . 'css/dynatree/skin/ui.dynatree.css';
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
         $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js';
+        $this->data['js'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.js';
+        $this->data['css'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.css';
         
         $this->data['infilter'] = $this->keymodel->projectInFilter($project);
         if (isset($this->session->userdata['GlobalFilter'])) {
@@ -151,6 +153,15 @@ class Key extends CI_Controller {
         //$this->data['keys'] = $this->keymodel->getProjectKeys($project);
         $this->data['users'] = $this->keymodel->getProjectUsers($project);
         $this->load->view('projectview', $this->data);
+    }
+    
+    public function update_hierarchy($projectid) {
+        $this->load->model('projectmodel');
+
+        if (isset($this->session->userdata['id']) && $this->projectmodel->IsProjectUser($projectid, $this->session->userdata['id']))
+            $this->hierarchy ($projectid);
+        redirect('key/project/' . $projectid);
+        
     }
     
     public function addprojectuser($project) {
@@ -293,6 +304,8 @@ class Key extends CI_Controller {
                             $this->lpxk->LpxkToKeybase($key, $filename, 'delimitedtext', FALSE, $delimiter, $this->session->userdata['id']);
                         }
                     }
+                }
+                if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
                     $projectid = $this->keymodel->getProjectID($key);
                     $this->hierarchy($projectid);
                 }
@@ -370,7 +383,6 @@ class Key extends CI_Controller {
     public function hierarchy($projectid) {
         $this->load->model('keyhierarchymodel');
         $this->data['hierarchy'] = $this->keyhierarchymodel->getHierarchy($projectid);
-        //$this->load->view('keyhierarchyview', $this->data);
     }
     
     public function addproject() {
@@ -636,6 +648,8 @@ class Key extends CI_Controller {
         
         if ($this->input->post('ok')) {
             $this->keymodel->deleteKey($key, $this->session->userdata['id']);
+            if (!$this->input->post('skip_hierarchy'))
+                $this->hierarchy($this->input->post('projectid'));
             redirect('key/project/' . $this->input->post('projectid'));
         }
         else {

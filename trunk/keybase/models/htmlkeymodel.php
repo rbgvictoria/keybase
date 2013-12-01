@@ -51,11 +51,15 @@ class HtmlKeyModel extends PlayerModel {
                             $nrow['LeadsID'] = $to['ToNode'];
                             $nrow['ItemsID'] = $to['ToItem'];
                             $nrow['NodeName'] = $to['ToNodeName'];
+                            $nrow['LinkToItemsID'] = FALSE;
+                            $nrow['LinkToItemName'] = FALSE;
                         }
                         else {
                             $nrow['LeadsID'] = $row->LeadsID;
                             $nrow['ItemsID'] = $row->ItemsID;
                             $nrow['NodeName'] = $row->NodeName;
+                            $nrow['LinkToItemsID'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemsID : FALSE;
+                            $nrow['LinkToItemName'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemName : FALSE;
                         }
                         $result[] = (object) $nrow;
                     }
