@@ -181,9 +181,8 @@ span.label {
     float: right;
 }
 
-#edit-project {
-    margin-top: 15px;
-    text-align: right;
+#edit-project, #update_hierarchy {
+    margin-top: 10px;
 }
 
 span.itemhl {

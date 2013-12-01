@@ -29,11 +29,102 @@ $(function(){
         //autoCollapse: true,
         onActivate: function(node) {
             if (node.data.href) {
-                    window.location.href=node.data.href;
+                window.location.href=node.data.href;
             }
         },
         onCreate: function(node) {
             node.expand(true);
+        }
+    });
+    
+    $('#tree').contextMenu({
+        selector: 'a', 
+        items: {
+            "player": {
+                name: "Key player",
+                callback: function(key, options) {
+                    window.location.href = $(this).attr('href');
+                }
+            },
+            "bracketed": {
+                name: "Bracketed key",
+                callback: function(key, options) {
+                    window.location.href = $(this).attr('href').replace('nothophoenix', 'bracketedkey');
+                }
+            },
+            "indented": {
+                name: "Indented key",
+                callback: function(key, options) {
+                    window.location.href = $(this).attr('href').replace('nothophoenix', 'indentedkey');
+                }
+            },
+            "about": {
+                name: "About",
+                callback: function(key, options) {
+                    window.location.href = $(this).attr('href').replace('nothophoenix', 'keydetail');
+                }
+            },
+            "sep1": "---------",
+            "edit": {
+                name: "Edit", 
+                icon: "edit", 
+                callback: function(key, options) {
+                    var href = $(this).attr('href');
+                    href = href.replace('nothophoenix', 'editkey') + '/cbox';
+                    $.colorbox({
+                        href: href,
+                        opacity: 0.40, 
+                        transition: 'elastic', 
+                        speed: 100,
+                        innerWidth: 860,
+                        innerHeight: "80%",
+                        close: 'close',
+                        onLoad: function() {
+                            $('#cboxClose').hide();
+                        },
+                        onComplete: function() {
+                            $('#colorbox').addClass('edit-project');
+                            $('#colorbox input[name="cancel"]').click(function(e) {
+                                e.preventDefault();
+                                $.colorbox.close();
+                            });
+                            $('input[type="submit"]').button();
+                        }
+                    });
+                }
+            },
+            "delete": {
+                name: "Delete", 
+                icon: "delete",
+                callback: function(key, options) {
+                    var href = $(this).attr('href');
+                    href = href.replace('nothophoenix', 'deletekey') + '/cbox';
+                    $.colorbox({
+                        href: href,
+                        opacity: 0.40, 
+                        transition: 'elastic', 
+                        speed: 100,
+                        innerWidth: 400,
+                        innerHeight: 165,
+                        close: 'close',
+                        onLoad: function() {
+                            $('#cboxClose').hide();
+                        },
+                        onComplete: function() {
+                            $('#colorbox').addClass('edit-project');
+                            $('#colorbox button.cancel').click(function(e) {
+                                e.preventDefault();
+                                $.colorbox.close();
+                            });
+                            $('input[type="submit"], button').button();
+                            $('input.ok').focus();
+                            /*$('input.ok').click(function(e) {
+                                $('form').submit();
+                            });*/
+                        }
+                    });
+                }
+            },
         }
     });
     
@@ -86,7 +177,7 @@ $(function(){
                 transition: 'elastic', 
                 speed: 100,
                 innerWidth: 400,
-                innerHeight: 150,
+                innerHeight: 165,
                 close: 'close',
                 onLoad: function() {
                     $('#cboxClose').hide();

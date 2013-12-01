@@ -25,6 +25,31 @@ class ProjectModel extends CI_Model {
         else
             return FALSE;
     }
+    
+    function IsProjectUser($projectid, $userid) {
+        $this->db->select('ProjectsUsersID');
+        $this->db->from('projects_users');
+        $this->db->where('ProjectsID', $projectid);
+        $this->db->where('UsersID', $userid);
+        $query = $this->db->get();
+        if ($query->num_rows())
+            return TRUE;
+        else
+            return FALSE;
+    }
+
+    function IsProjectManager($projectid, $userid) {
+        $this->db->select('ProjectsUsersID');
+        $this->db->from('projects_users');
+        $this->db->where('ProjectsID', $projectid);
+        $this->db->where('UsersID', $userid);
+        $this->db->where('Role', 'Manager');
+        $query = $this->db->get();
+        if ($query->num_rows())
+            return TRUE;
+        else
+            return FALSE;
+    }
 
 }
 

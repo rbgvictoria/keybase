@@ -38,13 +38,18 @@
         </ul>
         
         <div id="about">
-            <div class="content-fullwidth">
-                <div class="textarea"><?=$project['Description']?></div>
+            <div class="content-left">
                 <?php if (isset($this->session->userdata['id'])  && (in_array($userid, $prmanagers))):?>
                 <div id="edit-project">
                     <a class="button-link" href="<?=site_url()?>key/editproject/<?=$project['ProjectsID']?>">Edit project</a>
                 </div>
+                <div id="update_hierarchy">
+                    <a class="button-link" href="<?=site_url()?>key/update_hierarchy/<?=$project['ProjectsID']?>">Update key hierarchy</a>
+                </div>
                 <?php endif;?>
+            </div>
+            <div class="content-right">
+                <div class="textarea"><?=$project['Description']?></div>
             </div>
         </div>
 
@@ -107,7 +112,14 @@
         </div>
 
         <div id="projectusers">
-            <div class="content-fullwidth">
+            <div class="content-left">
+                <?php if ($userid && in_array($userid, $prmanagers)): ?>
+                <p>
+                    <?=anchor('key/addprojectuser/' . $project['ProjectsID'], 'Add another user', array('class'=>'button-link')); ?>
+                </p>
+                <?php endif; ?>
+            </div>
+            <div class="content-right">
                 <table>
                     <?php foreach ($users as $user): ?>
                     <tr>
@@ -119,11 +131,6 @@
                     </tr>
                     <?php endforeach; ?>
                 </table>
-                <?php if ($userid && in_array($userid, $prmanagers)): ?>
-                <p>
-                    <?=anchor('key/addprojectuser/' . $project['ProjectsID'], 'Add another user', array('class'=>'button-link')); ?>
-                </p>
-                <?php endif; ?>
             </div>
         </div>
     </div>
