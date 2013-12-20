@@ -275,8 +275,12 @@ class LpxkToKeyBaseModel extends CI_Model {
             FROM items
             WHERE Name=?";
 
-        $insert = "INSERT INTO items (ItemsID, Name)
-            VALUES (?, ?)";
+        $insert = "INSERT INTO items (ItemsID, Name, LSID)
+            VALUES (?, ?, ?)";
+        
+        $apcLSID = "SELECT TaxonLSID
+            FROM apc_taxa
+            WHERE ScientificName=?";
         
         foreach ($this->items as $key=>$item) {
             $query = $this->db->query($select, array($item['name']));
@@ -285,7 +289,15 @@ class LpxkToKeyBaseModel extends CI_Model {
                 $this->items[$key]['ItemsID'] = $row->ItemsID;
             }
             else {
-                $this->db->query($insert, array($newitemsid, $item['name']));
+                $query = $this->db->query($apcLSID, array($item['name']));
+                if ($query->num_rows()) {
+                    $row = $query->row();
+                    $lsid = $row->TaxonLSID;
+                }
+                else
+                    $lsid = NULL;
+                
+                $this->db->query($insert, array($newitemsid, $item['name'], $lsid));
                 $this->items[$key]['ItemsID'] = $newitemsid;
                 $newitemsid++;
             }
