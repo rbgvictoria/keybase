@@ -653,11 +653,10 @@ class Key extends CI_Controller {
             redirect('key/project/' . $this->input->post('projectid'));
         }
         else {
-            $this->output->enable_profiler(false);
             $this->data['cbox'] = $cbox;
             $this->data['key'] = $this->keymodel->getKey($key);
-            $this->load->view('deletekeyview', $this->data);
         }
+        $this->load->view('deletekeyview', $this->data);
     }
     
     public function deleteprojectuser($projectuserid) {

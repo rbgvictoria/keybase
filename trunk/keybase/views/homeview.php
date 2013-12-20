@@ -19,6 +19,11 @@
                 </a>
             </div>
             <?php endforeach; ?>
+            <?php if (isset($this->session->userdata['id'])): ?>
+            <div class="project">
+                <div id="new_project"><?=anchor('key/addproject', 'New project', array('class'=>'button-link'))?></div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
     <div id="column2">

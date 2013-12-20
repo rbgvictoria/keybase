@@ -608,3 +608,8 @@ span.keybase-dynatree-key a.dynatree-title {
     font-weight: bold;
     color: #aaa;
 }
+
+#new_project {
+    text-align: right;
+    padding: 10px;
+}
