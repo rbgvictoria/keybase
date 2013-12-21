@@ -162,7 +162,7 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getRemainingEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.LSID, l.LinkToItemsID, lti.Name AS LinkToItem, lti.LSID AS LinkToLSID, l.KeysID');
+        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL, l.KeysID');
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
@@ -186,8 +186,8 @@ class NothophoenixModel extends PlayerModel {
                 $linktokey = $this->nextKey($row->LinkToItemsID, parent::getProjectID($key));
                 $name['LinkToKey'] = ($linktokey) ? $linktokey : FALSE;
                 $name['media'] = $row->Filename;
-                $name['url'] = ($row->LSID) ? 'http://bie.ala.org.au/species/' . urlencode($row->LSID) : FALSE;
-                $name['linkToUrl'] = ($row->LinkToLSID) ? 'http://bie.ala.org.au/species/' . urlencode($row->LinkToLSID) : FALSE;
+                $name['url'] = ($row->URL) ? $row->URL : FALSE;
+                $name['linkToUrl'] = ($row->LinkToURL) ? $row->LinkToURL : FALSE;
                 $ret[] = $name;
             }
             return $ret;
@@ -200,7 +200,7 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getDiscardedEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.LSID, l.LinkToItemsID, lti.Name AS LinkToItem, lti.LSID AS LinkToLSID');
+        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL');
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
@@ -224,8 +224,8 @@ class NothophoenixModel extends PlayerModel {
                 $linktokey = $this->nextKey($row->LinkToItemsID, parent::getProjectID($key));
                 $name['LinkToKey'] = ($linktokey) ? $linktokey : FALSE;
                 $name['media'] = $row->Filename;
-                $name['url'] = ($row->LSID) ? 'http://bie.ala.org.au/species/' . urlencode($row->LSID) : FALSE;
-                $name['linkToUrl'] = ($row->LinkToLSID) ? 'http://bie.ala.org.au/species/' . urlencode($row->LinkToLSID) : FALSE;
+                $name['url'] = ($row->URL) ? $row->URL : FALSE;
+                $name['linkToUrl'] = ($row->LinkToURL) ? $row->LinkToURL : FALSE;
                 $ret[] = $name;
             }
             return $ret;
