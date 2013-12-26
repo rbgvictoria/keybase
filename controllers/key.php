@@ -262,6 +262,7 @@ class Key extends CI_Controller {
     }
     
     public function editkey($key=FALSE, $cbox=FALSE) {
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
         if (!$key) 
             redirect('key');
@@ -275,7 +276,7 @@ class Key extends CI_Controller {
         }
         
         if ($this->input->post('submit')) {
-            $this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
+            //$this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
             if ($_FILES['loadfile']['tmp_name']  ||
                     $this->input->post('loadurl') ||
                     $_FILES['delimitedtext']['tmp_name']) {
@@ -300,16 +301,53 @@ class Key extends CI_Controller {
                         }
                     }
                     elseif ($_FILES['delimitedtext']['tmp_name']) {
-                        if ($delimiter && $this->input->post('name')) {
+                        /*if ($delimiter && $this->input->post('name')) {
                             $this->lpxk->LpxkToKeybase($key, $filename, 'delimitedtext', FALSE, $delimiter, $this->session->userdata['id']);
-                        }
+                        }*/
+                        $tempfile = file_get_contents($_FILES['delimitedtext']['tmp_name']);
+                        $tempfilename = uniqid();
+                        file_put_contents('uploads/' . $tempfilename, $tempfile);
+                        $this->data['input_key'] = $this->detectDelimiter($key, $tempfilename);
+                        $cbox = FALSE;
                     }
                 }
-                if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
+                /*if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
                     $projectid = $this->keymodel->getProjectID($key);
                     $this->hierarchy($projectid);
-                }
+                }*/
             }
+            //redirect($this->input->post('referer'));
+        }
+        
+        if ($this->input->post('submit2')) {
+            $errors = $this->checkForErrors($this->input->post('keyid'), 
+                    $this->input->post('tempfilename'), $this->input->post('delimiter'));
+            if ($errors) {
+                $this->data['errors'] = $errors;
+                $cbox = FALSE;
+            }
+            else {
+                $this->load->model('lpxktokeybasemodel', 'lpxk');
+                $this->lpxk->LpxkToKeybase($key, 'uploads/' . $this->input->post('tempfilename'), 
+                        'delimitedtext', FALSE, $this->input->post('delimiter'), 
+                        $this->session->userdata['id']);
+                unlink('uploads/' . $this->input->post('tempfilename'));
+                redirect('key/nothophoenix/' . $key);
+            }
+        }
+        
+        if ($this->input->post('submit3')) {
+                $this->load->model('lpxktokeybasemodel', 'lpxk');
+                $this->lpxk->LpxkToKeybase($key, 'uploads/' . $this->input->post('tempfilename'), 
+                        'delimitedtext', FALSE, $this->input->post('delimiter'), 
+                        $this->session->userdata['id']);
+                unlink('uploads/' . $this->input->post('tempfilename'));
+                redirect('key/nothophoenix/' . $key);
+        }
+        
+        if ($this->input->post('cancel')) {
+            if (file_exists('uploads/' . $this->input->post('tempfilename')))
+                unlink ('uploads/' . $this->input->post('tempfilename'));
             redirect($this->input->post('referer'));
         }
         
@@ -317,10 +355,136 @@ class Key extends CI_Controller {
         $this->data['cbox'] = $cbox;
         $this->load->view('editkeyview', $this->data);
     }
+    
+    private function detectDelimiter($keyid, $tempfilename, $delimiter=FALSE) {
+        $this->data['keyid'] = $keyid;
+        $this->data['tempfilename'] = $tempfilename;
+        $infile = fopen('uploads/' . $tempfilename, 'r');
+        $linearray = array();
+        while (!feof($infile)) {
+            $linearray[] = fgets($infile);
+        }
+        
+        if (!$delimiter) {
+            $n = count($linearray);
+            $i = 0;
+            $numcols = array();
+            while ($i < 10 && $i < $n) {
+                $row = str_getcsv($linearray[$i], "\t");
+                $numcols[] = count($row);
+                $i++;
+            }
+            $sum = array_sum($numcols);
+            $count = count($numcols);
+            $delimiter = ($sum/$count > 2) ? 'tab' : 'comma';
+        }
+        
+        $this->data['delimiter'] = $delimiter;
+        $delimiter = ($delimiter == 'tab') ? "\t" : ",";
+        
+        $input_key = array();
+        foreach ($linearray as $line) {
+            if ($line) {
+                $input_key[] = str_getcsv($line, $delimiter);
+            }
+        }
+        
+        return $input_key;
+    }
+    
+    private function checkForErrors($keyid, $tempfilename, $delimiter) {
+        $this->data['tempfilename'] = $tempfilename;
+        $this->data['keyid'] = $keyid;
+        $this->data['delimiter'] = $delimiter;
+        
+        $delimiter = ($delimiter == 'tab') ? "\t" : ',';
+        
+        $infile = fopen('uploads/' . $tempfilename, 'r');
+        $inkey = array();
+        $fromnodes = array();
+        $tonodes = array();
+        while (!feof($infile)) {
+            $row = fgetcsv($infile, 0, $delimiter);
+            if ($row) {
+                $inkey[] = $row;
+                $fromnodes[] = $row[0];
+                $tonodes[] = isset($row[2]) ? $row[2] : FALSE;
+            }
+        }
+        
+        $unique_nodes = array_unique($fromnodes);
+        $unique_node_keys = array_keys($unique_nodes);
+        
+        $errors = array();
+        $htmltable = array();
+        $htmltable[] = '<table>';
+        foreach($inkey as $row) {
+            $numcols = count($row);
+            $fromnode = array_search(array_search($row[0], $unique_nodes), $unique_node_keys);
+            if (isset($row[2])) {
+                $key = array_search($row[2], $unique_nodes);
+                if ($key !== FALSE)
+                    $tonode = array_search($key, $unique_node_keys);
+                else $tonode = FALSE;
+            }
+            
+            $htmltablerow = array();
+            if ($numcols < 3) {
+                $htmltablerow[] = '<tr class="too-few-columns">';
+                $errors['too-few-columns'][] = $row;
+            }
+            elseif ($tonode && $tonode == $fromnode) {
+                $htmltablerow[] = '<tr class="definite-loop">';
+                $errors['definite-loop'][] = $row;
+            }
+            elseif ($tonode && $tonode < $fromnode) {
+                $htmltablerow[] = '<tr class="possible-loop">';
+                $errors['possible-loop'][] = $row;
+            }
+            else
+                $htmltablerow[] = '<tr>';
+            
+            $key = array_search($row[0], $tonodes);
+            if ($key !== FALSE || $fromnode == 0) {
+                $htmltablerow[] = '<td>' . $row[0] . '</td>';
+            }
+            else {
+                $htmltablerow[] = '<td class="orphan">' . $row[0] . '</td>';
+                $errors['orphan'][] = $row;
+            }
+            
+            if (isset($row[1]))
+                $htmltablerow[] = '<td>' . $row[1] . '</td>';
+            else
+                $htmltablerow[] = '<td>&nbsp;</td>';
+            
+            if (isset($row[2])) {
+                if ($tonode) {
+                    if (count(array_keys($tonodes, $row[2])) > 1) {
+                        $htmltablerow[] = '<td class="reticulation">' . $row[2] . '</td>';
+                        $errors['reticulation'][] = $row;
+                    }
+                    else
+                        $htmltablerow[] = '<td>' . $row[2] . '</td>';
+                }
+                else 
+                    $htmltablerow[] = '<td class="endnode">' . $row[2] . '</td>';
+            }
+            else
+                $htmltablerow[] = '<td>&nbsp;</td>';
+            
+            $htmltablerow[] = '</tr>';
+            $htmltable[] = implode('', $htmltablerow);
+        }
+        $htmltable[] = '</table>';
+        $this->data['error_key'] = implode('', $htmltable);
+        return $errors;
+    }
 
     public function addKey($projectid=FALSE, $cbox=FALSE) {
         $this->data['projectid'] = $projectid;
         $this->data['cbox'] = $cbox;
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js';
         if (!isset($this->session->userdata['id']))
             redirect('key');
         
@@ -378,6 +542,32 @@ class Key extends CI_Controller {
         
         $this->data['referer'] = $_SERVER['HTTP_REFERER'];
         $this->load->view('editkeyview', $this->data);
+    }
+    
+    public function getinputkey($keyid, $tempfilename, $delimiter=FALSE) {
+        $input_key = $this->detectDelimiter($keyid, $tempfilename, $delimiter);
+        
+        $maxcols = 0;
+        foreach ($input_key as $row) {
+            if (count($row) > $maxcols)
+                $maxcols = count($row);
+        }
+        
+        $table = array();
+        $table[] = '<table class="detect-delimiter" width="100%">';
+        foreach ($input_key as $row) {
+            $table[] = '<tr>';
+            foreach ($row as $cell) {
+                $table[] = '<td>' . $cell . '</td>';
+            }
+            for ($i = count($row); $i < $maxcols; $i++) {
+                $table[] = '<td>&nbsp;</td>';
+            }
+            $table[] = '</tr>';
+        }
+        $table[] = '</table>';
+                
+        echo implode('', $table);
     }
     
     public function hierarchy($projectid) {
