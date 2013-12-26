@@ -613,3 +613,32 @@ span.keybase-dynatree-key a.dynatree-title {
     text-align: right;
     padding: 10px;
 }
+
+/* error checking */
+
+tr.too-few-columns>td {
+    background-color: #ff0000;
+}
+
+tr.definite-loop>td {
+    background-color: #8b0000;
+}
+
+tr.possible-loop>td {
+    background-color: ffd700;
+}
+
+td.orphan {
+    font-weight: bold;
+    color: #ff0000;
+    border: solid 3px #ffcccc;
+}
+
+td.reticulation {
+    color: #ff8c00;
+}
+
+td.endnode {
+    font-weight: bold;
+    color: #104e88;
+}

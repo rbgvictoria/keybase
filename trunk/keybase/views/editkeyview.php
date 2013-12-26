@@ -28,6 +28,64 @@
     </ul>
     <?php endif; ?>
 
+    <?php if (isset($input_key) && $input_key): ?>
+
+    <?=form_open()?>
+        <?php   
+            echo form_hidden(array(
+                'keyid'=>$keyid,
+                'tempfilename'=>  $tempfilename
+            ));
+        ?>
+        <p>
+            Delimiter: <?=form_radio(array('name'=>'delimiter', 'id'=>'comma', 'value'=>'comma',($delimiter == 'comma') ? 'checked' : FALSE)) ?>
+            <?=form_label('comma', 'comma', array('style'=>'width: auto'))?>
+            <?=form_radio(array('name'=>'delimiter', 'id'=>'tab', 'value'=>'tab',  'checked'=> ($delimiter == 'tab') ? 'checked' : FALSE)) ?>
+            <?=form_label('tab', 'tab')?>
+        </p>
+
+
+        <div id="input_key">
+            <table class="detect-delimiter">
+            <?php foreach ($input_key as $row): ?>
+                <tr>
+                <?php foreach ($row as $cell): ?>
+                    <td><?=$cell?></td>
+                <?php endforeach; ?>
+                </tr>
+            <?php endforeach; ?>
+            </table>
+        </div>
+
+        <p style="text-align: right">
+            <?=form_submit('submit2', 'OK')?>
+            <?=form_submit('cancel', 'Cancel')?>
+        </p>
+
+    <?=form_close()?>
+
+    <?php elseif(isset($error_key) && $error_key): ?>
+
+    <?=form_open()?>
+        <?php   
+            echo form_hidden(array(
+                'keyid' => $keyid,
+                'tempfilename' => $tempfilename,
+                'delimiter' => $delimiter
+            ));
+        ?>
+        
+        <div class="error_table"><?=$error_key?></div>
+        
+        <p style="text-align: right">
+            <?=form_submit('submit3', 'OK')?>
+            <?=form_submit('cancel', 'Cancel')?>
+        </p>
+
+    <?=form_close()?>
+        
+    <?php else: ?>
+
     <?=form_open_multipart()?>
     <h3>Key metadata</h3>
     <hr />
@@ -318,10 +376,6 @@
     <p>
         <?=form_label('Load file:', 'delimitedtext')?>
         <?=form_upload('delimitedtext', '') ?>
-        Delimiter: <?=form_radio(array('name'=>'delimiter', 'id'=>'comma', 'value'=>'comma', 'checked'=>'checked')) ?>
-        <?=form_label('comma', 'comma', array('style'=>'width: auto'))?>
-        <?=form_radio(array('name'=>'delimiter', 'id'=>'tab', 'value'=>'tab')) ?>
-        <?=form_label('tab', 'tab')?>
     </p>
     </div>
     <p>&nbsp;</p>
@@ -349,6 +403,7 @@
         <?=form_submit('cancel', 'Cancel')?>
     </p>
     <?=form_close()?>
+<?php endif; ?>
 
 <?php 
     if (!$cbox) 
