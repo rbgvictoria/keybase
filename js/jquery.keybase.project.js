@@ -145,7 +145,7 @@ $(function(){
         });
         $('#list').html('<ul>' + list.join('') + '</ul>');
 
-        $("a.edit-key").on('click', function () {
+        /*$("a.edit-key").on('click', function () {
             var cbox_href = $(this).attr('href');
             $(this).attr('href', cbox_href + '/cbox');
             $(this).colorbox({
@@ -167,7 +167,7 @@ $(function(){
                     $('input[type="submit"]').button();
                 }
             });
-        });
+        });*/
         
         $("a.delete-key").on('click', function() {
             var cbox_href = $(this).attr('href');
@@ -257,7 +257,7 @@ $(function(){
         });
     });
 
-    $(".add-key a").click(function () {
+    /*$(".add-key a").click(function () {
         var cbox_href = $(this).attr('href');
         $(this).attr('href', cbox_href + '/cbox');
         $(this).colorbox({
@@ -279,7 +279,7 @@ $(function(){
                 $('input[type="submit"]').button();
             }
         });
-    });
+    });*/
     
     tabSize();
     $(window).resize(function() {

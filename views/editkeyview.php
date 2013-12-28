@@ -1,17 +1,12 @@
-<?php 
-    if (!$cbox)
-        require_once('header.php');
-    else
-        echo '<!-- start colorbox --><div class="cbox-edit-key">';
-?>
+<?php require_once('header.php'); ?>
     <h2>
         <?php
+            if ((isset($projectid) && $projectid)||isset($key['ProjectName'])) {
+                echo '<span class="project">';
+                echo anchor('key/project/' . $projectid, (isset($projectname) && $projectname) ? $projectname : $key['ProjectName']) . ': ';
+                echo '</span>';
+            }
             if (isset($key['Name'])) {
-                if ($key['ProjectsID']) {
-                    echo '<span class="project">';
-                    echo anchor('key/project/' . $key['ProjectsID'], $key['ProjectName']) . ': ';
-                    echo '</span>';
-                }
                 echo anchor(site_url() . 'key/keydetail/' . $key['KeysID'], $key['Name'], array('class'=>'keydetaillink'));
             }
             else
@@ -34,7 +29,9 @@
         <?php   
             echo form_hidden(array(
                 'keyid'=>$keyid,
-                'tempfilename'=>  $tempfilename
+                'projectid'=>$projectid,
+                'tempfilename'=>  $tempfilename,
+                'referer' => $referer
             ));
         ?>
         <p>
@@ -70,11 +67,20 @@
         <?php   
             echo form_hidden(array(
                 'keyid' => $keyid,
+                'projectid' => $projectid,
                 'tempfilename' => $tempfilename,
-                'delimiter' => $delimiter
+                'delimiter' => $delimiter,
+                'referer' => $referer,
             ));
         ?>
-        
+        <div class="errors">
+            <table><tr>
+            <?php foreach ($errors as $key => $value): ?>
+                <td class="<?=$key?>"><?=ucfirst(str_replace('-', ' ', $key))?> (<?=count($value)?>)</td>
+            <?php endforeach; ?>
+            </tr></table>
+        </div>
+        <p>&nbsp;</p>
         <div class="error_table"><?=$error_key?></div>
         
         <p style="text-align: right">
@@ -405,9 +411,4 @@
     <?=form_close()?>
 <?php endif; ?>
 
-<?php 
-    if (!$cbox) 
-        require_once('footer.php'); 
-    else 
-        echo '</div><!-- end colorbox -->';
-?>
+<?php require_once('footer.php'); ?>

@@ -22,7 +22,7 @@ $(function(){
         height: 800
     });
     
-    $("#edit-key a").click(function () {
+    /*$("#edit-key a").click(function () {
         var cbox_href = $(this).attr('href');
         $(this).attr('href', cbox_href + '/cbox');
         $(this).colorbox({
@@ -44,7 +44,7 @@ $(function(){
                 $('input[type="submit"]').button();
             }
         });
-    });
+    });*/
     
     
 });

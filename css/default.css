@@ -628,7 +628,15 @@ tr.possible-loop>td {
     background-color: ffd700;
 }
 
-td.orphan {
+tr.fewer-leads-than-expected, tr.more-leads-than-expected {
+    background-color: #ff9999;
+}
+
+tr.fewer-leads-than-expected td {
+    color: #ff0000;
+}
+
+td.orphan, td.missing-link {
     font-weight: bold;
     color: #ff0000;
     border: solid 3px #ffcccc;
