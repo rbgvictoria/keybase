@@ -11,13 +11,13 @@
     <link rel="stylesheet" type="text/css" href="<?=$link?>" />
         <?php endforeach; ?>
     <?php endif; ?>
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.css" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.css?v=1.0" />
     <!--script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script-->
     <script type="text/javascript" src="<?=base_url()?>js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jquery.window.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jquery-ui-1.10.2.custom.min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.colorbox.js"></script>
-    <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.keybase.colorbox.js"></script>
+    <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.keybase.colorbox.js?v=1.0"></script>
     <?php if (isset($js)): ?>
         <?php foreach ($js as $file): ?>
     <script type="text/javascript" src="<?=$file?>"></script>

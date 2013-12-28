@@ -10,7 +10,7 @@ class Key extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->output->enable_profiler(FALSE);
+        $this->output->enable_profiler(TRUE);
         $this->load->model('keymodel');
         
         // Allow for custom style sheets and javascript
@@ -35,7 +35,7 @@ class Key extends CI_Controller {
         if ($edit == '_edit') {
             $this->data['css'][] = base_url() . 'css/ckeditor_styles.css';
             $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
-            $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js';
+            $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js?v=1.0';
             
             if ($this->input->post('submit')) {
                 $this->keymodel->updateStaticContent($this->input->post());
@@ -68,7 +68,7 @@ class Key extends CI_Controller {
     }
     
     public function keys ($itemid=false) {
-        $this->data['js'][] = base_url() . 'js/jquery.comparekeys.js';
+        $this->data['js'][] = base_url() . 'js/jquery.comparekeys.js?v=1.0';
         if ($itemid) {
             $this->data['ItemsID'] = $itemid;
             $this->data['ItemName'] = $this->keymodel->getItemName($itemid);
@@ -106,7 +106,7 @@ class Key extends CI_Controller {
     
     public function keydetail($key=FALSE) {
         $this->load->model('playermodel');
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
         if (!$key) 
             redirect('key');
         $this->data['keyformat'] = 'about';
@@ -128,10 +128,10 @@ class Key extends CI_Controller {
     public function project($project) {
         $this->load->model('projectmodel');
         $this->data['js'][] = base_url() . 'js/dynatree/jquery.dynatree.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.project.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.project.js?v=1.0';
         $this->data['css'][] = base_url() . 'css/dynatree/skin/ui.dynatree.css';
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
-        $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js';
+        $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.js';
         $this->data['css'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.css';
         
@@ -185,8 +185,8 @@ class Key extends CI_Controller {
     public function nothophoenix($key, $node=null, $highestnode=null) {
         $this->output->enable_profiler(FALSE);
         $this->load->model('nothophoenixmodel', 'phoenix');
-        $this->data['js'][] = base_url() . 'js/jquery.keypanel.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keypanel.js?v=1.0';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
         $this->data['iehack'] = TRUE;
         
         $this->data['keyformat'] = 'player';
@@ -227,7 +227,7 @@ class Key extends CI_Controller {
     }
     
     public function bracketedkey($key) {
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
         $this->load->model('htmlkeymodel');
         //$this->data['js'][] = base_url() . 'js/jquery.bracketedkey.js';
         $this->data['keyformat'] = 'bracketed';
@@ -244,9 +244,8 @@ class Key extends CI_Controller {
     }
     
     public function indentedkey($key) {
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
-        $this->data['js'][] = base_url() . 'js/jquery.indentedkey.js';
-        $this->data['js'][] = base_url() . 'js/jquery.indentedkey.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
+        $this->data['js'][] = base_url() . 'js/jquery.indentedkey.js?v=1.0';
         $this->load->model('htmlkeymodel');
         $this->data['keyformat'] = 'indented';
         $this->data['keyid'] = $key;
@@ -261,19 +260,22 @@ class Key extends CI_Controller {
         $this->load->view('indentedkey_view', $this->data);
     }
     
-    public function editkey($key=FALSE, $cbox=FALSE) {
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js';
+    public function editkey($key=FALSE) {
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js?v=1.0';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
+        
+        if (!$key)
+            $key = $this->input->post('keyid');
+        
         if (!$key) 
             redirect('key');
         if (!isset($this->session->userdata['id']))
             redirect('key/keydetail/' . $key);
+        
+        $projectid = $this->keymodel->getProjectID($key);
+        $this->data['projectid'] = $projectid;
         $this->data['keyid'] = $key;
         $this->data['key'] = $this->keymodel->getKey($key);
-        
-        if ($this->input->post('cancel')) {
-            redirect($this->input->post('referer'));
-        }
         
         if ($this->input->post('submit')) {
             //$this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
@@ -299,6 +301,8 @@ class Key extends CI_Controller {
                         else {
                             $this->lpxk->LpxkToKeyBase($key, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
                         }
+                        $this->hierarchy($projectid);
+                        redirect($this->input->post('referer'));
                     }
                     elseif ($_FILES['delimitedtext']['tmp_name']) {
                         /*if ($delimiter && $this->input->post('name')) {
@@ -308,18 +312,16 @@ class Key extends CI_Controller {
                         $tempfilename = uniqid();
                         file_put_contents('uploads/' . $tempfilename, $tempfile);
                         $this->data['input_key'] = $this->detectDelimiter($key, $tempfilename);
-                        $cbox = FALSE;
                     }
                 }
-                /*if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
-                    $projectid = $this->keymodel->getProjectID($key);
+                if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
                     $this->hierarchy($projectid);
-                }*/
+                }
             }
-            //redirect($this->input->post('referer'));
         }
         
         if ($this->input->post('submit2')) {
+            $this->data['projectid'] = $this->input->post('projectid');
             $errors = $this->checkForErrors($this->input->post('keyid'), 
                     $this->input->post('tempfilename'), $this->input->post('delimiter'));
             if ($errors) {
@@ -332,6 +334,7 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
+                $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
             }
         }
@@ -342,17 +345,119 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
+                $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
         }
         
         if ($this->input->post('cancel')) {
-            if (file_exists('uploads/' . $this->input->post('tempfilename')))
+            if ($this->input->post('tempfilename') && file_exists('uploads/' . $this->input->post('tempfilename')))
                 unlink ('uploads/' . $this->input->post('tempfilename'));
             redirect($this->input->post('referer'));
         }
         
-        $this->data['referer'] = $_SERVER['HTTP_REFERER'];
-        $this->data['cbox'] = $cbox;
+        $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
+        $this->load->view('editkeyview', $this->data);
+    }
+    
+    public function addKey($projectid=FALSE) {
+        $this->data['projectid'] = ($projectid) ? $projectid : $this->input->post('projectid');
+        
+        $projectdata = $this->keymodel->getProjectData($this->data['projectid']);
+        $this->data['projectname'] = $projectdata['Name'];
+        
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js?v=1.0';
+        if (!isset($this->session->userdata['id']))
+            redirect('key');
+        
+        if ($this->input->post('submit')) {
+            if (!($this->input->post('name')  && $this->input->post('taxonomicscope') 
+                    && $this->input->post('geographicscope'))) {
+                $this->data['message'][] = 'Please enter all required metadata (name, taxonomic scope, geographic scope).';
+            }
+            if (!($_FILES['loadfile']['tmp_name'] || $_FILES['delimitedtext']['tmp_name'] 
+                    || $this->input->post('loadurl'))) {
+                $this->data['message'][] = 'Please select a key file to upload.';
+                echo 'Please select a key file to upload.';
+            }
+            if (isset($this->data['message'])) {
+                $this->load->view('editkeyview', $this->data);
+                return;
+            }
+            
+            if ($this->input->post('keyid'))
+                $keyid = $this->input->post('keyid');
+            else
+                $keyid = $this->keymodel->editKeyMetadata($this->input->post());
+
+            if ($_FILES['loadfile']['tmp_name']) {
+                $filename = $_FILES['loadfile']['tmp_name'];
+            }
+            elseif ($this->input->post('loadurl')){
+                $filename = $this->input->post('loadurl');
+            }
+            elseif ($_FILES['delimitedtext']['tmp_name']) {
+                $filename = $_FILES['delimitedtext']['tmp_name'];
+            }
+            if ($filename) {
+                $this->load->model('lpxktokeybasemodel', 'lpxk');
+                $delimiter = $this->input->post('delimiter');
+                if ($this->input->post('loadurl') || $_FILES['loadfile']['tmp_name']) {
+                    if ($this->input->post('loadurl') && $this->input->post('loadimages')) {
+                        $this->lpxk->LpxkToKeyBase($keyid, $filename, 'lpxk', TRUE, FALSE, $this->session->userdata['id']);
+                    }
+                    else {
+                        $this->lpxk->LpxkToKeyBase($keyid, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
+                    }
+                    $this->hierarchy($projectid);
+                    redirect('key/nothophoenix/' . $keyid);
+                }
+                elseif ($_FILES['delimitedtext']['tmp_name']) {
+                    $tempfile = file_get_contents($_FILES['delimitedtext']['tmp_name']);
+                    $tempfilename = uniqid();
+                    file_put_contents('uploads/' . $tempfilename, $tempfile);
+                    $this->data['input_key'] = $this->detectDelimiter($keyid, $tempfilename);
+                    $this->data['keyid'] = $keyid;
+                }
+            }
+        }
+        
+        if ($this->input->post('submit2')) {
+            $errors = $this->checkForErrors($this->input->post('keyid'), 
+                    $this->input->post('tempfilename'), $this->input->post('delimiter'));
+            if ($errors) {
+                $this->data['errors'] = $errors;
+                $cbox = FALSE;
+            }
+            else {
+                $this->load->model('lpxktokeybasemodel', 'lpxk');
+                $this->lpxk->LpxkToKeybase($keyid, 'uploads/' . $this->input->post('tempfilename'), 
+                        'delimitedtext', FALSE, $this->input->post('delimiter'), 
+                        $this->session->userdata['id']);
+                unlink('uploads/' . $this->input->post('tempfilename'));
+                redirect('key/nothophoenix/' . $keyid);
+            }
+        }
+        
+        if ($this->input->post('submit3')) {
+            $keyid = $this->input->post('keyid');
+            $this->load->model('lpxktokeybasemodel', 'lpxk');
+            $this->lpxk->LpxkToKeybase($keyid, 'uploads/' . $this->input->post('tempfilename'), 
+                    'delimitedtext', FALSE, $this->input->post('delimiter'), 
+                    $this->session->userdata['id']);
+            unlink('uploads/' . $this->input->post('tempfilename'));
+            $this->hierarchy($projectid);
+            redirect('key/nothophoenix/' . $keyid);
+        }
+        
+        if ($this->input->post('cancel')) {
+            if ($this->input->post('tempfilename') && file_exists('uploads/' . $this->input->post('tempfilename')))
+                unlink ('uploads/' . $this->input->post('tempfilename'));
+            if ($this->input->post('keyid'))
+                $this->keymodel->deleteKey($keyid, $this->session->userdata['id']);
+            redirect($this->input->post('referer'));
+        }
+
+        $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         $this->load->view('editkeyview', $this->data);
     }
     
@@ -406,6 +511,10 @@ class Key extends CI_Controller {
         while (!feof($infile)) {
             $row = fgetcsv($infile, 0, $delimiter);
             if ($row) {
+                foreach ($row as $index => $value)
+                    $row[$index] = trim($value);
+                
+                
                 $inkey[] = $row;
                 $fromnodes[] = $row[0];
                 $tonodes[] = isset($row[2]) ? $row[2] : FALSE;
@@ -437,9 +546,17 @@ class Key extends CI_Controller {
                 $htmltablerow[] = '<tr class="definite-loop">';
                 $errors['definite-loop'][] = $row;
             }
-            elseif ($tonode && $tonode < $fromnode) {
+            elseif ($tonode && $tonode < $fromnode && count(array_keys($tonodes, $row[2])) > 1) {
                 $htmltablerow[] = '<tr class="possible-loop">';
                 $errors['possible-loop'][] = $row;
+            }
+            elseif (count(array_keys($fromnodes, $row[0])) < 2) {
+                $htmltablerow[] = '<tr class="fewer-leads-than-expected">';
+                $errors['fewer-leads-than-expected'][] = $row;
+            }
+            elseif (count(array_keys($fromnodes, $row[0])) > 2) {
+                $htmltablerow[] = '<tr class="more-leads-than-expected">';
+                $errors['more-leads-than-expected'][] = $row;
             }
             else
                 $htmltablerow[] = '<tr>';
@@ -467,8 +584,19 @@ class Key extends CI_Controller {
                     else
                         $htmltablerow[] = '<td>' . $row[2] . '</td>';
                 }
-                else 
-                    $htmltablerow[] = '<td class="endnode">' . $row[2] . '</td>';
+                else {
+                    if (is_numeric($row[2])) {
+                        $htmltablerow[] = '<td class="missing-link">' . $row[2] . '</td>';
+                        $errors['missing-link'][] = $row;
+                    }
+                    elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', $row[2]) || preg_match('/^[A-Z]{1,1}[a-z]+$/', $row[2]))) {
+                        $htmltablerow[] = '<td class="missing-link">' . $row[2] . '</td>';
+                        $errors['missing-link'][] = $row;
+                    }
+                    else {
+                        $htmltablerow[] = '<td class="endnode">' . $row[2] . '</td>';
+                    }
+                }
             }
             else
                 $htmltablerow[] = '<td>&nbsp;</td>';
@@ -481,69 +609,6 @@ class Key extends CI_Controller {
         return $errors;
     }
 
-    public function addKey($projectid=FALSE, $cbox=FALSE) {
-        $this->data['projectid'] = $projectid;
-        $this->data['cbox'] = $cbox;
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js';
-        if (!isset($this->session->userdata['id']))
-            redirect('key');
-        
-        if ($this->input->post('cancel')) {
-            redirect($this->input->post('referer'));
-        }
-        
-        if ($this->input->post('submit')) {
-            if (!($this->input->post('name')  && $this->input->post('taxonomicscope') 
-                    && $this->input->post('geographicscope'))) {
-                $this->data['message'][] = 'Please enter all required metadata (name, taxonomic scope, geographic scope).';
-            }
-            if (!($_FILES['loadfile']['tmp_name'] || $_FILES['delimitedtext']['tmp_name'] 
-                    || $this->input->post('loadurl'))) {
-                $this->data['message'][] = 'Please select a key file to upload.';
-                echo 'Please select a key file to upload.';
-            }
-            if (isset($this->data['message'])) {
-                $this->load->view('editkeyview', $this->data);
-                return;
-            }
-            
-            $key = $this->keymodel->editKeyMetadata($this->input->post());
-
-            if ($_FILES['loadfile']['tmp_name']) {
-                $filename = $_FILES['loadfile']['tmp_name'];
-            }
-            elseif ($this->input->post('loadurl')){
-                $filename = $this->input->post('loadurl');
-            }
-            elseif ($_FILES['delimitedtext']['tmp_name']) {
-                $filename = $_FILES['delimitedtext']['tmp_name'];
-            }
-            if ($filename) {
-                $this->load->model('lpxktokeybasemodel', 'lpxk');
-                $delimiter = $this->input->post('delimiter');
-                if ($this->input->post('loadurl') || $_FILES['loadfile']['tmp_name']) {
-                    if ($this->input->post('loadurl') && $this->input->post('loadimages')) {
-                        $this->lpxk->LpxkToKeyBase($key, $filename, 'lpxk', TRUE, FALSE, $this->session->userdata['id']);
-                    }
-                    else {
-                        $this->lpxk->LpxkToKeyBase($key, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
-                    }
-                }
-                elseif ($_FILES['delimitedtext']['tmp_name']) {
-                    if ($delimiter) {
-                        $this->lpxk->LpxkToKeybase($key, $filename, 'delimitedtext', FALSE, $delimiter, $this->session->userdata['id']);
-                    }
-                }
-                $this->hierarchy($projectid);
-            }
-
-            redirect('key/nothophoenix/' . $key);
-        }
-        
-        $this->data['referer'] = $_SERVER['HTTP_REFERER'];
-        $this->load->view('editkeyview', $this->data);
-    }
-    
     public function getinputkey($keyid, $tempfilename, $delimiter=FALSE) {
         $input_key = $this->detectDelimiter($keyid, $tempfilename, $delimiter);
         
@@ -577,7 +642,7 @@ class Key extends CI_Controller {
     
     public function addproject() {
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editproject.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editproject.js?v=1.0';
         if (!isset($this->session->userdata['id']))
             redirect('key');
         
@@ -592,7 +657,7 @@ class Key extends CI_Controller {
     
     public function editproject($project=false, $cbox=false) {
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editproject.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.editproject.js?v=1.0';
         $this->output->enable_profiler(false);
         if (!$project) {
             if (!isset($this->session->userdata['id']))
@@ -863,7 +928,7 @@ class Key extends CI_Controller {
     public function filter() {
         $this->load->model('filtermodel');
         $this->data['js'][] = base_url() . 'js/dynatree/jquery.dynatree.js';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.globalfilter.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.globalfilter.js?v=1.0';
         $this->data['css'][] = base_url() . 'css/dynatree/skin/ui.dynatree.css';
         
         $default = array('filterid');
