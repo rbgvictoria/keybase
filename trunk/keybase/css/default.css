@@ -620,19 +620,15 @@ tr.too-few-columns>td {
     background-color: #ff0000;
 }
 
-tr.definite-loop>td {
-    background-color: #8b0000;
+tr.loop>td, td.loop {
+    background-color: #fac9f6;
 }
 
-tr.possible-loop>td {
-    background-color: ffd700;
-}
-
-tr.fewer-leads-than-expected, tr.more-leads-than-expected {
+tr.fewer-than-two-leads, tr.more-than-two-leads {
     background-color: #ff9999;
 }
 
-tr.fewer-leads-than-expected td {
+tr.fewer-than-two-leads td {
     color: #ff0000;
 }
 
@@ -644,9 +640,20 @@ td.orphan, td.missing-link {
 
 td.reticulation {
     color: #ff8c00;
+    font-weight: bold;
 }
 
 td.endnode {
     font-weight: bold;
     color: #104e88;
+}
+
+td.will-not-key-out {
+    font-weight: bold;
+    color: #c300ff;
+}
+
+/* text colour for disabled JQuery UI button */
+.ui-state-disabled {
+    color: #aaaaaa;
 }

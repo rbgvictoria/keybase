@@ -40,15 +40,22 @@ class Export {
         $firststepid->value = 's0';
         $steps->appendChild($firststepid);
         
+        $stepno = 0;
+        
         foreach ($key['Steps'] as $couplet) {
             $step = $doc->createElement('Step');
             $id = $doc->createAttribute('id');
             $id->value = $couplet['id'];
             $step->appendChild($id);
             
+            $stepno++;
             $text = $doc->createAttribute('text');
-            $text->value = $couplet['text'];
+            $text->value = 'Step ' . $stepno;
             $step->appendChild($text);
+            
+            //$text = $doc->createAttribute('text');
+            //$text->value = $couplet['text'];
+            //$step->appendChild($text);
             
             foreach ($couplet['leads'] as $alt) {
                 $lead = $doc->createElement('Lead');
