@@ -137,7 +137,7 @@ class NothophoenixModel extends PlayerModel {
      */
     function auxRemainingEntities($key, $currentnode) {
         $ret = array();
-        $this->db->select('ItemsID');
+        $this->db->select('IF(LinkToItemsID IS NOT NULL, LinkToItemsID, ItemsID) AS ItemsID', FALSE);
         $this->db->from('leads');
         $this->db->where('KeysID', $key);
         $this->db->where('!isnull(NodeName)', false, false);

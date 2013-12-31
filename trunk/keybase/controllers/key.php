@@ -7,7 +7,6 @@ class Key extends CI_Controller {
     // error checking
     private $fromnodes;
     private $tonodes;
-    private $path;
     private $numpaths;
     private $endnodes;
     private $loops;
@@ -191,7 +190,7 @@ class Key extends CI_Controller {
     }
 
     public function nothophoenix($key, $node=null, $highestnode=null) {
-        $this->output->enable_profiler(FALSE);
+        $this->output->enable_profiler(TRUE);
         $this->load->model('nothophoenixmodel', 'phoenix');
         $this->data['js'][] = base_url() . 'js/jquery.keypanel.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
@@ -274,7 +273,6 @@ class Key extends CI_Controller {
         
         if (!$key)
             $key = $this->input->post('keyid');
-        
         if (!$key) 
             redirect('key');
         if (!isset($this->session->userdata['id']))
@@ -333,7 +331,6 @@ class Key extends CI_Controller {
             $errors = $this->checkForErrors($this->input->post('keyid'), 
                     $this->input->post('tempfilename'), $this->input->post('delimiter'));
             if ($errors) {
-                $this->data['errors'] = $errors;
                 $cbox = FALSE;
             }
             else {
@@ -433,16 +430,15 @@ class Key extends CI_Controller {
             $errors = $this->checkForErrors($this->input->post('keyid'), 
                     $this->input->post('tempfilename'), $this->input->post('delimiter'));
             if ($errors) {
-                $this->data['errors'] = $errors;
                 $cbox = FALSE;
             }
             else {
                 $this->load->model('lpxktokeybasemodel', 'lpxk');
-                $this->lpxk->LpxkToKeybase($keyid, 'uploads/' . $this->input->post('tempfilename'), 
+                $this->lpxk->LpxkToKeybase($this->input->post('keyid'), 'uploads/' . $this->input->post('tempfilename'), 
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
-                redirect('key/nothophoenix/' . $keyid);
+                redirect('key/nothophoenix/' . $this->input->post('keyid'));
             }
         }
         
@@ -531,14 +527,15 @@ class Key extends CI_Controller {
         $unique_nodes = array_unique($this->fromnodes);
         $unique_node_keys = array_keys($unique_nodes);
         
-        $this->path = array();
+        $path = array();
         $this->numpaths = 0;
         $this->endnodes = array();
         $this->loops = array();
         
-        $this->traverseKey($this->fromnodes[0]);
+        $this->traverseKey($path, $unique_nodes[0]);
         
         $errors = array();
+        $warnings = array();
         $htmltable = array();
         $htmltable[] = '<table>';
         foreach($inkey as $k => $row) {
@@ -551,33 +548,31 @@ class Key extends CI_Controller {
                 else $tonode = FALSE;
             }
             
+            
             $htmltablerow = array();
             if ($numcols < 3) {
                 $htmltablerow[] = '<tr class="too-few-columns">';
                 $errors['too-few-columns'][] = $row;
             }
-            elseif (isset($this->loops[$k])) {
-                $htmltablerow[] = '<tr class="loop">';
-                $errors['loop'][] = $row;
-            }
-            elseif (count(array_keys($this->fromnodes, $row[0])) < 2) {
-                $htmltablerow[] = '<tr class="fewer-than-two-leads">';
-                $errors['fewer-than-two-leads'][] = $row;
-            }
-            elseif (count(array_keys($this->fromnodes, $row[0])) > 2) {
-                $htmltablerow[] = '<tr class="more-than-two-leads">';
-                $errors['more-than-two-leads'][] = $row;
-            }
             else
                 $htmltablerow[] = '<tr>';
             
             $key = array_search($row[0], $this->tonodes);
-            if ($key !== FALSE || $fromnode == 0) {
-                $htmltablerow[] = '<td>' . $row[0] . '</td>';
+            
+            if (count(array_keys($this->fromnodes, $row[0])) < 2) {
+                $htmltablerow[] = '<td class="singleton-leads">' . $row[0] . '</td>';
+                $errors['singleton-leads'][] = $row;
+            }
+            elseif (count(array_keys($this->fromnodes, $row[0])) > 2) {
+                $htmltablerow[] = '<td class="polytomies">' . $row[0] . '</td>';
+                $warnings['polytomies'][] = $row;
+            }
+            elseif ($key === FALSE && $fromnode != 0) {
+                $htmltablerow[] = '<td class="orphan-couplets">' . $row[0] . '</td>';
+                $errors['orphan-couplets'][] = $row;
             }
             else {
-                $htmltablerow[] = '<td class="orphan">' . $row[0] . '</td>';
-                $errors['orphan'][] = $row;
+                $htmltablerow[] = '<td>' . $row[0] . '</td>';
             }
             
             if (isset($row[1]))
@@ -587,28 +582,32 @@ class Key extends CI_Controller {
             
             if (isset($row[2])) {
                 if ($tonode) {
-                    if (count(array_keys($this->tonodes, $row[2])) > 1) {
-                        $htmltablerow[] = '<td class="reticulation">' . $row[2] . '</td>';
-                        $errors['reticulation'][] = $row;
+                    if (isset($this->loops[$k])) {
+                        $htmltablerow[] = '<td class="loops">' . $row[2] . '</td>';
+                        $errors['loops'][] = $row;
+                    }
+                    elseif (count(array_keys($this->tonodes, $row[2])) > 1) {
+                        $htmltablerow[] = '<td class="reticulations">' . $row[2] . '</td>';
+                        $warnings['reticulations'][] = $row;
                     }
                     else
                         $htmltablerow[] = '<td>' . $row[2] . '</td>';
                 }
                 else {
                     if (is_numeric($row[2])) {
-                        $htmltablerow[] = '<td class="missing-link">' . $row[2] . '</td>';
-                        $errors['missing-link'][] = $row;
+                        $htmltablerow[] = '<td class="dead-ends">' . $row[2] . '</td>';
+                        $errors['dead-ends'][] = $row;
                     }
                     elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', $row[2]) || preg_match('/^[A-Z]{1,1}[a-z]+$/', $row[2]))) {
-                        $htmltablerow[] = '<td class="missing-link">' . $row[2] . '</td>';
-                        $errors['missing-link'][] = $row;
+                        $htmltablerow[] = '<td class="dead-ends">' . $row[2] . '</td>';
+                        $errors['dead-ends'][] = $row;
                     }
                     elseif (isset($this->endnodes[$k])) {
                         $htmltablerow[] = '<td class="endnode">' . $row[2] . '</td>';
                     }
                     else {
                         $htmltablerow[] = '<td class="will-not-key-out">' . $row[2] . '</td>';
-                        $errors['will-not-key-out'][] = $row;
+                        $warnings['will-not-key-out'][] = $row;
                     }
                 }
             }
@@ -620,32 +619,37 @@ class Key extends CI_Controller {
         }
         $htmltable[] = '</table>';
         $this->data['error_key'] = implode('', $htmltable);
-        return $errors;
+        $this->data['errors'] = $errors;
+        $this->data['warnings'] = $warnings;
+        return ($errors || $warnings) ? TRUE : FALSE;
     }
     
-    private function traverseKey($node) {
-        $this->path[] = $node;
+    private function traverseKey($path, $node) {
+        $path[] = $node;
         $this->numpaths++;
         
         foreach (array_keys($this->fromnodes, $node) as $lead) {
             $goto = $this->tonodes[$lead];
             if ($goto) {
                 if (in_array($goto, $this->fromnodes)) {
-                    if (in_array($goto, $this->path)) {
-                        $endpath = $this->path;
+                    if (in_array($goto, $path)) {
+                        $endpath = $path;
                         $endpath[] = $goto;
+                        //echo implode('->', $endpath) . '<br/>';
                         $this->numpaths++;
                         $this->loops[$lead] = $goto;
                     }
                     else {
-                        $this->traverseKey($goto);
+                        //echo implode('->', $path) . '<br/>';
+                        $this->traverseKey($path, $goto);
                     }
                 }
                 else {
-                    $endpath = $this->path;
+                    $endpath = $path;
                     $endpath[] = $goto;
+                    //echo implode('->', $endpath) . '<br/>';
                     $this->numpaths++;
-                    $this->endnodes[$lead] = $goto; 
+                    $this->endnodes[$lead] = $goto;
                 }
             }
         }
@@ -1088,6 +1092,7 @@ class Key extends CI_Controller {
                     redirect('/key/st/' . $cleanuri);
                 }
                 $this->load->view('editview', $this->data);
+                return TRUE;
             }
         }
         if ($cleanuri == 'citation')

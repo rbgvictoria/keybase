@@ -30,6 +30,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.removePlugins = 'templates';
     
     // config.autoGrow_onStartup = true;
+    config.autoGrow_maxHeight = 420;
     config.height = '420px';
     config.toolbarCanCollapse = true;
     config.toolbarStartupExpanded = true;

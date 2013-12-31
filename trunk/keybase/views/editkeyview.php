@@ -73,31 +73,36 @@
                 'referer' => $referer,
             ));
         ?>
+        <?php if ($errors): ?>
         <div class="errors">
-            <table><tr>
+            <table><tr><td>Errors:</td>
             <?php foreach ($errors as $key => $value): ?>
                 <td class="<?=$key?>"><?=ucfirst(str_replace('-', ' ', $key))?> (<?=count($value)?>)</td>
             <?php endforeach; ?>
             </tr></table>
         </div>
-        <p>&nbsp;</p>
+        <?php endif; ?>
+        
+        <?php if ($warnings): ?>
+        <div class="warnings">
+            <table><tr><td>Warnings:</td>
+            <?php foreach ($warnings as $key => $value): ?>
+                <td class="<?=$key?>"><?=ucfirst(str_replace('-', ' ', $key))?> (<?=count($value)?>)</td>
+            <?php endforeach; ?>
+            </tr></table>
+        </div>
+        <?php endif; ?>
+        
         <div class="error_table"><?=$error_key?></div>
         
         <p style="text-align: right">
             <?php 
-                $killarray = array(
-                    'too-few-columns',
-                    'loop',
-                    'fewer-than-two-leads',
-                    'orphan',
-                    'missing-link',
-                    'will-not-key-out'
-                );
                 $data = array(
                     'name' => 'submit3',
                     'value' => 'OK',
-                    'disabled' => array_intersect($killarray, array_keys($errors)) ? 'disabled' : FALSE,
                 );
+                if ($errors) 
+                    $data['disabled'] = 'disabled'; 
                 echo form_submit($data);
             ?>
             <?=form_submit('cancel', 'Cancel')?>
