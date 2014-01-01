@@ -70,7 +70,6 @@ class Key extends CI_Controller {
         $this->data['search_string'] = $searchstring;
         $this->data['search_result'] = $this->keymodel->getSearchResult($searchstring);
         
-        
         $this->load->view('searchresultview', $this->data);
     }
     
@@ -190,7 +189,6 @@ class Key extends CI_Controller {
     }
 
     public function nothophoenix($key, $node=null, $highestnode=null) {
-        $this->output->enable_profiler(TRUE);
         $this->load->model('nothophoenixmodel', 'phoenix');
         $this->data['js'][] = base_url() . 'js/jquery.keypanel.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
