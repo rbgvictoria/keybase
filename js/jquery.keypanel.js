@@ -209,23 +209,9 @@ $(function(){
                         entity += '<img src="' + base_url + 'images/' + item.media + '" alt="Image of ' + item.name + '"/>';
                     }
 
-                    if (item.url) {
-                        entity += '<a class="external" href="' + item.url + '" target="_blank">';
-                    }
-                    entity += item.name;
-                    if (item.url) {
-                        entity += '</a>';
-                    }
-                    if (item.tokey) {
-                        entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
-                        entity += '&#x25BA;';
-                        entity += '</a>';
-                    }
-
                     if (item.LinkTo) {
-                        entity += ' (';
                         if (item.linkToUrl) {
-                            entity += '&nbsp;<a class="external" href="' + item.linkToUrl + '">';
+                            entity += '<a class="external" href="' + item.linkToUrl + '">';
                         }
                         entity += item.LinkTo;
                         if (item.linkToUrl) {
@@ -236,8 +222,34 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-
+                        entity += ' (';
+                        if (item.url) {
+                            entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        }
+                        entity += item.name;
+                        if (item.url) {
+                            entity += '</a>';
+                        }
+                        if (item.tokey) {
+                            entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
+                            entity += '&#x25BA;';
+                            entity += '</a>';
+                        }
                         entity += ')';
+                    }
+                    else {
+                        if (item.url) {
+                            entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        }
+                        entity += item.name;
+                        if (item.url) {
+                            entity += '</a>';
+                        }
+                        if (item.tokey) {
+                            entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
+                            entity += '&#x25BA;';
+                            entity += '</a>';
+                        }
                     }
 
                     entity += '</span>';
@@ -261,21 +273,7 @@ $(function(){
                         entity += '<img src="' + base_url + 'images/' + item.media + '" alt="Image of ' + item.name + '"/>';
                     }
 
-                    if (item.url) {
-                        entity += '<a class="external" href="' + item.url + '" target="_blank">';
-                    }
-                    entity += item.name;
-                    if (item.url) {
-                        entity += '</a>';
-                    }
-                    if (item.tokey) {
-                        entity += '&nbsp;<a href="' + site_url + '/key/nothophoenix/' + item.tokey + '">';
-                        entity += '&#x25BA;';
-                        entity += '</a>';
-                    }
-
                     if (item.LinkTo) {
-                        entity += ' (';
                         if (item.linkToUrl) {
                             entity += '<a class="external" href="' + item.linkToUrl + '">';
                         }
@@ -288,8 +286,34 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-
+                        entity += ' (';
+                        if (item.url) {
+                            entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        }
+                        entity += item.name;
+                        if (item.url) {
+                            entity += '</a>';
+                        }
+                        if (item.tokey) {
+                            entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
+                            entity += '&#x25BA;';
+                            entity += '</a>';
+                        }
                         entity += ')';
+                    }
+                    else {
+                        if (item.url) {
+                            entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        }
+                        entity += item.name;
+                        if (item.url) {
+                            entity += '</a>';
+                        }
+                        if (item.tokey) {
+                            entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
+                            entity += '&#x25BA;';
+                            entity += '</a>';
+                        }
                     }
 
                     entity += '</span>';

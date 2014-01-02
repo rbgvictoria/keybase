@@ -218,16 +218,25 @@ class HtmlKeyModel extends PlayerModel {
             
             if ($lead->NodeName) {
                 $html .= ' <span class="to">';
-                $html .= $lead->NodeName;
-                if ($lead->ItemsID && $this->nextKey($lead->ItemsID)) {
-                    $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
-                }
+                
+                
                 if ($lead->LinkToItemName) {
-                    $html .= ' (' . $lead->LinkToItemName;
-                    if ($lead->LinkToItemsID && $this->nextKey($lead->LinkToItemsID)) {
+                    $html .= $lead->LinkToItemName;
+                    if ($lead->LinkToItemsID && $this->nextKey($lead->LinkToItemsID, $projectid)) {
                         $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->LinkToItemsID, $projectid) . '">&#x25BA;</a>';
                     }
+                    $html .= ' (';
+                    $html .= $lead->NodeName;
+                    if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
+                        $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
+                    }
                     $html .= ')';
+                }
+                else {
+                    $html .= $lead->NodeName;
+                    if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
+                        $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
+                    }
                 }
                 
                 $html .= '</span></td>';

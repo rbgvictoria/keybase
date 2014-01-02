@@ -162,7 +162,7 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getRemainingEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL, l.KeysID');
+        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL, l.KeysID');
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
@@ -173,6 +173,7 @@ class NothophoenixModel extends PlayerModel {
         if ($this->FilterItems)
             $this->db->where_in('i.ItemsID', $this->FilterItems);
         $this->db->group_by('i.Name');
+        $this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
         $query = $this->db->get();
         if ($query->num_rows()) {
             $ret = array();
@@ -211,6 +212,7 @@ class NothophoenixModel extends PlayerModel {
         if ($this->FilterItems)
             $this->db->where_in('i.ItemsID', $this->FilterItems);
         $this->db->group_by('i.Name');
+        $this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
         $query = $this->db->get();
         if ($query->num_rows()) {
             $ret = array();
