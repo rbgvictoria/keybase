@@ -398,15 +398,18 @@ class LpxkToKeyBaseModel extends CI_Model {
                 $endnode['ModifiedByAgentID'] = $this->UserID;
                 $key = array_search($thisLead['goto'], $this->itemIDs);
                 if ($key !== FALSE) {
-                    $endnode['NodeName'] = $this->items[$key]['name'];
-                    $endnode['ItemsID'] = $this->items[$key]['ItemsID'];
                     if ($thisLead['linkto']) {
-                        $endnode['LinkToItem'] = $thisLead['linkto'];
+                        $endnode['NodeName'] = $thisLead['linkto'];
                         $lkey = array_search($thisLead['linkto'], $this->itemIDs);
                         if ($lkey !== FALSE) {
-                            //$endnode['LinkToItem'] = $this->items[$lkey]['name'];
-                            $endnode['LinkToItemsID'] = $this->items[$lkey]['ItemsID'];
+                            $endnode['ItemsID'] = $this->items[$lkey]['ItemsID'];
                         }
+                        $endnode['LinkToItem'] = $this->items[$key]['name'];
+                        $endnode['LinkToItemsIDItemsID'] = $this->items[$key]['ItemsID'];
+                    }
+                    else {
+                        $endnode['NodeName'] = $this->items[$key]['name'];
+                        $endnode['ItemsID'] = $this->items[$key]['ItemsID'];
                     }
                     if ($this->items[$key]['icon']) {
                         $ikey = array_search($this->items[$key]['icon'], $this->icons);
