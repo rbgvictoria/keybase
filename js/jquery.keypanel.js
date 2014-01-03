@@ -222,7 +222,7 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-                        entity += ' (';
+                        entity += ': ';
                         if (item.url) {
                             entity += '<a class="external" href="' + item.url + '" target="_blank">';
                         }
@@ -235,7 +235,6 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-                        entity += ')';
                     }
                     else {
                         if (item.url) {
@@ -286,7 +285,7 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-                        entity += ' (';
+                        entity += ': ';
                         if (item.url) {
                             entity += '<a class="external" href="' + item.url + '" target="_blank">';
                         }
@@ -299,7 +298,6 @@ $(function(){
                             entity += '&#x25BA;';
                             entity += '</a>';
                         }
-                        entity += ')';
                     }
                     else {
                         if (item.url) {
