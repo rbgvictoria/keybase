@@ -95,7 +95,7 @@
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
-                                $entity[] = ' (';
+                                $entity[] = ': ';
                                 if ($item['url'])
                                     $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
 
@@ -106,7 +106,6 @@
                                 if ($item['tokey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                                 
-                                $entity[] = ')';
                                 $entity[] = '</span>';
                             }
                             else {
@@ -149,7 +148,7 @@
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
-                                $entity[] = ' (';
+                                $entity[] = ': ';
                                 if ($item['url'])
                                     $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
 
@@ -160,7 +159,6 @@
                                 if ($item['tokey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                                 
-                                $entity[] = ')';
                                 $entity[] = '</span>';
                             }
                             else {
