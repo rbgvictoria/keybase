@@ -318,7 +318,7 @@ class Key extends CI_Controller {
                         $this->data['input_key'] = $this->detectDelimiter($key, $tempfilename);
                     }
                 }
-                if (($filename || $this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old')) && !$this->input->post('skip_hierarchy')) {
+                if ($this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old') && !$this->input->post('skip_hierarchy')) {
                     $this->hierarchy($projectid);
                 }
             }
@@ -337,7 +337,8 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
-                $this->hierarchy($this->input->post('projectid'));
+                if (!$this->input->post('skip_hierarchy'))
+                    $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
             }
         }
@@ -348,7 +349,8 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
-                $this->hierarchy($this->input->post('projectid'));
+                if (!$this->input->post('skip_hierarchy'))
+                    $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
         }
         

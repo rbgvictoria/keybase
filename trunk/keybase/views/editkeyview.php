@@ -31,7 +31,8 @@
                 'keyid'=>$keyid,
                 'projectid'=>$projectid,
                 'tempfilename'=>  $tempfilename,
-                'referer' => $referer
+                'referer' => $referer,
+                'skip_hierarchy' => $this->input->post('skip_hierarchy')
             ));
         ?>
         <p>
@@ -71,6 +72,7 @@
                 'tempfilename' => $tempfilename,
                 'delimiter' => $delimiter,
                 'referer' => $referer,
+                'skip_hierarchy' => $this->input->post('skip_hierarchy')
             ));
         ?>
         <?php if ($errors): ?>
