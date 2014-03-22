@@ -32,8 +32,8 @@
     <div id="project_tabs">
         <ul>
             <li><a href="#about">About</a></li>
-            <li><a href="#keys_alphabetical">Keys (list)</a></li>
             <li><a href="#keys_hierarchy">Keys (tree)</a></li>
+            <li><a href="#keys_alphabetical">Keys (list)</a></li>
             <li><a href="#projectusers">Contributors</a></li>
         </ul>
         
