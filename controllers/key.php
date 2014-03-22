@@ -153,8 +153,8 @@ class Key extends CI_Controller {
         $this->data['projectid'] = $project;
         $this->data['project'] = $this->keymodel->getProjectData($project);
         
-        $this->data['keys_hierarchy'] = $this->keymodel->getProjectKeysLinked($project);
-        $this->data['keys_orphaned'] = $this->keymodel->getProjectKeysOrphaned($project);
+        //$this->data['keys_hierarchy'] = $this->keymodel->getProjectKeysLinked($project);
+        //$this->data['keys_orphaned'] = $this->keymodel->getProjectKeysOrphaned($project);
         
         //$this->data['keys'] = $this->keymodel->getProjectKeys($project);
         $this->data['users'] = $this->keymodel->getProjectUsers($project);

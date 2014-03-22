@@ -87,7 +87,17 @@
                             if ($item['media'])
                                 $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
+                            if ($item['url'])
+                                $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
+
+                            $entity[] = $item['name'];
+                            if ($item['url'])
+                                $entity[] = '</a>';
+
+                            if ($item['tokey'])
+                                $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                             if ($item['LinkTo']) {
+                                $entity[] = ': ';
                                 if ($item['linkToUrl'])
                                     $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '" target="_blank">';
                                 $entity[] = $item['LinkTo'];
@@ -95,30 +105,8 @@
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
-                                $entity[] = ': ';
-                                if ($item['url'])
-                                    $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
-
-                                $entity[] = $item['name'];
-                                if ($item['url'])
-                                    $entity[] = '</a>';
-
-                                if ($item['tokey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
-                                
-                                $entity[] = '</span>';
                             }
-                            else {
-                                if ($item['url'])
-                                    $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
-
-                                $entity[] = $item['name'];
-                                if ($item['url'])
-                                    $entity[] = '</a>';
-
-                                if ($item['tokey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
-                            }
+                            $entity[] = '</span>';
                             echo implode('', $entity);
                         }
                     }
@@ -140,7 +128,17 @@
                             if ($item['media'])
                                 $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
+                            if ($item['url'])
+                                $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
+
+                            $entity[] = $item['name'];
+                            if ($item['url'])
+                                $entity[] = '</a>';
+
+                            if ($item['tokey'])
+                                $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                             if ($item['LinkTo']) {
+                                $entity[] = ': ';
                                 if ($item['linkToUrl'])
                                     $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '" target="_blank">';
                                 $entity[] = $item['LinkTo'];
@@ -148,30 +146,8 @@
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
                                     $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
-                                $entity[] = ': ';
-                                if ($item['url'])
-                                    $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
-
-                                $entity[] = $item['name'];
-                                if ($item['url'])
-                                    $entity[] = '</a>';
-
-                                if ($item['tokey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
-                                
-                                $entity[] = '</span>';
                             }
-                            else {
-                                if ($item['url'])
-                                    $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
-
-                                $entity[] = $item['name'];
-                                if ($item['url'])
-                                    $entity[] = '</a>';
-
-                                if ($item['tokey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
-                            }
+                            $entity[] = '</span>';
                             echo implode('', $entity);
                         }
                     }

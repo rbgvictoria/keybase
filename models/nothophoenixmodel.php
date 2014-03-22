@@ -147,7 +147,22 @@ class NothophoenixModel extends PlayerModel {
         }
         $this->db->where('!isnull(ParentID)', false, false);
         $this->db->group_by('ItemsID');
-        $query = $this->db->get();
+        $this->db->union_push();
+        
+        $this->db->select('LinkToItemsID');
+        $this->db->from('leads');
+        $this->db->where('KeysID', $key);
+        $this->db->where('!isnull(NodeName)', false, false);
+        if ($currentnode) {
+            $this->db->where('NodeNumber>', $currentnode->NodeNumber, false);
+            $this->db->where('NodeNumber<=', $currentnode->HighestDescendantNodeNumber, false);
+        }
+        $this->db->where('!isnull(ParentID)', false, false);
+        $this->db->where('LinkToItemsID IS NOT NULL', FALSE, FALSE);
+        $this->db->group_by('LinkToItemsID');
+        $this->db->union_push();
+        $query = $this->db->union();
+        
         if ($query->num_rows()) {
             foreach ($query->result() as $row)
                 $ret[] = $row->ItemsID;
@@ -162,19 +177,42 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getRemainingEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL, l.KeysID');
+        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            lti.URL AS LinkToURL, l.KeysID, 
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('l.KeysID', $key);
         $this->db->where('!isnull(l.ItemsID)', false, false);
+        $this->db->where('l.LinkToItemsID IS NULL', FALSE, FALSE);
         $this->db->where_in('l.ItemsID', $remaining);
         if ($this->FilterItems)
             $this->db->where_in('i.ItemsID', $this->FilterItems);
         $this->db->group_by('i.Name');
-        $this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
-        $query = $this->db->get();
+        //$this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
+        $this->db->union_push();
+        
+        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            lti.URL AS LinkToURL, l.KeysID,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $this->db->from("leads l");
+        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
+        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
+        $this->db->where('l.KeysID', $key);
+        $this->db->where('!isnull(l.ItemsID)', false, false);
+        $this->db->where_in('l.LinkToItemsID', $remaining);
+        if ($this->FilterItems)
+            $this->db->where_in('l.LinkToItemsID', $this->FilterItems);
+        $this->db->group_by('i.Name');
+        $this->db->order_by('sortingname');
+        $this->db->union_push();
+        
+        $query = $this->db->union();
+        
+        
         if ($query->num_rows()) {
             $ret = array();
             foreach ($query->result() as $row) {
@@ -201,19 +239,39 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getDiscardedEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, lti.URL AS LinkToURL');
+        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            lti.URL AS LinkToURL,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $this->db->from("leads l");
+        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
+        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
+        $this->db->where('!isnull(l.ItemsID)', false, false);
+        $this->db->where('l.linkToItemsID IS NULL', FALSE, FALSE);
+        $this->db->where('l.KeysID', $key);
+        $this->db->where_not_in('l.ItemsID', $remaining);
+        if ($this->FilterItems)
+            $this->db->where_in('i.ItemsID', $this->FilterItems);
+        $this->db->group_by('i.Name');
+        $this->db->union_push();
+        
+        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            lti.URL AS LinkToURL,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('!isnull(l.ItemsID)', false, false);
         $this->db->where('l.KeysID', $key);
-        $this->db->where_not_in('l.ItemsID', $remaining);
+        $this->db->where_not_in('l.LinkToItemsID', $remaining);
         if ($this->FilterItems)
-            $this->db->where_in('i.ItemsID', $this->FilterItems);
+            $this->db->where_in('l.LinkToItemsID', $this->FilterItems);
         $this->db->group_by('i.Name');
-        $this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
-        $query = $this->db->get();
+        $this->db->order_by('sortingname');
+        $this->db->union_push();
+        
+        $query = $this->db->union();
         if ($query->num_rows()) {
             $ret = array();
             foreach ($query->result() as $row) {
