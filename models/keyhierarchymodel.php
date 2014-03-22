@@ -65,17 +65,31 @@ class KeyHierarchyModel extends CI_Model {
     
     private function getFirstKey() {
         $ret = array();
-        $query = $this->db->query("SELECT k.KeysID
-            FROM `keys` k
-            JOIN projects p ON k.ProjectsID=p.ProjectsID
-            WHERE k.ProjectsID=$this->projectid
-              AND k.TaxonomicScopeID NOT IN (
-              SELECT l.ItemsID
-              FROM leads l
-              JOIN `keys` k ON l.KeysID=k.KeysID
-              WHERE k.ProjectsID=$this->projectid AND l.ItemsID IS NOT NULL
-            )
-            ORDER BY IF(k.TaxonomicScopeID=p.TaxonomicScopeID, 1, 0) DESC, k.Name");
+        
+        $this->db->select('if(tk.TaxonomicScopeID IS NOT NULL, tk.TaxonomicScopeID, ltk.TaxonomicScopeID) AS ID', FALSE);
+        $this->db->from('leads l');
+        $this->db->join('`keys` tk', "l.ItemsID=tk.TaxonomicScopeID AND tk.ProjectsID=$this->projectid", 'left', FALSE);
+        $this->db->join('`keys` ltk', "l.LinkToItemsID=ltk.TaxonomicScopeID AND ltk.ProjectsID=$this->projectid", 'left');
+        $this->db->join('keys k', 'l.KeysID=k.KeysID');
+        $this->db->where('k.ProjectsID', $this->projectid);
+        $this->db->where('(tk.KeysID IS NOT NULL OR ltk.KeysID IS NOT NULL)', FALSE, FALSE);
+        $subquery = $this->db->get();
+        $linkeditems = array();
+        if ($subquery->num_rows()) {
+            foreach ($subquery->result() as $row) {
+                $linkeditems[] = $row->ID;
+            }
+        }
+        $linkeditems = array_unique($linkeditems);
+        
+        $this->db->select('k.KeysID, IF(k.TaxonomicScopeID=p.TaxonomicScopeID, 1, 0) AS keyorder', FALSE);
+        $this->db->from('keys k');
+        $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID');
+        $this->db->where('k.ProjectsID', $this->projectid);
+        $this->db->where_not_in('k.TaxonomicScopeID', $linkeditems);
+        $this->db->order_by('keyorder DESC, k.Name');
+        
+        $query = $this->db->get();
         if ($query->num_rows()) {
             foreach ($query->result() as $row)
                 $ret[] = $row->KeysID;
@@ -152,13 +166,27 @@ class KeyHierarchyModel extends CI_Model {
     }
     
     private function getNextKey($keyid, $depth) {
-        $this->db->select('k.KeysID, k.Name, l.KeysID AS ParentKeyID');
+        
+        /*
+         * SELECT IF(k.KeysID IS NOT NULL, k.KeysID, lk.KeysID) AS KeyID, IF(k.Name IS NOT NULL, k.Name, lk.Name) AS KeyName, l.KeysID AS ParentKeyID
+FROM (`leads` l)
+LEFT JOIN `keys` k ON `l`.`ItemsID`=`k`.`TaxonomicScopeID` AND k.ProjectsID=10
+LEFT JOIN `keys` lk ON `l`.`LinkToItemsID`=`lk`.`TaxonomicScopeID` AND lk.ProjectsID=10
+WHERE `l`.`KeysID` =  '1903'
+AND (k.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)
+GROUP BY KeyID
+ORDER BY KeyName;
+
+         */
+        $this->db->select('IF(k.KeysID IS NOT NULL, k.KeysID, lk.KeysID) AS KeyID, 
+            IF(k.Name IS NOT NULL, k.Name, lk.Name) AS KeyName, l.KeysID AS ParentKeyID', FALSE);
         $this->db->from('leads l');
-        $this->db->join('keys k', 'l.ItemsID=k.TaxonomicScopeID');
-        $this->db->where('k.ProjectsID', $this->projectid);
+        $this->db->join('`keys` k', "l.ItemsID=k.TaxonomicScopeID AND k.ProjectsID=$this->projectid", 'left', FALSE);
+        $this->db->join('`keys` lk', "l.LinkToItemsID=lk.TaxonomicScopeID AND lk.ProjectsID=$this->projectid", 'left', FALSE);
         $this->db->where('l.KeysID', $keyid);
-        $this->db->group_by('k.KeysID');
-        $this->db->order_by('k.Name');
+        $this->db->where('(k.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)', FALSE, FALSE);
+        $this->db->group_by('KeyID');
+        $this->db->order_by('KeyName');
         $query = $this->db->get();
         
         if ($query->num_rows()) {
@@ -166,14 +194,14 @@ class KeyHierarchyModel extends CI_Model {
             foreach($query->result() as $row) {
                 $this->nodenumber++;
                 $this->parentids[] = $row->ParentKeyID;
-                $this->keyids[] = $row->KeysID;
+                $this->keyids[] = $row->KeyID;
                 $this->hierarchy[] = array('ParentKeyID' => $row->ParentKeyID,
                     'ProjectsID' => $this->projectid,
-                    'KeysID' => $row->KeysID, 
+                    'KeysID' => $row->KeyID, 
                     'NodeNumber' => $this->nodenumber,
                     'HighestDescendantNodeNumber' => NULL,
                     'Depth' => $depth);
-                $this->getNextKey($row->KeysID, $depth);
+                $this->getNextKey($row->KeyID, $depth);
             }
         }
         

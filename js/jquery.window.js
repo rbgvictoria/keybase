@@ -1,4 +1,14 @@
 $(function() {
+    var href = location.href;
+    var base_url;
+    var site_url = href.substr(0, href.indexOf('/key/project'));
+    if (site_url.indexOf('index.php') > 0) {
+        base_url = site_url.substr(0, site_url.indexOf('index.php'));
+    }
+    else {
+        base_url = site_url + '/';
+    }
+
     contentSize();
     $(window).resize(function() {
         contentSize();
@@ -9,7 +19,7 @@ $(function() {
     $('input[type!="hidden"]').first().focus();
     
     $('#searchbox').autocomplete({
-            source: 'http://keybase.rbg.vic.gov.au/autocomplete/searchtaxon',
+            source: base_url + 'autocomplete/searchtaxon',
             minLength: 2
     });
     
