@@ -401,7 +401,7 @@ class LpxkToKeyBaseModel extends CI_Model {
                     $endnode['NodeName'] = $this->items[$key]['name'];
                     $endnode['ItemsID'] = $this->items[$key]['ItemsID'];
                     if ($thisLead['linkto']) {
-                        $endnode['LinkToItem'] = $thisLead['linkto'];
+                        $endnode['LinkToItem'] = $thisLead['linkto']; 
                         $lkey = array_search($thisLead['linkto'], $this->itemIDs);
                         if ($lkey !== FALSE) {
                             $endnode['LinkToItemsID'] = $this->items[$lkey]['ItemsID'];
