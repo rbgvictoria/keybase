@@ -41,6 +41,22 @@ class Ajax extends CI_Controller {
         }
     }
     
+    private function auxNextCouplet($key, $node) {
+        $this->load->model('nothophoenixmodel', 'phoenix');
+        $project = $this->phoenix->getProjectID($key);
+        $this->phoenix->GlobalFilter($project, $key);
+        $node = $this->phoenix->getNode($key, $node);
+        return $this->phoenix->getNextCouplet($node);
+    }
+    
+    public function nextCoupletJSON($key, $node=FALSE) {
+        $data = $this->auxNextCouplet($key, $node);
+        if (isset($_GET['callback']))
+            echo $_GET['callback'] . '(' . json_encode ($data) . ')';
+        else
+            echo json_encode($data);
+    }
+    
     public function path($key, $node) {
         $this->load->model('nothophoenixmodel', 'phoenix');
         $project = $this->phoenix->getProjectID($key);
@@ -69,26 +85,86 @@ class Ajax extends CI_Controller {
         echo '</ol>';
     }
     
-    public function remainingItemsJSON($key, $node) {
+    private function auxPath($key, $node) {
         $this->load->model('nothophoenixmodel', 'phoenix');
         $project = $this->phoenix->getProjectID($key);
         $this->phoenix->GlobalFilter($project, $key);
         $node = $this->phoenix->getNode($key, $node);
         $currentnode = $this->phoenix->getCurrentNode($node);
-        $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
-        $entities = $this->phoenix->getRemainingEntities($key, $remaining);
-        echo json_encode($entities);
+        return $this->phoenix->getPath($key, $currentnode);
     }
     
-    public function discardedItemsJSON($key, $node) {
+    public function pathJSON($key, $node=false) {
+        $path = FALSE;
+        if ($node)
+            $path = $this->auxPath($key, $node);
+        if (isset($_GET['callback']))
+            echo $_GET['callback'] . '(' . json_encode ($path) . ')';
+        else
+            echo json_encode($path);
+    }
+    
+    
+    private function auxRemaining($key, $node=FALSE) {
+        $this->load->model('nothophoenixmodel', 'phoenix');
+        $project = $this->phoenix->getProjectID($key);
+        $this->phoenix->GlobalFilter($project, $key);
+        if ($node) {
+            $node = $this->phoenix->getNode($key, $node);
+            $currentnode = $this->phoenix->getCurrentNode($node);
+            $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
+        }
+        else 
+            $remaining = FALSE;
+        return $this->phoenix->getRemainingEntities($key, $remaining);
+    }
+    
+    public function remainingItemsJSON($key, $node=FALSE) {
+        $entities = $this->auxRemaining($key, $node=FALSE);
+        if (isset($_GET['callback']))
+            echo $_GET['callback'] . '(' . json_encode ($entities) . ')';
+        else
+            echo json_encode($entities);
+    }
+    
+    private function auxDiscarded($key, $node) {
         $this->load->model('nothophoenixmodel', 'phoenix');
         $project = $this->phoenix->getProjectID($key);
         $this->phoenix->GlobalFilter($project, $key);
         $node = $this->phoenix->getNode($key, $node);
         $currentnode = $this->phoenix->getCurrentNode($node);
         $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
-        $entities = $this->phoenix->getDiscardedEntities($key, $remaining);;
-        echo json_encode($entities);
+        return $this->phoenix->getDiscardedEntities($key, $remaining);;
+    }
+    
+    public function discardedItemsJSON($key, $node=FALSE) {
+        if ($node)
+            $entities = $this->auxDiscarded ($key, $node);
+        else
+            $entities = FALSE;
+        if (isset($_GET['callback']))
+            echo $_GET['callback'] . '(' . json_encode ($entities) . ')';
+        else
+            echo json_encode($entities);
+    }
+    
+    private function auxParent($key, $node) {
+        $this->load->model('nothophoenixmodel', 'phoenix');
+        $currentnode = $this->phoenix->getCurrentNode($node);
+        return $this->phoenix->getParent($currentnode);
+    }
+    
+    public function parentJSON($key, $node=FALSE) {
+        if ($node) {
+            $data = array('id' => $this->auxParent ($key, $node));
+            $json = json_encode((object) $data);
+        }
+        else
+            $json = json_encode(FALSE);
+        if (isset($_GET['callback']))
+            echo $_GET['callback'] . '(' . $json . ')';
+        else
+            echo json_encode($json);
     }
     
     public function parent($key, $node=false) {
@@ -97,6 +173,33 @@ class Ajax extends CI_Controller {
             $currentnode = $this->phoenix->getCurrentNode($node);
             echo $this->phoenix->getParent($currentnode);
         }
+    }
+    
+    public function coupletJSON($key, $node=FALSE) {
+        $data = array(
+            'parent' => FALSE,
+            'currentNode' => FALSE,
+            'path' => FALSE,
+            'remainingItems' => FALSE,
+            'discardedItems' => FALSE
+        );
+        
+        $data['currentNode'] = $this->auxNextCouplet($key, $node);
+        $data['remainingItems'] = $this->auxRemaining($key, $node);
+        
+        if ($node) {
+            $data['parent'] = (object) array('id' => $this->auxParent($key, $node));
+            $data['path'] = $this->auxPath($key, $node);
+            $data['discardedItems'] = $this->auxDiscarded($key, $node);
+        }
+        
+        $json = json_encode((object) $data);
+        
+        if ($_GET['callback'])
+            echo $_GET['callback'] . '(' . $json . ')';
+        else
+            echo $json;
+            
     }
     
     public function projectkeys_hierarchy($project, $filterid=FALSE) {
