@@ -5,6 +5,7 @@ class PlayerModel extends CI_Model {
     public $FilterItems;
     public $FilterLeads;
     private $BreadCrumbs;
+    protected $hasProjectItems;
     
     public function __construct() {
         parent::__construct();
@@ -158,6 +159,15 @@ class PlayerModel extends CI_Model {
             $this->BreadCrumbs[] = $row;
             $this->getCrumb($row['KeysID']);
         }
+    }
+    
+    public function hasProjectItems($project) {
+        $this->db->select('count(Url) as Url', FALSE);
+        $this->db->from('projectitems');
+        $this->db->where('ProjectsID', $project);
+        $query = $this->db->get();
+        $row = $query->row();
+        $this->hasProjectItems = ($row->Url) ? TRUE : FALSE;
     }
     
     

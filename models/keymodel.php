@@ -220,6 +220,10 @@ class KeyModel extends CI_Model {
             return FALSE;
     }
     
+    public function keyTaxa($keysid) {
+        
+    }
+    
     public function getItemName($itemid) {
         $this->db->select('Name');
         $this->db->from('items');

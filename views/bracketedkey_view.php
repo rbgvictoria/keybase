@@ -16,15 +16,29 @@
                         <a href="<?=site_url()?>key/bracketedkey/<?=$keyid?>#s<?=$lead['LeadID']?>"><?=$lead['ToNode']?></a>
                         <?php else: ?>
                         
+                        <?php 
+                            if ($lead['URL']) {
+                                $toname = anchor($lead['URL'], $lead['ToName']);
+                            }
+                            else {
+                                $toname = $lead['ToName'];
+                            }
+                        ?>
                         
+                        <?=$toname?><?php if ($lead['NextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['NextKey']?>">&#x25BA;</a><?php endif; ?>
                         
                         <?php if ($lead['LinkToName']):?>
-                        <?=$lead['LinkToName']?><?php if ($lead['LinkToNextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['LinkToNextKey']?>">&#x25BA;</a><?php endif; ?>
-                        (<?=$lead['ToName']?><?php if ($lead['NextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['NextKey']?>">&#x25BA;</a><?php endif; ?>)
                         
-                        <?php else: ?>
-                        <?=$lead['ToName']?><?php if ($lead['NextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['NextKey']?>">&#x25BA;</a><?php endif; ?>
+                        <?php 
+                            if ($lead['LinkToURL']) {
+                                $linktoname = anchor($lead['LinkToURL'], $lead['LinkToName']);
+                            }
+                            else {
+                                $linktoname = $lead['LinkToName'];
+                            }
+                        ?>
                         
+                        (<?=$linktoname?><?php if ($lead['LinkToNextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['LinkToNextKey']?>">&#x25BA;</a><?php endif; ?>)
                         <?php endif; ?>
                         
                         <?php endif; ?>
