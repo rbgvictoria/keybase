@@ -219,7 +219,7 @@ class Key extends CI_Controller {
         if ($node)
             $this->data['path'] = $this->phoenix->getPath($key, $currentnode);
 
-        
+        $this->phoenix->hasProjectItems($project);
         $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
 
         // included taxa
@@ -238,6 +238,7 @@ class Key extends CI_Controller {
         $this->data['keyformat'] = 'bracketed';
         $this->data['keyid'] = $key;
         $project = $this->htmlkeymodel->getProjectID($key);
+        $this->htmlkeymodel->hasProjectItems($project);
         $this->data['infilter'] = $this->htmlkeymodel->keyInFilter($key);
         $this->htmlkeymodel->GlobalFilter($project, $key);
         $this->data['keyname'] = $this->htmlkeymodel->getKeyName($key);
@@ -255,6 +256,7 @@ class Key extends CI_Controller {
         $this->data['keyformat'] = 'indented';
         $this->data['keyid'] = $key;
         $project = $this->htmlkeymodel->getProjectID($key);
+        $this->htmlkeymodel->hasProjectItems($project);
         $this->data['infilter'] = $this->htmlkeymodel->keyInFilter($key);
         $this->htmlkeymodel->GlobalFilter($project, $key);
         $this->data['keyname'] = $this->htmlkeymodel->getKeyName($key);
@@ -282,7 +284,7 @@ class Key extends CI_Controller {
         $this->data['key'] = $this->keymodel->getKey($key);
         
         if ($this->input->post('submit')) {
-            //$this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
+            $this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
             if ($_FILES['loadfile']['tmp_name']  ||
                     $this->input->post('loadurl') ||
                     $_FILES['delimitedtext']['tmp_name']) {
@@ -598,7 +600,7 @@ class Key extends CI_Controller {
                         $htmltablerow[] = '<td class="dead-ends">' . $row[2] . '</td>';
                         $errors['dead-ends'][] = $row;
                     }
-                    elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', $row[2]) || preg_match('/^[A-Z]{1,1}[a-z]+$/', $row[2]))) {
+                    elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', str_replace('×', '', $row[2])) || preg_match('/^[A-Z]{1,1}[a-z]+$/', str_replace('×', '', $row[2])))) {
                         $htmltablerow[] = '<td class="dead-ends">' . $row[2] . '</td>';
                         $errors['dead-ends'][] = $row;
                     }
@@ -1161,6 +1163,48 @@ class Key extends CI_Controller {
             
         }
         $this->load->view('loadimageview', $this->data);
+    }
+    
+    public function project_items($project) {
+        if (!$project || !isset($this->session->userdata['id'])) {
+            redirect(base_url());
+        }
+        
+        $this->load->model('projectmodel');
+        $this->data['project'] = $this->keymodel->getProjectData($project);
+
+        if ($this->input->post('submit')) {
+            if ($_FILES['itemsfile']['name']) {
+                $zip = new ZipArchive();
+                $path = getcwd() . '/uploads/' . basename($_FILES['itemsfile']['tmp_name']);
+                if ($zip->open($_FILES['itemsfile']['tmp_name']) === TRUE) {
+                    if (!file_exists($path))
+                        mkdir ($path);
+                    $zip->extractTo($path);
+                    if ($handle = opendir($path)) {
+                        while (false !== ($entry = readdir($handle))) {
+                            if (!in_array($entry, array('.', '..'))) {
+                                $itemsfilepath = $path . '/' . $entry;
+                            }
+                        }
+                        closedir($handle);
+                    }
+                    
+                    if (isset($itemsfilepath)) {
+                        $csv = array();
+                        $handle = fopen($itemsfilepath, 'r');
+                        while (!feof($handle)) {
+                            $row = fgetcsv($handle);
+                            if ($row)
+                                $csv[] = $row;
+                        }
+                        $this->projectmodel->loadProjectItems($project, $csv);
+                    }
+                }
+            }
+        }
+        
+        $this->load->view('project_items_view', $this->data);
     }
     
 }

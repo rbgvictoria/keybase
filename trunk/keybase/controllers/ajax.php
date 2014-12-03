@@ -105,32 +105,46 @@ class Ajax extends CI_Controller {
     }
     
     
+    public function remainingItemsJSON($key, $node=0) {
+        $this->load->model('nothophoenixmodel', 'phoenix');
+        $project = $this->phoenix->getProjectID($key);
+        $this->phoenix->GlobalFilter($project, $key);
+        $this->phoenix->hasProjectItems($project);
+        $node = $this->phoenix->getNode($key, $node);
+        $currentnode = $this->phoenix->getCurrentNode($node);
+        $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
+        $entities = $this->phoenix->getRemainingEntities($key, $remaining);
+        echo json_encode($entities);
+    }
+
+    
+    
+    
     private function auxRemaining($key, $node=FALSE) {
         $this->load->model('nothophoenixmodel', 'phoenix');
         $project = $this->phoenix->getProjectID($key);
         $this->phoenix->GlobalFilter($project, $key);
-        if ($node) {
-            $node = $this->phoenix->getNode($key, $node);
-            $currentnode = $this->phoenix->getCurrentNode($node);
-            $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
-        }
-        else 
-            $remaining = FALSE;
-        return $this->phoenix->getRemainingEntities($key, $remaining);
+        $this->phoenix->hasProjectItems($project);
+        $node = $this->phoenix->getNode($key, $node);
+        $currentnode = $this->phoenix->getCurrentNode($node);
+        $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
+        $entities = $this->phoenix->getRemainingEntities($key, $remaining);
+        return $entities;
     }
     
-    public function remainingItemsJSON($key, $node=FALSE) {
+    /*public function remainingItemsJSON($key, $node=FALSE) {
         $entities = $this->auxRemaining($key, $node=FALSE);
         if (isset($_GET['callback']))
             echo $_GET['callback'] . '(' . json_encode ($entities) . ')';
         else
             echo json_encode($entities);
-    }
+    }*/
     
     private function auxDiscarded($key, $node) {
         $this->load->model('nothophoenixmodel', 'phoenix');
         $project = $this->phoenix->getProjectID($key);
         $this->phoenix->GlobalFilter($project, $key);
+        $this->phoenix->hasProjectItems($project);
         $node = $this->phoenix->getNode($key, $node);
         $currentnode = $this->phoenix->getCurrentNode($node);
         $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);

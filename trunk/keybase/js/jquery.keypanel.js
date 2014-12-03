@@ -210,7 +210,7 @@ $(function(){
                     }
 
                     if (item.url) {
-                        entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        entity += '<a class="external" href="' + item.url + '">';
                     }
                     entity += item.name;
                     if (item.url) {
@@ -258,7 +258,7 @@ $(function(){
                     }
 
                     if (item.url) {
-                        entity += '<a class="external" href="' + item.url + '" target="_blank">';
+                        entity += '<a class="external" href="' + item.url + '">';
                     }
                     entity += item.name;
                     if (item.url) {
@@ -268,21 +268,6 @@ $(function(){
                         entity += '&nbsp;<a href="' +  site_url + '/key/nothophoenix/' + item.tokey + '">';
                         entity += '&#x25BA;';
                         entity += '</a>';
-                    }
-                    if (item.LinkTo) {
-                        entity += ': ';
-                        if (item.linkToUrl) {
-                            entity += '<a class="external" href="' + item.linkToUrl + '">';
-                        }
-                        entity += item.LinkTo;
-                        if (item.linkToUrl) {
-                            entity += '</a>';
-                        }
-                        if (item.LinkToItemsID) {
-                            entity += '&nbsp;<a href="' + site_url + '/key/nothophoenix/' + item.linkToItemsID + '">';
-                            entity += '&#x25BA;';
-                            entity += '</a>';
-                        }
                     }
                     entity += '</span>';
 

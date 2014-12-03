@@ -88,7 +88,7 @@
                                 $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
                             if ($item['url'])
-                                $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
+                                $entity[] = '<a class="external" href="' . $item['url'] . '">';
 
                             $entity[] = $item['name'];
                             if ($item['url'])
@@ -99,7 +99,7 @@
                             if ($item['LinkTo']) {
                                 $entity[] = ': ';
                                 if ($item['linkToUrl'])
-                                    $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '" target="_blank">';
+                                    $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '">';
                                 $entity[] = $item['LinkTo'];
                                 if ($item['linkToUrl'])
                                     $entity[] = '</a>';
@@ -129,7 +129,7 @@
                                 $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
                             if ($item['url'])
-                                $entity[] = '<a class="external" href="' . $item['url'] . '" target="_blank">';
+                                $entity[] = '<a class="external" href="' . $item['url'] . '">';
 
                             $entity[] = $item['name'];
                             if ($item['url'])
@@ -140,7 +140,7 @@
                             if ($item['LinkTo']) {
                                 $entity[] = ': ';
                                 if ($item['linkToUrl'])
-                                    $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '" target="_blank">';
+                                    $entity[] = '<a class="external" href="' . $item['linkToUrl'] . '">';
                                 $entity[] = $item['LinkTo'];
                                 if ($item['linkToUrl'])
                                     $entity[] = '</a>';

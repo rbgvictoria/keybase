@@ -214,6 +214,7 @@ ORDER BY KeyName;
     }
     
     private function getHighestDescendantNodeNumber($key, $leadid) {
+        set_time_limit(600);
         $parentids = array_keys($this->parentids, $leadid);
         if ($parentids) {
             foreach ($parentids as $parentid) {

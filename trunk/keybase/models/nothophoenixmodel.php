@@ -2,8 +2,8 @@
 require_once('playermodel.php');
 
 class NothophoenixModel extends PlayerModel {
-    
     private $Node;
+    protected $hasProjectItems;
 
     function  __construct() {
         parent::__construct();
@@ -171,18 +171,29 @@ class NothophoenixModel extends PlayerModel {
         else
             return FALSE;
     }
+    
+    public function hasProjectItems($project) {
+        parent::hasProjectItems($project);
+    }
 
     /**
      *
      * @return array|boolean 
      */
     function getRemainingEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            lti.URL AS LinkToURL, l.KeysID, 
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $url = ($this->hasProjectItems) ? 'pi.URL' : 'i.URL';
+        $linktourl = ($this->hasProjectItems) ? 'lpi.URL' : 'lti.URL';
+        
+        $this->db->select("i.Name, m.Filename, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            $linktourl AS LinkToURL, l.KeysID, 
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        if ($this->hasProjectItems) {
+            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
+            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
+        }
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('l.KeysID', $key);
         $this->db->where('!isnull(l.ItemsID)', false, false);
@@ -194,12 +205,16 @@ class NothophoenixModel extends PlayerModel {
         //$this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
         $this->db->union_push();
         
-        $this->db->select('i.Name, m.Filename, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            lti.URL AS LinkToURL, l.KeysID,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $this->db->select("i.Name, m.Filename, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            $linktourl AS LinkToURL, l.KeysID,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        if ($this->hasProjectItems) {
+            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
+            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
+        }
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('l.KeysID', $key);
         $this->db->where('!isnull(l.ItemsID)', false, false);
@@ -239,12 +254,19 @@ class NothophoenixModel extends PlayerModel {
      * @return array|boolean 
      */
     function getDiscardedEntities($key, $remaining) {
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            lti.URL AS LinkToURL,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $url = ($this->hasProjectItems) ? 'pi.URL' : 'i.URL';
+        $linktourl = ($this->hasProjectItems) ? 'lpi.URL' : 'lti.URL';
+        
+        $this->db->select("i.Name, m.Filename, l.ItemUrl, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            $linktourl AS LinkToURL,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        if ($this->hasProjectItems) {
+            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
+            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
+        }
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('!isnull(l.ItemsID)', false, false);
         $this->db->where('l.linkToItemsID IS NULL', FALSE, FALSE);
@@ -255,12 +277,16 @@ class NothophoenixModel extends PlayerModel {
         $this->db->group_by('i.Name');
         $this->db->union_push();
         
-        $this->db->select('i.Name, m.Filename, l.ItemUrl, i.ItemsID, i.URL, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            lti.URL AS LinkToURL,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname', FALSE);
+        $this->db->select("i.Name, m.Filename, l.ItemUrl, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
+            $linktourl AS LinkToURL,
+            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        if ($this->hasProjectItems) {
+            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
+            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
+        }
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('!isnull(l.ItemsID)', false, false);
         $this->db->where('l.KeysID', $key);

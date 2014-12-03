@@ -13,12 +13,27 @@ class HtmlKeyModel extends PlayerModel {
         parent::__construct();
     }
     
-    function getHtmlKey($keyid, $type) {
-        $this->db->select('p.ParentID, p.LeadText, p.LeadsID, l.NodeName, l.ItemsID, i.Name AS ItemName, l.LinkToItemsID, lti.Name AS LinkToItemName');
+    public function hasProjectItems($project) {
+        $this->project = $project;
+        parent::hasProjectItems($project);
+    }
+
+    private function getHtmlKey($keyid, $type) {
+        if ($this->hasProjectItems)
+            $links = ', pi.Url AS URL, lpi.Url AS LinkToURL';
+        else
+            $links = '';
+        
+        $this->db->select("p.ParentID, p.LeadText, p.LeadsID, l.NodeName, l.ItemsID, i.Name AS ItemName, 
+            l.LinkToItemsID, lti.Name AS LinkToItemName$links");
         $this->db->from('leads p');
         $this->db->join('leads l', 'p.LeadsID=l.ParentID AND l.NodeName IS NOT NULL', 'left');
         $this->db->join('items i', 'l.ItemsID=i.ItemsID', 'left');
         $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        if ($this->hasProjectItems) {
+            $this->db->join('projectitems pi', "i.ItemsID=pi.ItemsID AND pi.ProjectsID=$this->project", 'left', FALSE);
+            $this->db->join('projectitems lpi', "i.ItemsID=lpi.ItemsID AND lpi.ProjectsID=$this->project", 'left', FALSE);
+        }
         $this->db->where('p.KeysID', $keyid);
         $this->db->where('p.LeadText IS NOT NULL', FALSE, FALSE);
         
@@ -53,6 +68,8 @@ class HtmlKeyModel extends PlayerModel {
                             $nrow['NodeName'] = $to['ToNodeName'];
                             $nrow['LinkToItemsID'] = FALSE;
                             $nrow['LinkToItemName'] = FALSE;
+                            $nrow['URL'] = FALSE;
+                            $nrow['LinkToURL'] = FALSE;
                         }
                         else {
                             $nrow['LeadsID'] = $row->LeadsID;
@@ -60,6 +77,8 @@ class HtmlKeyModel extends PlayerModel {
                             $nrow['NodeName'] = $row->NodeName;
                             $nrow['LinkToItemsID'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemsID : FALSE;
                             $nrow['LinkToItemName'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemName : FALSE;
+                            $nrow['URL'] = ($this->hasProjectItems) ? $row->URL : FALSE;
+                            $nrow['LinkToURL'] = ($this->hasProjectItems) ? $row->LinkToURL : FALSE;
                         }
                         $result[] = (object) $nrow;
                     }
@@ -120,6 +139,8 @@ class HtmlKeyModel extends PlayerModel {
                     'NextKey' => $nextkey,
                     'LinkToName' => $linktoitemnames[$v],
                     'LinkToNextKey' => $linktonextkey,
+                    'URL' => $this->result[$v]->URL,
+                    'LinkToURL' => $this->result[$v]->LinkToURL
                 );
             }
             $result[] = $node;
@@ -220,23 +241,23 @@ class HtmlKeyModel extends PlayerModel {
                 $html .= ' <span class="to">';
                 
                 
+                if ($lead->URL)
+                    $html .= anchor($lead->URL, $lead->NodeName);
+                else
+                    $html .= $lead->NodeName;
+                if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
+                    $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
+                }
                 if ($lead->LinkToItemName) {
-                    $html .= $lead->LinkToItemName;
+                    $html .= ' (';
+                    if ($lead->URL)
+                        $html .= anchor($lead->LinkToURL, $lead->LinkToItemName);
+                    else
+                        $html .= $lead->LinkToItemName;
                     if ($lead->LinkToItemsID && $this->nextKey($lead->LinkToItemsID, $projectid)) {
                         $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->LinkToItemsID, $projectid) . '">&#x25BA;</a>';
                     }
-                    $html .= ' (';
-                    $html .= $lead->NodeName;
-                    if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
-                        $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
-                    }
                     $html .= ')';
-                }
-                else {
-                    $html .= $lead->NodeName;
-                    if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
-                        $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
-                    }
                 }
                 
                 $html .= '</span></td>';
