@@ -22,10 +22,10 @@ class HtmlKeyModel extends PlayerModel {
         if ($this->hasProjectItems)
             $links = ', pi.Url AS URL, lpi.Url AS LinkToURL';
         else
-            $links = '';
+            $links = ', i.URL AS URL, lti.URL AS LinkToURL';
         
         $this->db->select("p.ParentID, p.LeadText, p.LeadsID, l.NodeName, l.ItemsID, i.Name AS ItemName, 
-            l.LinkToItemsID, lti.Name AS LinkToItemName$links");
+            l.LinkToItemsID, lti.Name AS LinkToItemName$links", FALSE);
         $this->db->from('leads p');
         $this->db->join('leads l', 'p.LeadsID=l.ParentID AND l.NodeName IS NOT NULL', 'left');
         $this->db->join('items i', 'l.ItemsID=i.ItemsID', 'left');
@@ -41,7 +41,7 @@ class HtmlKeyModel extends PlayerModel {
             $this->db->where_in('p.LeadsID', $this->FilterLeads);
         
         if ($type == 'bracketed')
-            $this->db->order_by('p.ParentID');
+            $this->db->order_by('p.ParentID, p.NodeNumber');
         elseif ($type == 'indented')
             $this->db->order_by('p.NodeNumber');
         $query = $this->db->get();
@@ -94,7 +94,6 @@ class HtmlKeyModel extends PlayerModel {
     
     public function createBracketedKey($keyid, $projectid=FALSE) {
         $this->result = $this->getHtmlKey($keyid, 'bracketed');
-        //print_r($this->result);
         $result = array();
         $nodeids = array();
         $texts = array();

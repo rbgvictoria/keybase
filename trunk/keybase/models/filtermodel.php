@@ -208,7 +208,7 @@ class FilterModel extends CI_Model {
             $insertArray = array_merge($filterArray, array(
                 'FilterID' => $filterid,
                 'TimestampCreated' => date('Y-m-d H:i:s'),
-                'UsersID' => (isset($this->session->userdata['id'])) ? isset($this->session->userdata['id']) : NULL,
+                'UsersID' => (isset($this->session->userdata['id'])) ? $this->session->userdata['id'] : NULL,
                 'IPAddress' => $this->input->ip_address(),
                 'SessionID' => $this->session->userdata('session_id')
             ));
