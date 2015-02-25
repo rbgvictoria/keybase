@@ -17,7 +17,7 @@ class Key extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->output->enable_profiler(TRUE);
+        $this->output->enable_profiler(FALSE);
         $this->load->model('keymodel');
         
         // Allow for custom style sheets and javascript
@@ -281,7 +281,6 @@ class Key extends CI_Controller {
         $projectid = $this->keymodel->getProjectID($key);
         $this->data['projectid'] = $projectid;
         $this->data['keyid'] = $key;
-        $this->data['key'] = $this->keymodel->getKey($key);
         
         if ($this->input->post('submit')) {
             $this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
@@ -362,6 +361,7 @@ class Key extends CI_Controller {
             redirect($this->input->post('referer'));
         }
         
+        $this->data['key'] = $this->keymodel->getKey($key);
         $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         $this->load->view('editkeyview', $this->data);
     }
@@ -459,7 +459,7 @@ class Key extends CI_Controller {
             if ($this->input->post('tempfilename') && file_exists('uploads/' . $this->input->post('tempfilename')))
                 unlink ('uploads/' . $this->input->post('tempfilename'));
             if ($this->input->post('keyid'))
-                $this->keymodel->deleteKey($keyid, $this->session->userdata['id']);
+                $this->keymodel->deleteKey($this->input->post('keyid'), $this->session->userdata['id']);
             redirect($this->input->post('referer'));
         }
 
@@ -550,7 +550,6 @@ class Key extends CI_Controller {
                 else $tonode = FALSE;
             }
             
-            
             $htmltablerow = array();
             if ($numcols < 3) {
                 $htmltablerow[] = '<tr class="too-few-columns">';
@@ -601,8 +600,8 @@ class Key extends CI_Controller {
                         $errors['dead-ends'][] = $row;
                     }
                     elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', str_replace('×', '', $row[2])) || preg_match('/^[A-Z]{1,1}[a-z]+$/', str_replace('×', '', $row[2])))) {
-                        $htmltablerow[] = '<td class="dead-ends">' . $row[2] . '</td>';
-                        $errors['dead-ends'][] = $row;
+                        $htmltablerow[] = '<td class="possible-dead-ends">' . $row[2] . '</td>';
+                        $warnings['possible-dead-ends'][] = $row;
                     }
                     elseif (isset($this->endnodes[$k])) {
                         $htmltablerow[] = '<td class="endnode">' . $row[2] . '</td>';
