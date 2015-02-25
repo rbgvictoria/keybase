@@ -656,6 +656,10 @@ td.dead-ends {
     background-color: rgb(220, 75, 175);
 }
 
+td.possible-dead-ends {
+    background-color: rgb(220, 196, 75);
+}
+
 td.reticulations {
     background-color: rgb(100, 150, 200);
 }
