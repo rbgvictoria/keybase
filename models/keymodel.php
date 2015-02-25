@@ -8,7 +8,7 @@ class KeyModel extends CI_Model {
 
     function getKeys($item=FALSE, $key=FALSE) {
         $this->db->select('k.KeysID, k.Name, k.Rank, k.TaxonomicScope, k.GeographicScope,
-            p.ProjectsID, p.Name AS ProjectName');
+            p.ProjectsID, p.Name AS ProjectNamezz');
         $this->db->from('keys k');
         $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID', 'left');
         if ($item)
@@ -49,7 +49,7 @@ class KeyModel extends CI_Model {
     }
     
     function getKey($keyid) {
-        $this->db->select("k.KeysID, k.Name, k.UID, k.Description, k.Rank, k.TaxonomicScope, k.GeographicScope, 
+        $this->db->select("k.KeysID, k.Name, k.UID, k.Description, k.Rank, k.TaxonomicScope, k.GeographicScope, k.Notes,
             CONCAT(u.FirstName, ' ', u.LastName) AS Owner, s.Authors, s.`Year`, s.Title, s.InAuthors, s.InTitle, 
             s.Edition, s.Journal, s.Series, s.Volume, s.Part, s.Publisher, s.PlaceOfPublication, s.Pages, s.Modified, 
             s.Url, 
@@ -321,7 +321,7 @@ class KeyModel extends CI_Model {
         $this->db->from('keys k');
         $this->db->where('k.ProjectsID', $projectid);
         if ($userid) {
-            $this->db->select("IF(pu.UsersID IS NOT NULL, 1, 0) AS Edit, IF(pu.Role='Manager', 1, 0) AS `Delete`", FALSE);
+            $this->db->select("IF(pu.UsersID IS NOT NULL, 1, 0) AS Edit, IF(pu.Role='Manager' OR k.CreatedByID=$userid, 1, 0) AS `Delete`", FALSE);
             $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID');
             $this->db->join('projects_users pu', "p.ProjectsID=pu.ProjectsID AND pu.UsersID=$userid", 'left');
         }
@@ -431,6 +431,7 @@ class KeyModel extends CI_Model {
             'Description' => $data['description'],
             'TaxonomicScope' => $data['taxonomicscope'],
             'GeographicScope' => $data['geographicscope'],
+            'Notes' => $data['notes'],
             'ProjectsID' => $data['projectid'],
             'CreatedByID' => $data['createdbyid'],
         );
@@ -496,7 +497,7 @@ class KeyModel extends CI_Model {
 
             $this->db->select('SourcesID');
             $this->db->from('keys');
-            $this->db->where('KeysID', $data['keyid']);
+            $this->db->where('KeysID', $keysid);
             $query = $this->db->get();
             $row = $query->row();
             if ($row->SourcesID) {
