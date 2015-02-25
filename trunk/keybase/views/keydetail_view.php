@@ -25,13 +25,17 @@
     <p><span class="label">Geographic scope: </span><?=$key['GeographicScope']?></p>
     
     <?php if ($key['Description']): ?>
-    <p><span class="label">Notes:</span><span class="textarea"><?=$key['Description']?></span></p>
+    <p><span class="label">Description:</span><span class="textarea"><?=$key['Description']?></span></p>
+    <?php endif; ?>
+    
+    <?php if ($key['Notes']): ?>
+    <p><span class="label">Notes:</span><span class="textarea"><?=$key['Notes']?></span></p>
     <?php endif; ?>
     
     
     <?php if ($citation): ?>
     <h3>Source/attribution</h3>
-    <p><?=substr($citation, 5)?>
+    <p><?=substr($citation, strpos($citation, ':')+2)?>
     <?php if ($key['Url']): ?>
         [<?=anchor($key['Url'], $key['Url']); ?>]
     <?php endif; ?>    

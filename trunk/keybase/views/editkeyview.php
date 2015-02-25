@@ -36,9 +36,9 @@
             ));
         ?>
         <p>
-            Delimiter: <?=form_radio(array('name'=>'delimiter', 'id'=>'comma', 'value'=>'comma',($delimiter == 'comma') ? 'checked' : FALSE)) ?>
+            Delimiter: <?=form_radio(array('name'=>'delimiter', 'id'=>'comma', 'value'=>'comma', 'checked' =>($delimiter == 'comma') ? 'checked' : FALSE)) ?>
             <?=form_label('comma', 'comma', array('style'=>'width: auto'))?>
-            <?=form_radio(array('name'=>'delimiter', 'id'=>'tab', 'value'=>'tab',  'checked'=> ($delimiter == 'tab') ? 'checked' : FALSE)) ?>
+            <?=form_radio(array('name'=>'delimiter', 'id'=>'tab', 'value'=>'tab', 'checked' => ($delimiter == 'tab') ? 'checked' : FALSE)) ?>
             <?=form_label('tab', 'tab')?>
         </p>
 
@@ -58,6 +58,7 @@
         <p style="text-align: right">
             <?=form_submit('submit2', 'OK')?>
             <?=form_submit('cancel', 'Cancel')?>
+            <?=form_hidden('keyid', $keyid)?>
         </p>
 
     <?=form_close()?>
@@ -196,6 +197,23 @@
         ?>
         </span>
     </p>
+    <p>
+        <span style="font-weight: bold;">
+        <?php
+            $data = array(
+                'name' => 'notes',
+                'id' => 'notes',
+                'value' => (isset($key['Notes'])) ? $key['Notes'] : FALSE,
+                'rows' => 3,
+                'cols' => 90,
+                'style' => 'vertical-align: top',
+            );
+            echo form_label('Notes: ', 'description');
+            echo form_textarea($data);
+        
+        ?>
+        </span>
+    </p>
     <?php if (isset($key)): ?>
     <p>
         <span style="font-weight: bold;">
@@ -242,7 +260,8 @@
                 echo form_input($data);
             ?>
         </div>
-        <div style="margin-bottom:10px;"><label>&nbsp;</label><span style="color:gray">Format: &lt;last name&gt;, &lt;initials&gt;[; &lt;last name&gt;, &lt;initials&gt;][...]</span></div>
+        <div><label>&nbsp;</label><span style="color:gray">Format: &lt;last name&gt;, &lt;initials&gt;[; &lt;last name&gt;, &lt;initials&gt;][...]</span></div>
+        <div style="margin-bottom:10px;"><label>&nbsp;</label><span style="color:gray">e.g.: Jones, B.J.; Smith, P.H. (...etc)</span></div>
         <div>
             <?php
                 $data = array(
