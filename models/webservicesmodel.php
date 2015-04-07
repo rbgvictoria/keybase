@@ -1,9 +1,13 @@
 <?php
 
-class WebServicesModel extends CI_Model {
+class WebServicesModel extends KeyModel {
     
     public function __construct() {
         parent::__construct();
+    }
+    
+    public function getProjects() {
+        
     }
     
     public function retrieveFilter($t, $v) {
@@ -149,6 +153,210 @@ class WebServicesModel extends CI_Model {
         else
             return FALSE;
     }
+    
+    public function getKey($keyid) {
+        $this->db->select("k.KeysID AS key_id, 
+            k.Name AS key_name, 
+            k.UID, 
+            k.Description AS description, 
+            k.Rank AS rank, 
+            k.TaxonomicScope AS taxonomic_scope, 
+            k.GeographicScope AS geographic_scope, 
+            k.Notes AS notes,
+            CONCAT(u.FirstName, ' ', u.LastName) AS owner", FALSE);
+        $this->db->from('keys k');
+        $this->db->join('users u', 'k.CreatedByID=u.UsersID');
+        $this->db->where('k.KeysID', $keyid);
+        $query = $this->db->get();
+        
+        if ($query->num_rows()) {
+            return $query->row_array();
+        }
+    }
+    
+    public function getProjectDetails($keyid) {
+        $this->db->select('p.ProjectsID AS project_id, p.Name AS project_name, p.ProjectIcon AS project_icon');
+        $this->db->from('projects p');
+        $this->db->join('keys k', 'p.ProjectsID=k.ProjectsID');
+        $this->db->where('k.KeysID', $keyid);
+        $query = $this->db->get();
+        return $query->row_array();
+    }
+    
+    function getSource($keyid) {
+        $this->db->select("s.Authors AS author, s.Year AS publication_year, s.Title AS title, s.InAuthors AS in_author, 
+            s.InTitle AS in_title, s.Edition AS edition, s.Journal AS journal, s.Series AS series, s.Volume AS volume, 
+            s.Part AS part, s.Publisher AS publisher, s.PlaceOfPublication AS place_of_publication, s.Pages AS page, 
+            s.Modified AS is_modified, s.Url AS url");
+        $this->db->from('keys k');
+        $this->db->join('sources s', 'k.SourcesID=s.SourcesID', 'left');
+        $this->db->where('k.KeysID', $keyid);
+        $query = $this->db->get();
+        
+        if ($query->num_rows()) {
+            return $query->row_array();
+        }
+    }
+    
+    public function getKeyItems($keysid) {
+        $bie = 'http://bie.ala.org.au/species/';
+        
+        $query = $this->db->query("SELECT count(*) AS num FROM projectitems WHERE ProjectsID=(SELECT ProjectsID FROM `keys` WHERE KeysID=$keysid)", FALSE);
+        $row = $query->row();
+        $hasProjectItems = ($row->num) ? TRUE : FALSE;
+        
+        if ($hasProjectItems) {
+            $this->db->select('i.ItemsID AS item_id, 
+                coalesce(m.Name, i.Name) AS item_name,
+                coalesce(mpi.Url, pi.Url) AS url,
+                coalesce(mkto.KeysID, kto.KeysID) AS to_key,
+                mlt.ItemsID AS link_to_item_id,
+                mlt.Name AS link_to_item_name,
+                lpi.Url AS link_to_url,
+                mltkto.KeysID AS link_to_key', FALSE);
+        }
+        else {
+            $this->db->select("i.ItemsID AS item_id, 
+                coalesce(m.Name, i.Name) AS item_name,
+                concat('$bie', coalesce(m.LSID, i.LSID)) AS url,
+                coalesce(mkto.KeysID, kto.KeysID) AS to_key,
+                mlt.ItemsID AS link_to_item_id,
+                mlt.Name AS link_to_item_name,
+                concat('$bie', mlt.LSID) AS link_to_url,
+                mltkto.KeysID AS link_to_key", FALSE);
+        }
+        $this->db->from('leads l');
+        $this->db->join('keys k', 'l.keysID=k.KeysID');
+        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
+        $this->db->join('keys kto', 'l.ItemsID=kto.TaxonomicScopeID AND k.ProjectsID=kto.ProjectsID', 'left');
+        $this->db->join('groupitem gi', 'l.ItemsID=gi.GroupID AND gi.OrderNumber=0', 'left', FALSE);
+        $this->db->join('items m', 'gi.MemberID=m.ItemsID', 'left');
+        $this->db->join('keys mkto', 'm.ItemsID=mkto.TaxonomicScopeID AND k.ProjectsID=mkto.ProjectsID', 'left');
+        $this->db->join('groupitem gilt', 'l.ItemsID=gilt.GroupID AND gilt.OrderNumber=1', 'left', FALSE);
+        $this->db->join('items mlt', 'gilt.MemberID=mlt.ItemsID', 'left');
+        $this->db->join('keys mltkto', 'mlt.ItemsID=mltkto.TaxonomicScopeID AND k.ProjectsID=mltkto.ProjectsID', 'left');
+        
+        if ($hasProjectItems) {
+            $this->db->join('projectitems pi', "i.ItemsID=pi.ItemsID AND pi.ProjectsID=k.ProjectsID", 'left', FALSE);
+            $this->db->join('projectitems mpi', "m.ItemsID=mpi.ItemsID AND mpi.ProjectsID=k.ProjectsID", 'left', FALSE);
+            $this->db->join('projectitems lpi', "mlt.ItemsID=lpi.ItemsID AND lpi.ProjectsID=k.ProjectsID", 'left', FALSE);
+        }
+        
+        $this->db->where('l.KeysID', $keysid);
+        $this->db->group_by('item_id');
+        $this->db->order_by('item_name, link_to_item_name');
+        
+        $query = $this->db->get();
+        if ($query->num_rows())
+            return $query->result_array();
+        else
+            return FALSE;
+    }
+    
+    public function getLeads($keysid) {
+        $this->db->select("p.ParentID AS parent_id, p.LeadsID AS lead_id, /*p.NodeNumber AS `left`, p.HighestDescendantNodeNumber AS `right`,*/ 
+            p.LeadText AS lead_text, l.ItemsID AS item", false);
+        $this->db->from('leads p');
+        $this->db->join('leads l', 'p.LeadsID=l.ParentID AND l.NodeName IS NOT NULL', 'left', false);
+        $this->db->where('p.KeysID', $keysid);
+        $this->db->where('p.LeadText IS NOT NULL', false, false);
+        $this->db->order_by('p.ParentID, p.NodeNumber');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    
+    public function getRootNode($keysID) {
+        $this->db->select('LeadsID AS root_node_id /*, NodeNumber AS `left`, HighestDescendantNodeNumber AS `right`*/', FALSE);
+        $this->db->from('leads');
+        $this->db->where('KeysID', $keysID);
+        $this->db->where('NodeNumber', 1);
+        $query = $this->db->get();
+        return $query->row();
+    }
+    
+    /**
+     * getProjectsStats
+     * 
+     * Extension of the function in the parent class. Adds taxonomic scope, geographic scope and first key
+     * (key with the same taxonomic scope as the project).
+     * 
+     * @return array
+     */
+    public function getProjectStats($project=FALSE) {
+        $this->db->select('p.ProjectsID, p.Name AS ProjectName, p.TaxonomicScopeID, p.TaxonomicScope,
+            p.GeographicScope, p.ProjectIcon, fk.KeysID AS FirstKeyID, fk.Name AS FirstKeyName, count(DISTINCT k.KeysID) AS NumKeys, 
+            count(DISTINCT coalesce(gi.MemberID, l.ItemsID)) AS NumTaxa', FALSE);
+        $this->db->from('projects p');
+        $this->db->join('keys k', 'p.ProjectsID=k.ProjectsID');
+        $this->db->join('keys fk', 'p.TaxonomicScopeID=fk.TaxonomicScopeID AND p.ProjectsID=fk.ProjectsID', 'left');
+        $this->db->join('leads l', 'k.KeysID=l.KeysID', 'left');
+        $this->db->join('groupitem gi', 'l.ItemsID=gi.GroupID', 'left');
+        if ($project) {
+            $this->db->where('p.ProjectsID', $project);
+        }
+        $this->db->group_by('p.ProjectsID');
+        $this->db->order_by('NumKeys', 'desc');
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $ret = array();
+            foreach ($query->result_array() as $row) {
+                $this->db->select('count(distinct UsersID) AS NumUsers', FALSE);
+                $this->db->from('projects_users');
+                $this->db->where('ProjectsID', $row['ProjectsID']);
+                $q = $this->db->get();
+                $ret[] = array_merge($row, $q->row_array());
+            }
+            return $ret;
+        }
+    }
+    
+    public function getProjectItems($project) {
+        $this->db->select("coalesce(i.ItemsID,gi.ItemsID) AS item_id, coalesce(i.Name, gi.Name) AS item_name", FALSE);
+        $this->db->from('leads l');
+        $this->db->join('keys k', 'l.KeysID=k.KeysID');
+        $this->db->join('items i', 'l.ItemsID=i.ItemsID AND l.ItemsID NOT IN (SELECT GroupID FROM groupitem)', 'left', FALSE);
+        $this->db->join('groupitem g0', 'l.ItemsID=g0.GroupID AND g0.OrderNumber=0', 'left', FALSE);
+        $this->db->join('groupitem g1', 'l.ItemsID=g1.GroupID AND g1.OrderNumber=1', 'left', FALSE);
+        $this->db->join('items gi', 'coalesce(g0.MemberID, g1.MemberID)=gi.ItemsID', 'left', FALSE);
+        $this->db->where('k.ProjectsID', $project);
+        $this->db->where('coalesce(i.ItemsID,gi.ItemsID) IS NOT NULL', FALSE, FALSE);
+        $this->db->group_by('item_id');
+        $this->db->order_by('item_name');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    
+    /**
+     * getProjectKeys()
+     * 
+     * Extends method in the parent class by adding key hierarchy
+     * 
+     * @param integer $project
+     * @return array
+     */
+    public function getProjectKeys($project) {
+        $query = $this->db->query("SELECT k.KeysID, k.Name, k.TaxonomicScopeID, s.KeysID AS ParentKeyID, s.Name AS ParentKeyName
+            FROM `keys` k
+            LEFT JOIN (
+            SELECT coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) AS KeyID, sk.KeysID, sk.Name, sk.TaxonomicScopeID
+            FROM `keys` sk
+            JOIN leads sl ON sk.KeysID=sl.KeysID
+            LEFT JOIN `keys` slk ON sl.ItemsID=slk.TaxonomicScopeID AND slk.ProjectsID=$project
+            LEFT JOIN groupitem sg ON sl.ItemsID=sg.GroupID
+            LEFT JOIN `keys` sgk ON sg.MemberID=sgk.TaxonomicScopeID AND sg.OrderNumber=0 AND sgk.ProjectsID=$project
+            LEFT JOIN `keys` sglk ON sg.MemberID=sglk.TaxonomicScopeID AND sg.OrderNumber=1 AND sglk.ProjectsID=1
+            WHERE sk.ProjectsID=$project AND coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) IS NOT NULL
+            GROUP BY KeyID
+            ) as s ON k.KeysID=s.KeyID
+            WHERE k.ProjectsID=$project
+            ORDER BY k.Name");
+        return $query->result();
+    }
+
+    
+
+
+
 }
 
 ?>

@@ -132,14 +132,8 @@ class LpxkToKeyBaseModel extends CI_Model {
         
         // Get the items
         foreach ($array as $row) {
-            if (is_numeric($row['toNode']) || !strpos($row['toNode'], '{')) {
-                $goto = $row['toNode'];
-                $linkto = NULL;
-            }
-            else {
-                $goto = trim(substr($row['toNode'], 0, strpos($row['toNode'], '{')));
-                $linkto = trim(substr($row['toNode'], strpos($row['toNode'], '{')+1, strpos($row['toNode'], '}')-strpos($row['toNode'], '{')-1));
-            }
+            $goto = $row['toNode'];
+
             if ($row && !is_numeric($row['toNode'])) {
                 $this->items[] = array(
                     'id' => $goto,
@@ -148,16 +142,6 @@ class LpxkToKeyBaseModel extends CI_Model {
                     'url' => NULL
                 );
                 $this->itemIDs[] = $goto;
-                
-                if ($linkto) {
-                    $this->items[] = array(
-                        'id' => $linkto,
-                        'name' => $linkto,
-                        'icon' => NULL,
-                        'url' => NULL
-                    );
-                    $this->itemIDs[] = $linkto;
-                }
             }
         }
         
@@ -167,20 +151,12 @@ class LpxkToKeyBaseModel extends CI_Model {
         
         // Get all the leads
         foreach ($array as $index => $row) {
-            if (is_numeric($row['toNode']) || !strpos($row['toNode'], '{')) {
-                $goto = $row['toNode'];
-                $linkto = NULL;
-            }
-            else {
-                $goto = trim(substr($row['toNode'], 0, strpos($row['toNode'], '{')));
-                $linkto = trim(substr($row['toNode'], strpos($row['toNode'], '{')+1, strpos($row['toNode'], '}')-strpos($row['toNode'], '{')-1));
-            }
+            $goto = $row['toNode'];
             $this->stepIDs[] = $row['fromNode'];
             $this->leads[] = array(
                 'stepid' => $row['fromNode'],
                 'leadid' => $index + 1,
                 'goto' => $goto,
-                'linkto' => $linkto,
                 'icon' => NULL,
                 'leadtext' => $row['leadText'],
             );
@@ -271,6 +247,12 @@ class LpxkToKeyBaseModel extends CI_Model {
         $row = $query->row();
         $newitemsid = $row->max + 1;
         
+        $select = "SELECT max(GroupItemID) as max
+            FROM groupitem";
+        $query = $this->db->query($select);
+        $row = $query->row();
+        $newgroupitemid = $row->max + 1;
+        
         $select = "SELECT ItemsID
             FROM items
             WHERE Name=?";
@@ -281,6 +263,9 @@ class LpxkToKeyBaseModel extends CI_Model {
         $apcLSID = "SELECT TaxonLSID
             FROM apc_taxa
             WHERE ScientificName=?";
+        
+        $gi_insert = "INSERT INTO groupitem (GroupItemID, OrderNumber, GroupID, MemberID)
+            VALUES (?, ?, ?, ?)";
         
         foreach ($this->items as $key=>$item) {
             $query = $this->db->query($select, array($item['name']));
@@ -299,8 +284,38 @@ class LpxkToKeyBaseModel extends CI_Model {
                 
                 $this->db->query($insert, array($newitemsid, $item['name'], $lsid));
                 $this->items[$key]['ItemsID'] = $newitemsid;
+                
+                if (strpos($item['name'], '{')) {
+                    $groupid = $newitemsid;
+                    $members = array();
+                    $members[] = trim(substr($item['name'], 0, strpos($item['name'], '{')));
+                    $members[] = trim(substr($item['name'], strpos($item['name'], '{')+1, strpos($item['name'], '}') - strpos($item['name'], '{') -1));
+                    
+                    foreach ($members as $index => $value) {
+                        $query = $this->db->query($select, array($value));
+                        if ($query->num_rows()) {
+                            $row = $query->row();
+                            $memberid = $row->ItemsID;
+                        }
+                        else {
+                            $query = $this->db->query($apcLSID, array($item['name']));
+                            if ($query->num_rows()) {
+                                $row = $query->row();
+                                $lsid = $row->TaxonLSID;
+                            }
+                            else
+                                $lsid = NULL;
+                            $newitemsid++;
+                            $memberid = $newitemsid;
+                            $this->db->query($insert, array($newitemsid, $value, $lsid));
+                        }
+                        $this->db->query($gi_insert, array($newgroupitemid, $index, $groupid, $memberid));
+                        $newgroupitemid++;
+                    }
+                }
                 $newitemsid++;
             }
+            
         }
     }
     
@@ -400,13 +415,6 @@ class LpxkToKeyBaseModel extends CI_Model {
                 if ($key !== FALSE) {
                     $endnode['NodeName'] = $this->items[$key]['name'];
                     $endnode['ItemsID'] = $this->items[$key]['ItemsID'];
-                    if ($thisLead['linkto']) {
-                        $endnode['LinkToItem'] = $thisLead['linkto']; 
-                        $lkey = array_search($thisLead['linkto'], $this->itemIDs);
-                        if ($lkey !== FALSE) {
-                            $endnode['LinkToItemsID'] = $this->items[$lkey]['ItemsID'];
-                        }
-                    }
                     if ($this->items[$key]['icon']) {
                         $ikey = array_search($this->items[$key]['icon'], $this->icons);
                         $endnode['MediaID'] = $this->media[$ikey]['id'];
@@ -505,8 +513,6 @@ class Lead {
     var $NodeNumber = NULL;
     var $HighestDescendantNodeNumber = NULL;
     var $ItemsID = NULL;
-    var $LinkToItem = NULL;
-    var $LinkToItemsID = NULL;
     var $MediaID = NULL;
     var $ItemUrl = NULL;
     var $TimestampCreated = NULL;

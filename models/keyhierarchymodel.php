@@ -66,13 +66,30 @@ class KeyHierarchyModel extends CI_Model {
     private function getFirstKey() {
         $ret = array();
         
-        $this->db->select('if(tk.TaxonomicScopeID IS NOT NULL, tk.TaxonomicScopeID, ltk.TaxonomicScopeID) AS ID', FALSE);
+        /*
+         * SELECT coalesce(tk.TaxonomicScopeID, mtk.TaxonomicScopeID, mltk.TaxonomicScopeID) AS ID
+FROM (`leads` l)
+LEFT JOIN `keys` tk ON l.ItemsID=tk.TaxonomicScopeID AND tk.ProjectsID=6
+LEFT JOIN groupitem g ON l.ItemsID=g.GroupID
+LEFT JOIN items m ON g.MemberID=m.ItemsID AND g.OrderNumber=0
+LEFT JOIN `keys` mtk ON m.ItemsID=mtk.TaxonomicScopeID AND mtk.ProjectsID=6
+LEFT JOIN items ml ON g.MemberID=ml.ItemsID AND g.OrderNumber=1
+LEFT JOIN `keys` mltk ON ml.ItemsID=`mltk`.`TaxonomicScopeID` AND mltk.ProjectsID=6
+JOIN `keys` k ON `l`.`KeysID`=`k`.`KeysID`
+WHERE `k`.`ProjectsID` = '6' AND coalesce(tk.KeysID, mtk.KeysID, mltk.KeysID) IS NOT NULL
+         */
+        
+        $this->db->select('coalesce(tk.TaxonomicScopeID, mtk.TaxonomicScopeID, mltk.TaxonomicScopeID) AS ID', FALSE);
         $this->db->from('leads l');
         $this->db->join('`keys` tk', "l.ItemsID=tk.TaxonomicScopeID AND tk.ProjectsID=$this->projectid", 'left', FALSE);
-        $this->db->join('`keys` ltk', "l.LinkToItemsID=ltk.TaxonomicScopeID AND ltk.ProjectsID=$this->projectid", 'left');
-        $this->db->join('keys k', 'l.KeysID=k.KeysID');
+        $this->db->join('groupitem g', 'l.ItemsID=g.GroupID', 'left');
+        $this->db->join('items m', 'g.MemberID=m.ItemsID AND g.OrderNumber=0', 'left', FALSE);
+        $this->db->join('`keys` mtk', "m.ItemsID=mtk.TaxonomicScopeID AND mtk.ProjectsID=$this->projectid", 'left', FALSE);
+        $this->db->join('items ml', "g.MemberID=ml.ItemsID AND g.OrderNumber=1", 'left', FALSE);
+        $this->db->join('`keys` mltk', "ml.ItemsID=mltk.TaxonomicScopeID AND mltk.ProjectsID=$this->projectid", 'left', FALSE);
+         $this->db->join('keys k', 'l.KeysID=k.KeysID');
         $this->db->where('k.ProjectsID', $this->projectid);
-        $this->db->where('(tk.KeysID IS NOT NULL OR ltk.KeysID IS NOT NULL)', FALSE, FALSE);
+        $this->db->where('coalesce(tk.KeysID, mtk.KeysID, mltk.KeysID) IS NOT NULL', FALSE, FALSE);
         $subquery = $this->db->get();
         $linkeditems = array();
         if ($subquery->num_rows()) {
@@ -168,23 +185,32 @@ class KeyHierarchyModel extends CI_Model {
     private function getNextKey($keyid, $depth) {
         
         /*
-         * SELECT IF(k.KeysID IS NOT NULL, k.KeysID, lk.KeysID) AS KeyID, IF(k.Name IS NOT NULL, k.Name, lk.Name) AS KeyName, l.KeysID AS ParentKeyID
+         * SELECT IF(coalesce(mk.KeysID, k.KeysID) IS NOT NULL, coalesce(mk.KeysID, k.KeysID), lk.KeysID) AS KeyID,
+  IF(coalesce(mk.Name, k.Name) IS NOT NULL, coalesce(mk.Name, k.Name), lk.Name) AS KeyName, l.KeysID AS ParentKeyID
 FROM (`leads` l)
+LEFT JOIN groupitem g ON l.ItemsID=g.GroupID AND g.OrderNumber=0
+LEFT JOIN groupitem gl ON l.ItemsID=gl.GroupID AND gl.OrderNumber=1
 LEFT JOIN `keys` k ON `l`.`ItemsID`=`k`.`TaxonomicScopeID` AND k.ProjectsID=10
-LEFT JOIN `keys` lk ON `l`.`LinkToItemsID`=`lk`.`TaxonomicScopeID` AND lk.ProjectsID=10
-WHERE `l`.`KeysID` =  '1903'
-AND (k.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)
+LEFT JOIN `keys` mk ON g.MemberID=k.TaxonomicScopeID AND k.ProjectsID=10
+LEFT JOIN `keys` lk ON gl.MemberID=`lk`.`TaxonomicScopeID` AND lk.ProjectsID=10
+WHERE `l`.`KeysID` =  '1907'
+AND (k.KeysID IS NOT NULL OR mk.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)
 GROUP BY KeyID
 ORDER BY KeyName;
 
+
          */
-        $this->db->select('IF(k.KeysID IS NOT NULL, k.KeysID, lk.KeysID) AS KeyID, 
-            IF(k.Name IS NOT NULL, k.Name, lk.Name) AS KeyName, l.KeysID AS ParentKeyID', FALSE);
+        $this->db->select('IF(coalesce(mk.KeysID, k.KeysID) IS NOT NULL, coalesce(mk.KeysID, k.KeysID), lk.KeysID) AS KeyID,
+            IF(coalesce(mk.Name, k.Name) IS NOT NULL, coalesce(mk.Name, k.Name), lk.Name) AS KeyName, 
+            l.KeysID AS ParentKeyID', FALSE);
         $this->db->from('leads l');
+        $this->db->join('groupitem g', 'l.ItemsID=g.GroupID AND g.OrderNumber=0', 'left', FALSE);
+        $this->db->join('groupitem gl', 'l.ItemsID=gl.GroupID AND gl.OrderNumber=1', 'left', FALSE);
         $this->db->join('`keys` k', "l.ItemsID=k.TaxonomicScopeID AND k.ProjectsID=$this->projectid", 'left', FALSE);
-        $this->db->join('`keys` lk', "l.LinkToItemsID=lk.TaxonomicScopeID AND lk.ProjectsID=$this->projectid", 'left', FALSE);
+        $this->db->join('`keys` mk', "g.MemberID=k.TaxonomicScopeID AND k.ProjectsID=$this->projectid", 'left', FALSE);
+        $this->db->join('`keys` lk', "gl.MemberID=lk.TaxonomicScopeID AND lk.ProjectsID=$this->projectid", 'left', FALSE);
         $this->db->where('l.KeysID', $keyid);
-        $this->db->where('(k.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)', FALSE, FALSE);
+        $this->db->where('(k.KeysID IS NOT NULL OR mk.KeysID IS NOT NULL OR lk.KeysID IS NOT NULL)', FALSE, FALSE);
         $this->db->group_by('KeyID');
         $this->db->order_by('KeyName');
         $query = $this->db->get();

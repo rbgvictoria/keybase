@@ -682,3 +682,8 @@ td.will-not-key-out {
 .ui-state-disabled {
     color: #aaaaaa;
 }
+
+.grey {
+    color: #666;
+    /*font-weight: bold;*/
+}

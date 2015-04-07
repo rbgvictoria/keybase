@@ -55,7 +55,7 @@ class Exportmodel extends CI_Model {
      * @return array|boolean 
      */
     private function getKey($keyid) {
-        $this->db->select('l.ParentID, l.LeadText, l.LeadsID, c.NodeName, c.LinkToItem,
+        $this->db->select('l.ParentID, l.LeadText, l.LeadsID, c.NodeName,
             m.FileName as LeadIcon, im.FileName as ItemIcon, c.ItemUrl');
         $this->db->from('leads l');
         $this->db->join('leads c', 'l.LeadsID=c.ParentID AND c.NodeName IS NOT NULL', 'left');
@@ -80,13 +80,11 @@ class Exportmodel extends CI_Model {
         $this->leads = array();
         $this->tonodes = array();
         $this->items = array();
-        $this->linktoitems = array();
         
         foreach ($result as $row) {
             $this->fromnodes[] = $row->ParentID;
             $this->tonodes[] = $row->LeadsID;
             $this->items[] = $row->NodeName;
-            $this->linktoitems[] = $row->LinkToItem;
         }
         
         $sddLeads = sort($this->tonodes);
@@ -101,7 +99,6 @@ class Exportmodel extends CI_Model {
                 $identity = array(
                     'id' => 'i' . $index,
                     'name' => $result[$key]->NodeName,
-                    'linkto' => $result[$key]->LinkToItem,
                     'icon' => ($result[$key]->ItemIcon) ? base_url() . 'images/' . 
                         $result[$key]->ItemIcon : '',
                     'url' => $result[$key]->ItemUrl,
@@ -137,7 +134,6 @@ class Exportmodel extends CI_Model {
                 $tonode = $k + 1;
                 if ($result[$lead]->NodeName) {
                     $tonode = $result[$lead]->NodeName;
-                    $tonode .= ($result[$lead]->LinkToItem) ? ' {' . $result[$lead]->LinkToItem . '}' : '';
                 }
                 
                 $steps['leads'][] = array(
