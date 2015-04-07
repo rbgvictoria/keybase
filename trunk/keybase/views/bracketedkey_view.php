@@ -38,7 +38,7 @@
                             }
                         ?>
                         
-                        (<?=$linktoname?><?php if ($lead['LinkToNextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['LinkToNextKey']?>">&#x25BA;</a><?php endif; ?>)
+                        : <?=$linktoname?><?php if ($lead['LinkToNextKey']): ?>&nbsp;<a href="<?=site_url()?>key/bracketedkey/<?=$lead['LinkToNextKey']?>">&#x25BA;</a><?php endif; ?>
                         <?php endif; ?>
                         
                         <?php endif; ?>

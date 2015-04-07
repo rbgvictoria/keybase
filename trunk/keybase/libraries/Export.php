@@ -99,7 +99,7 @@ class Export {
             $delimiter = "\t";
         }
         else {
-            $filename = 'key_' . uniqid() . '.txt';
+            $filename = 'key_' . uniqid() . '.csv';
             $delimiter = ',';
         }
         $handle = fopen('temp_out/' . $filename, 'w');

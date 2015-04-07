@@ -148,11 +148,32 @@ class PlayerModel extends CI_Model {
     }
     
     function getCrumb($key) {
-        $this->db->select('pk.KeysID, pk.Name');
+        /*
+SELECT coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) AS KeysID, coalesce(pk.Name, gpk.Name, gltpk.Name) AS `Name`
+FROM (`keys` k)
+LEFT JOIN `leads` l ON `k`.`TaxonomicScopeID`=`l`.`ItemsID`
+LEFT JOIN `keys` pk ON `l`.`KeysID`=`pk`.`KeysID` AND k.ProjectsID=pk.ProjectsID
+LEFT JOIN groupitem g ON k.TaxonomicScopeID=g.MemberID AND g.OrderNumber=0
+LEFT JOIN leads gl ON g.GroupID=gl.ItemsID
+LEFT JOIN `keys` gpk ON gl.KeysID=gpk.KeysID AND k.ProjectsID=gpk.ProjectsID
+LEFT JOIN groupitem glt ON k.TaxonomicScopeID=glt.MemberID AND glt.OrderNumber=1
+LEFT JOIN leads gltl ON glt.GroupID=gltl.ItemsID
+LEFT JOIN `keys` gltpk ON gltl.KeysID=gltpk.KeysID AND k.ProjectsID=gltpk.ProjectsID
+WHERE `k`.`KeysID` =  '8' AND coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) IS NOT NULL
+         */
+        
+        $this->db->select('coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) AS KeysID, coalesce(pk.Name, gpk.Name, gltpk.Name) AS Name', FALSE);
         $this->db->from('keys k');
-        $this->db->join('leads l', 'k.TaxonomicScopeID=l.ItemsID');
-        $this->db->join('keys pk', 'l.KeysID=pk.KeysID AND k.ProjectsID=pk.ProjectsID');
+        $this->db->join('leads l', 'k.TaxonomicScopeID=l.ItemsID', 'left');
+        $this->db->join('keys pk', 'l.KeysID=pk.KeysID AND k.ProjectsID=pk.ProjectsID', 'left');
+        $this->db->join('groupitem g', 'k.TaxonomicScopeID=g.MemberID AND g.OrderNumber=0', 'left', FALSE);
+        $this->db->join('leads gl', 'g.GroupID=gl.ItemsID', 'left');
+        $this->db->join('keys gpk', 'gl.KeysID=gpk.KeysID AND k.ProjectsID=gpk.ProjectsID', 'left');
+        $this->db->join('groupitem glt', 'k.TaxonomicScopeID=glt.MemberID AND glt.OrderNumber=1', 'left', FALSE);
+        $this->db->join('leads gltl', 'glt.GroupID=gltl.ItemsID', 'left');
+        $this->db->join('keys gltpk', 'gltl.KeysID=gltpk.KeysID AND k.ProjectsID=gltpk.ProjectsID', 'left');
         $this->db->where('k.KeysID', $key);
+        $this->db->where('coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) IS NOT NULL', FALSE, FALSE);
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row_array();

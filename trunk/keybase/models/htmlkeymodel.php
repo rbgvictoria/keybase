@@ -20,19 +20,24 @@ class HtmlKeyModel extends PlayerModel {
 
     private function getHtmlKey($keyid, $type) {
         if ($this->hasProjectItems)
-            $links = ', pi.Url AS URL, lpi.Url AS LinkToURL';
+            $links = ', coalesce(mpi.Url, pi.Url) AS URL, lpi.Url AS LinkToURL';
         else
-            $links = ', i.URL AS URL, lti.URL AS LinkToURL';
+            $links = ', coalesce(m.URL, i.URL) AS URL, ml.URL AS LinkToURL';
         
-        $this->db->select("p.ParentID, p.LeadText, p.LeadsID, l.NodeName, l.ItemsID, i.Name AS ItemName, 
-            l.LinkToItemsID, lti.Name AS LinkToItemName$links", FALSE);
+        $this->db->select("p.ParentID, p.LeadText, p.LeadsID, l.NodeName, coalesce(m.ItemsID, l.ItemsID) AS ItemsID, 
+            coalesce(m.Name, i.Name) AS ItemName, ml.ItemsID AS LinkToItemsID, ml.Name AS LinkToItemName$links", FALSE);
         $this->db->from('leads p');
         $this->db->join('leads l', 'p.LeadsID=l.ParentID AND l.NodeName IS NOT NULL', 'left');
         $this->db->join('items i', 'l.ItemsID=i.ItemsID', 'left');
-        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
+        $this->db->join('groupitem g', 'l.ItemsID=g.GroupID AND g.OrderNumber=0', 'left', FALSE);
+        $this->db->join('items m', 'g.MemberID=m.ItemsID', 'left');
+        $this->db->join('groupitem gl', 'l.ItemsID=gl.GroupID AND gl.OrderNumber=1', 'left', FALSE);
+        $this->db->join('items ml', 'gl.MemberID=ml.ItemsID', 'left');
+        
         if ($this->hasProjectItems) {
             $this->db->join('projectitems pi', "i.ItemsID=pi.ItemsID AND pi.ProjectsID=$this->project", 'left', FALSE);
-            $this->db->join('projectitems lpi', "i.ItemsID=lpi.ItemsID AND lpi.ProjectsID=$this->project", 'left', FALSE);
+            $this->db->join('projectitems mpi', "m.ItemsID=mpi.ItemsID AND mpi.ProjectsID=$this->project", 'left', FALSE);
+            $this->db->join('projectitems lpi', "ml.ItemsID=lpi.ItemsID AND lpi.ProjectsID=$this->project", 'left', FALSE);
         }
         $this->db->where('p.KeysID', $keyid);
         $this->db->where('p.LeadText IS NOT NULL', FALSE, FALSE);
@@ -74,7 +79,7 @@ class HtmlKeyModel extends PlayerModel {
                         else {
                             $nrow['LeadsID'] = $row->LeadsID;
                             $nrow['ItemsID'] = $row->ItemsID;
-                            $nrow['NodeName'] = $row->NodeName;
+                            $nrow['NodeName'] = $row->ItemName;
                             $nrow['LinkToItemsID'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemsID : FALSE;
                             $nrow['LinkToItemName'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemName : FALSE;
                             $nrow['URL'] = ($this->hasProjectItems) ? $row->URL : FALSE;
@@ -107,7 +112,7 @@ class HtmlKeyModel extends PlayerModel {
             $nodeids[] = $row->ParentID;
             $texts[] = $row->LeadText;
             $tonodes[] = $row->LeadsID;
-            $tonames[] = $row->NodeName;
+            $tonames[] = $row->ItemName;
             $itemids[] = $row->ItemsID;
             $linktoitemids[] = $row->LinkToItemsID;
             $linktoitemnames[] = $row->LinkToItemName;
@@ -166,7 +171,7 @@ class HtmlKeyModel extends PlayerModel {
                     $ret['ToItem'] = $lead->ItemsID;
                     $ret['LinkToItem'] = $lead->LinkToItemsID;
                     $ret['ToNode'] = $lead->LeadsID;
-                    $ret['ToNodeName'] = $lead->NodeName;
+                    $ret['ToNodeName'] = $lead->ItemName;
                 }
                 else {
                     return $this->findNextNode($lead->LeadsID, $result, $fromnodes);
@@ -236,19 +241,19 @@ class HtmlKeyModel extends PlayerModel {
             $html .= '<td class="from">' . $nodeid . '</td>';
             $html .= '<td class="text" colspan="' . $colspan . '">' . $lead->LeadText;
             
-            if ($lead->NodeName) {
+            if ($lead->ItemName) {
                 $html .= ' <span class="to">';
                 
                 
                 if ($lead->URL)
-                    $html .= anchor($lead->URL, $lead->NodeName);
+                    $html .= anchor($lead->URL, $lead->ItemName);
                 else
-                    $html .= $lead->NodeName;
+                    $html .= $lead->ItemName;
                 if ($lead->ItemsID && $this->nextKey($lead->ItemsID, $projectid)) {
                     $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->ItemsID, $projectid) . '">&#x25BA;</a>';
                 }
                 if ($lead->LinkToItemName) {
-                    $html .= ' (';
+                    $html .= ': ';
                     if ($lead->URL)
                         $html .= anchor($lead->LinkToURL, $lead->LinkToItemName);
                     else
@@ -256,7 +261,6 @@ class HtmlKeyModel extends PlayerModel {
                     if ($lead->LinkToItemsID && $this->nextKey($lead->LinkToItemsID, $projectid)) {
                         $html .= '&nbsp;<a href="' . site_url() . 'key/indentedkey/' . $this->nextKey($lead->LinkToItemsID, $projectid) . '">&#x25BA;</a>';
                     }
-                    $html .= ')';
                 }
                 
                 $html .= '</span></td>';
@@ -282,12 +286,12 @@ class HtmlKeyModel extends PlayerModel {
             $nodeid .= ($index == 1) ? ':' : '';
             
             $html .= "<tr>";
-            $rowspan = ($lead['NodeName']) ? '1' : '2';
+            $rowspan = ($lead['ItemName']) ? '1' : '2';
             $html .= '<td class="from" rowspan="' . $rowspan . '">' . $nodeid . '</td>';
             $html .= '<td class="text">' . $lead['LeadText'];
             
-            if ($lead['NodeName']) {
-                $html .= ' <span class="to">' . $lead['NodeName'] . '</span></td>';
+            if ($lead['ItemName']) {
+                $html .= ' <span class="to">' . $lead['ItemName'] . '</span></td>';
                 $html .= "</tr>";
             }
             else {

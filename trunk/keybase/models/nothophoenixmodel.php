@@ -147,21 +147,7 @@ class NothophoenixModel extends PlayerModel {
         }
         $this->db->where('!isnull(ParentID)', false, false);
         $this->db->group_by('ItemsID');
-        $this->db->union_push();
-        
-        $this->db->select('LinkToItemsID');
-        $this->db->from('leads');
-        $this->db->where('KeysID', $key);
-        $this->db->where('!isnull(NodeName)', false, false);
-        if ($currentnode) {
-            $this->db->where('NodeNumber>', $currentnode->NodeNumber, false);
-            $this->db->where('NodeNumber<=', $currentnode->HighestDescendantNodeNumber, false);
-        }
-        $this->db->where('!isnull(ParentID)', false, false);
-        $this->db->where('LinkToItemsID IS NOT NULL', FALSE, FALSE);
-        $this->db->group_by('LinkToItemsID');
-        $this->db->union_push();
-        $query = $this->db->union();
+        $query = $this->db->get();
         
         if ($query->num_rows()) {
             foreach ($query->result() as $row)
@@ -180,68 +166,39 @@ class NothophoenixModel extends PlayerModel {
      *
      * @return array|boolean 
      */
-    function getRemainingEntities($key, $remaining) {
-        $url = ($this->hasProjectItems) ? 'pi.URL' : 'i.URL';
-        $linktourl = ($this->hasProjectItems) ? 'lpi.URL' : 'lti.URL';
-        
-        $this->db->select("i.Name, m.Filename, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            $linktourl AS LinkToURL, l.KeysID, 
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
+    function getRemainingEntities($key, $remaining, $which='remaining') {
+        $this->db->select("i.Name, m.Filename, i.ItemsID, l.KeysID");
         $this->db->from("leads l");
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
-        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
-        if ($this->hasProjectItems) {
-            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
-            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
-        }
         $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
         $this->db->where('l.KeysID', $key);
         $this->db->where('!isnull(l.ItemsID)', false, false);
-        $this->db->where('l.LinkToItemsID IS NULL', FALSE, FALSE);
-        $this->db->where_in('l.ItemsID', $remaining);
+        if ($which == 'remaining')
+            $this->db->where_in('l.ItemsID', $remaining);
+        else
+            $this->db->where_not_in('l.ItemsID', $remaining);
         if ($this->FilterItems)
             $this->db->where_in('i.ItemsID', $this->FilterItems);
         $this->db->group_by('i.Name');
-        //$this->db->order_by('if(lti.Name IS NOT NULL, CONCAT(lti.Name, i.Name ), i.Name )');
-        $this->db->union_push();
-        
-        $this->db->select("i.Name, m.Filename, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            $linktourl AS LinkToURL, l.KeysID,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
-        $this->db->from("leads l");
-        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
-        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
-        if ($this->hasProjectItems) {
-            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
-            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
-        }
-        $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
-        $this->db->where('l.KeysID', $key);
-        $this->db->where('!isnull(l.ItemsID)', false, false);
-        $this->db->where_in('l.LinkToItemsID', $remaining);
-        if ($this->FilterItems)
-            $this->db->where_in('l.LinkToItemsID', $this->FilterItems);
-        $this->db->group_by('i.Name');
-        $this->db->order_by('sortingname');
-        $this->db->union_push();
-        
-        $query = $this->db->union();
+        $query = $this->db->get();
         
         
         if ($query->num_rows()) {
             $ret = array();
             foreach ($query->result() as $row) {
+                $items = $this->nextKey($row->ItemsID, parent::getProjectID($key));
+                $thisitem = isset($items[0]) ? $items[0] : FALSE;
+                $linkToItem = (count($items) > 1) ? $items[1] : FALSE;
+                
                 $name = array();
-                $name['name'] = $row->Name;
+                $name['name'] = ($thisitem) ? $thisitem->ItemName : $row->ItemsID;
                 $name['NamesID'] = NULL;
-                $tokey = $this->nextKey($row->ItemsID, parent::getProjectID($key));
-                $name['tokey'] = ($tokey) ? $tokey : FALSE;
-                $name['LinkTo'] = $row->LinkToItem;
-                $linktokey = $this->nextKey($row->LinkToItemsID, parent::getProjectID($key));
-                $name['LinkToKey'] = ($linktokey) ? $linktokey : FALSE;
+                $name['tokey'] = ($thisitem) ? $thisitem->KeysID : FALSE;
+                $name['LinkTo'] = ($linkToItem) ? $linkToItem->ItemName : FALSE;
+                $name['LinkToKey'] = ($linkToItem) ? $linkToItem->KeysID : FALSE;
                 $name['media'] = $row->Filename;
-                $name['url'] = ($row->URL) ? $row->URL : FALSE;
-                $name['linkToUrl'] = ($row->LinkToURL) ? $row->LinkToURL : FALSE;
+                $name['url'] = ($thisitem) ? $thisitem->ItemUrl : FALSE;
+                $name['linkToUrl'] = ($linkToItem) ? $linkToItem->ItemUrl : FALSE;
                 $ret[] = $name;
             }
             return $ret;
@@ -249,88 +206,28 @@ class NothophoenixModel extends PlayerModel {
         else return false;
     }
 
-    /**
-     * 
-     * @return array|boolean 
-     */
-    function getDiscardedEntities($key, $remaining) {
-        $url = ($this->hasProjectItems) ? 'pi.URL' : 'i.URL';
-        $linktourl = ($this->hasProjectItems) ? 'lpi.URL' : 'lti.URL';
-        
-        $this->db->select("i.Name, m.Filename, l.ItemUrl, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            $linktourl AS LinkToURL,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
-        $this->db->from("leads l");
-        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
-        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
-        if ($this->hasProjectItems) {
-            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
-            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
-        }
-        $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
-        $this->db->where('!isnull(l.ItemsID)', false, false);
-        $this->db->where('l.linkToItemsID IS NULL', FALSE, FALSE);
-        $this->db->where('l.KeysID', $key);
-        $this->db->where_not_in('l.ItemsID', $remaining);
-        if ($this->FilterItems)
-            $this->db->where_in('i.ItemsID', $this->FilterItems);
-        $this->db->group_by('i.Name');
-        $this->db->union_push();
-        
-        $this->db->select("i.Name, m.Filename, l.ItemUrl, i.ItemsID, $url, l.LinkToItemsID, lti.Name AS LinkToItem, 
-            $linktourl AS LinkToURL,
-            if(lti.Name IS NOT NULL, CONCAT(i.Name, lti.Name), i.Name) AS sortingname", FALSE);
-        $this->db->from("leads l");
-        $this->db->join('items i', 'l.ItemsID=i.ItemsID');
-        $this->db->join('items lti', 'l.LinkToItemsID=lti.ItemsID', 'left');
-        if ($this->hasProjectItems) {
-            $this->db->join('projectitems pi', 'l.ItemsID=pi.ItemsID', 'left');
-            $this->db->join('projectitems lpi', 'l.LinkToItemsID=lpi.ItemsID', 'left');
-        }
-        $this->db->join('media m', 'l.MediaID=m.MediaID', 'left');
-        $this->db->where('!isnull(l.ItemsID)', false, false);
-        $this->db->where('l.KeysID', $key);
-        $this->db->where_not_in('l.LinkToItemsID', $remaining);
-        if ($this->FilterItems)
-            $this->db->where_in('l.LinkToItemsID', $this->FilterItems);
-        $this->db->group_by('i.Name');
-        $this->db->order_by('sortingname');
-        $this->db->union_push();
-        
-        $query = $this->db->union();
-        if ($query->num_rows()) {
-            $ret = array();
-            foreach ($query->result() as $row) {
-                $name = array();
-                $name['name'] = $row->Name;
-                $name['NamesID'] = NULL;
-                $tokey = $this->nextKey($row->ItemsID, parent::getProjectID($key));
-                $name['tokey'] = ($tokey) ? $tokey : FALSE;
-                $name['LinkTo'] = $row->LinkToItem;
-                $linktokey = $this->nextKey($row->LinkToItemsID, parent::getProjectID($key));
-                $name['LinkToKey'] = ($linktokey) ? $linktokey : FALSE;
-                $name['media'] = $row->Filename;
-                $name['url'] = ($row->URL) ? $row->URL : FALSE;
-                $name['linkToUrl'] = ($row->LinkToURL) ? $row->LinkToURL : FALSE;
-                $ret[] = $name;
-            }
-            return $ret;
-        }
-        else return false;
-    }
-    
     private function nextKey($item, $project) {
-        $this->db->select('KeysID');
-        $this->db->from('keys');
-        $this->db->where('TaxonomicScopeID', $item);
-        $this->db->where('ProjectsID', $project);
+        /*
+         * SELECT coalesce(m.Name, i.Name) AS ItemName, coalesce(mpi.Url, m.Url, pi.Url, i.Url) AS ItemUrl, k.KeysID
+FROM items i
+LEFT JOIN projectitems pi ON i.ItemsID=pi.ItemsID AND pi.ProjectsID=10
+LEFT JOIN groupitem g ON i.ItemsID=g.GroupID
+LEFT JOIN items m ON g.MemberID=m.ItemsID
+LEFT JOIN projectitems mpi ON m.ItemsID=mpi.ItemsID AND mpi.ProjectsID=1
+LEFT JOIN `keys` k ON COALESCE(g.MemberID, i.ItemsID)=k.TaxonomicScopeID
+WHERE k.ProjectsID=10 AND i.ItemsID=293
+         */
+        
+        $this->db->select("coalesce(m.Name, i.Name) AS ItemName, coalesce(mpi.Url, m.Url, pi.Url, i.Url) AS ItemUrl, k.KeysID", FALSE);
+        $this->db->from('items i');
+        $this->db->join('projectitems pi', "i.ItemsID=pi.ItemsID AND pi.ProjectsID=$project", 'left', FALSE);
+        $this->db->join('groupitem g', 'i.ItemsID=g.GroupID', 'left');
+        $this->db->join('items m', 'g.MemberID=m.ItemsID', 'left');
+        $this->db->join('projectitems mpi', "m.ItemsID=mpi.ItemsID AND mpi.ProjectsID=$project", 'left', FALSE);
+        $this->db->join('`keys` k', "COALESCE(g.MemberID, i.ItemsID)=k.TaxonomicScopeID AND k.ProjectsID=$project", 'left', FALSE);
+        $this->db->where('i.ItemsID', $item);
         $query = $this->db->get();
-        if ($query->num_rows()) {
-            $row = $query->row();
-            return $row->KeysID;
-        }
-        else
-            return FALSE;
+        return $query->result();
     }
 
     /**
