@@ -17,7 +17,7 @@ class Key extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->output->enable_profiler(FALSE);
+        $this->output->enable_profiler(TRUE);
         $this->load->model('keymodel');
         
         // Allow for custom style sheets and javascript
@@ -226,7 +226,7 @@ class Key extends CI_Controller {
         $this->data['remaining'] = $this->phoenix->getRemainingEntities($key, $remaining);
 
         // discarded taxa
-        $this->data['discarded'] = $this->phoenix->getDiscardedEntities($key, $remaining);
+        $this->data['discarded'] = $this->phoenix->getRemainingEntities($key, $remaining, 'discarded');
 
         $this->load->view('nothophoenix_view', $this->data);
     }

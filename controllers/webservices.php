@@ -33,6 +33,10 @@ class WebServices extends CI_Controller {
         }
     }
     
+    function projects() {
+        
+    }
+    
     public function project_items() {
         if (empty($_GET['project']) && empty($_GET['key'])) exit;
         $data = $this->webservicesmodel->ws_getItems($_GET);
@@ -82,7 +86,6 @@ class WebServices extends CI_Controller {
                 echo $json;
             }
         }
-        
     }
     
     public function keys () {
