@@ -113,7 +113,7 @@ class Ajax extends CI_Controller {
         $node = $this->phoenix->getNode($key, $node);
         $currentnode = $this->phoenix->getCurrentNode($node);
         $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
-        $entities = $this->phoenix->getRemainingEntities($key, $remaining);
+        $entities = $this->phoenix->getRemainingEntities($key, $remaining, 'remaining');
         echo json_encode($entities);
     }
 
@@ -148,7 +148,7 @@ class Ajax extends CI_Controller {
         $node = $this->phoenix->getNode($key, $node);
         $currentnode = $this->phoenix->getCurrentNode($node);
         $remaining = $this->phoenix->auxRemainingEntities($key, $currentnode);
-        return $this->phoenix->getDiscardedEntities($key, $remaining);;
+        return $this->phoenix->getRemainingEntities($key, $remaining, 'discarded');
     }
     
     public function discardedItemsJSON($key, $node=FALSE) {
@@ -209,7 +209,7 @@ class Ajax extends CI_Controller {
         
         $json = json_encode((object) $data);
         
-        if ($_GET['callback'])
+        if (isset($_GET['callback']) && $_GET['callback'])
             echo $_GET['callback'] . '(' . $json . ')';
         else
             echo $json;
