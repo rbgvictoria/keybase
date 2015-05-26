@@ -97,19 +97,22 @@ WHERE `k`.`ProjectsID` = '6' AND coalesce(tk.KeysID, mtk.KeysID, mltk.KeysID) IS
                 $linkeditems[] = $row->ID;
             }
         }
-        $linkeditems = array_unique($linkeditems);
         
-        $this->db->select('k.KeysID, IF(k.TaxonomicScopeID=p.TaxonomicScopeID, 1, 0) AS keyorder', FALSE);
-        $this->db->from('keys k');
-        $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID');
-        $this->db->where('k.ProjectsID', $this->projectid);
-        $this->db->where_not_in('k.TaxonomicScopeID', $linkeditems);
-        $this->db->order_by('keyorder DESC, k.Name');
-        
-        $query = $this->db->get();
-        if ($query->num_rows()) {
-            foreach ($query->result() as $row)
-                $ret[] = $row->KeysID;
+        if ($linkeditems) {
+            $linkeditems = array_unique($linkeditems);
+
+            $this->db->select('k.KeysID, IF(k.TaxonomicScopeID=p.TaxonomicScopeID, 1, 0) AS keyorder', FALSE);
+            $this->db->from('keys k');
+            $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID');
+            $this->db->where('k.ProjectsID', $this->projectid);
+            $this->db->where_not_in('k.TaxonomicScopeID', $linkeditems);
+            $this->db->order_by('keyorder DESC, k.Name');
+
+            $query = $this->db->get();
+            if ($query->num_rows()) {
+                foreach ($query->result() as $row)
+                    $ret[] = $row->KeysID;
+            }
         }
         return $ret;
     }
