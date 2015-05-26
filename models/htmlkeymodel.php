@@ -71,17 +71,19 @@ class HtmlKeyModel extends PlayerModel {
                             $nrow['LeadsID'] = $to['ToNode'];
                             $nrow['ItemsID'] = $to['ToItem'];
                             $nrow['NodeName'] = $to['ToNodeName'];
-                            $nrow['LinkToItemsID'] = FALSE;
-                            $nrow['LinkToItemName'] = FALSE;
-                            $nrow['URL'] = FALSE;
-                            $nrow['LinkToURL'] = FALSE;
+                            $nrow['ItemName'] = $to['ToItemName'];
+                            $nrow['LinkToItemsID'] = $to['LinkToItem'];
+                            $nrow['LinkToItemName'] = $to['LinkToItemName'];
+                            $nrow['URL'] = $to['URL'];
+                            $nrow['LinkToURL'] = $to['LinkToURL'];
                         }
                         else {
                             $nrow['LeadsID'] = $row->LeadsID;
                             $nrow['ItemsID'] = $row->ItemsID;
-                            $nrow['NodeName'] = $row->ItemName;
-                            $nrow['LinkToItemsID'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemsID : FALSE;
-                            $nrow['LinkToItemName'] = in_array($row->LinkToItemsID, $this->FilterItems) ? $row->LinkToItemName : FALSE;
+                            $nrow['NodeName'] = $row->NodeName;
+                            $nrow['ItemName'] = $row->ItemName;
+                            $nrow['LinkToItemsID'] = $row->LinkToItemsID;
+                            $nrow['LinkToItemName'] = $row->LinkToItemName;
                             $nrow['URL'] = ($this->hasProjectItems) ? $row->URL : FALSE;
                             $nrow['LinkToURL'] = ($this->hasProjectItems) ? $row->LinkToURL : FALSE;
                         }
@@ -90,7 +92,7 @@ class HtmlKeyModel extends PlayerModel {
                 }
                 
             }
-            else 
+            else
                 $result = $query->result();
             
             return $result;
@@ -157,8 +159,12 @@ class HtmlKeyModel extends PlayerModel {
         $ret = array(
             'ToItem' => FALSE,
             'LinkToItem' => FALSE,
+            'LinkToItemName' => FALSE,
             'ToNodeName' => FALSE,
+            'ToItemName' => FALSE,
             'ToNode' => FALSE,
+            'URL' => FALSE,
+            'LinkToURL' => FALSE
         );
         $parents = array_keys($fromnodes, $tonode);
         if ($parents) {
@@ -170,8 +176,12 @@ class HtmlKeyModel extends PlayerModel {
                 if ($lead->ItemsID) {
                     $ret['ToItem'] = $lead->ItemsID;
                     $ret['LinkToItem'] = $lead->LinkToItemsID;
+                    $ret['LinkToItemName'] = $lead->LinkToItemName;
                     $ret['ToNode'] = $lead->LeadsID;
-                    $ret['ToNodeName'] = $lead->ItemName;
+                    $ret['ToNodeName'] = $lead->NodeName;
+                    $ret['ToItemName'] = $lead->ItemName;
+                    $ret['URL'] = $lead->URL;
+                    $ret['LinkToURL'] = $lead->LinkToURL;
                 }
                 else {
                     return $this->findNextNode($lead->LeadsID, $result, $fromnodes);

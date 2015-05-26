@@ -335,7 +335,7 @@ class WebServicesModel extends KeyModel {
      * @return array
      */
     public function getProjectKeys($project) {
-        $query = $this->db->query("SELECT k.KeysID, k.Name, k.TaxonomicScopeID, s.KeysID AS ParentKeyID, s.Name AS ParentKeyName
+        $query = $this->db->query("SELECT k.KeysID, k.Name, k.TaxonomicScopeID, i.Name AS TaxonomicScope, s.KeysID AS ParentKeyID, s.Name AS ParentKeyName
             FROM `keys` k
             LEFT JOIN (
             SELECT coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) AS KeyID, sk.KeysID, sk.Name, sk.TaxonomicScopeID
@@ -348,6 +348,7 @@ class WebServicesModel extends KeyModel {
             WHERE sk.ProjectsID=$project AND coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) IS NOT NULL
             GROUP BY KeyID
             ) as s ON k.KeysID=s.KeyID
+            LEFT JOIN items i ON k.TaxonomicScopeID=i.ItemsID
             WHERE k.ProjectsID=$project
             ORDER BY k.Name");
         return $query->result();
