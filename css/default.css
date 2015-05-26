@@ -687,3 +687,15 @@ td.will-not-key-out {
     color: #666;
     /*font-weight: bold;*/
 }
+
+td.text-center {
+    text-align: center;
+}
+
+i.fa.fa-check.green {
+  color: #4c9900;
+}
+
+i.fa.fa-remove.red {
+  color: #ff0000;
+}
