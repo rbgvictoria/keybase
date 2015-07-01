@@ -241,6 +241,30 @@ class WS extends CI_Controller {
         else
             echo $json;
     }
+    
+    public function globalFilter() {
+        if (empty($_GET['filter_id'])) {
+            exit;
+        }
+        
+        $data = $this->ws->globalFilter($_GET['filter_id']);
+        $json = json_encode($data);
+        header('Content-type: application/json');
+        echo $json;
+        
+    }
+    
+    public function filterProjects() {
+        if (isset($_GET['project_id'])) {
+            $data = $this->ws->getFilterProjects($_GET['project_id']);
+        }
+        else {
+            $data = $this->ws->getFilterProjects();
+        }
+        $json = json_encode($data);
+        header('Content-type: application/json');
+        echo $json;
+    }
 
     
     private function arrayToCsv($data) {
