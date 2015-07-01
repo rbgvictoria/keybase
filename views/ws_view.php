@@ -49,6 +49,17 @@ allow for CSV output, while this web service only provides JSON.</p>
     <li><?=anchor(site_url() . 'ws/filter?id=54f98c14457b8&format=xml', site_url() . 'ws/filter?id=54f98c14457b8&format=xml'); ?></li>
 </ul>
 
+<h3>Global filter</h3>
+<p><span class="grey"><?=site_url()?>ws/globalFilter?filter_id=&laquo;<i>filter ID</i>&raquo</span></p>
+<div>Examples:</div>
+<ul>
+    <li><?=anchor(site_url() . 'ws/globalFilter?filter_id=54f98c14457b8&projects=10', site_url() . 'ws/globalFilter?filter_id=54f98c14457b8'); ?></li>
+    <li><?=anchor(site_url() . 'ws/globalFilter?filter_id=555f5b4bd9412&projects=11', site_url() . 'ws/globalFilter?filter_id=555f5b4bd9412'); ?></li>
+</ul>
+<p>This service does basically the same as the previous one, only it doesn't need the nested sets and can create global filters on the fly from a stored list 
+    of item IDs, while the previous service merely retrieved a stored array.</p>
+
+
 <h2>Export</h2>
 <h3>Key</h3>
 <p><?=site_url()?>key/export/&laquo;<i>format</i>&raquo;/&laquo;<i>keyID</i>&raquo;</p>

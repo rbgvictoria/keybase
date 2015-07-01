@@ -1,6 +1,8 @@
 <?php
 
 class WebServicesModel extends KeyModel {
+    private $filterKeys;
+    private $filterKeyIDs;
     
     public function __construct() {
         parent::__construct();
@@ -352,6 +354,86 @@ class WebServicesModel extends KeyModel {
             WHERE k.ProjectsID=$project
             ORDER BY k.Name");
         return $query->result();
+    }
+    
+    
+    public function globalFilter($filter) {
+        $this->filterKeys = array();
+        $this->filterKeyIDs = array();
+        $this->db->select('FilterItems, Filter');
+        $this->db->from('globalfilter');
+        $this->db->where('FilterID', $filter);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            $filterItems = unserialize($row->FilterItems);
+            $projects = array_keys(unserialize($row->Filter));
+            $this->getGlobalFilterKeys($filterItems, $projects);
+            return $this->filterKeys;
+        }
+        else {
+            return FALSE;
+        }
+    }
+    
+    private function getGlobalFilterKeys($items, $projects) {
+        $newItems = array();
+        $this->db->select('k.ProjectsID, k.KeysID, k.TaxonomicScopeID, k.Name AS KeyName, 
+            group_concat(DISTINCT cast(l.ItemsID as char)) AS Items', FALSE);
+        $this->db->from('keys k');
+        $this->db->join('leads l', 'k.KeysID=l.KeysID');
+        $this->db->join('groupitem g0', 'l.ItemsID=g0.GroupID AND g0.OrderNumber=0', 'left', FALSE);
+        $this->db->join('groupitem g1', 'l.ItemsID=g1.GroupID AND g1.OrderNumber=1', 'left', FALSE);
+        $this->db->join('items i', 'coalesce(g0.MemberID, g1.MemberID, l.ItemsID)=i.ItemsID', 'inner', FALSE);
+        $this->db->where_in('k.ProjectsID', $projects);
+        $this->db->where_in('i.itemsID', $items);
+        $this->db->group_by('k.KeysID');
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            foreach ($query->result() as $row) {
+                $key = array();
+                $key['key_id'] = $row->KeysID;
+                $key['key_name'] = $row->KeyName;
+                $key['filter_items'] = explode(',', $row->Items);
+                
+                if (in_array($key['key_id'], $this->filterKeyIDs)) {
+                    $k = array_search($key['key_id'], $this->filterKeyIDs);
+                    $this->filterKeys[$k]->filter_items = array_unique(array_merge($this->filterKeys[$k]->filter_items, $key['filter_items']));
+                }
+                else {
+                    $this->filterKeys[] = (object) $key;
+                    $newItems[] = $row->TaxonomicScopeID;
+                }
+            }
+            
+            if ($newItems) {
+                $this->getGlobalFilterKeys($newItems, $projects);
+            }
+        }
+    }
+    
+    public function getFilterProjects($project=false) {
+        $ret = array();
+        $this->db->select('FilterID, Name, Filter');
+        $this->db->from('globalfilter');
+        $this->db->where('Name IS NOT NULL', FALSE, FALSE);
+        $query = $this->db->get();
+        if ($query->num_rows) {
+            foreach ($query->result() as $row) {
+                $filter = unserialize($row->Filter);
+                if (is_array($filter)) {
+                    $projects = array_keys($filter);
+                    if (!$project || in_array($project, $projects)) {
+                        $ret[] = (object) array(
+                            'filter_id' => $row->FilterID,
+                            'filter_name' => $row->Name,
+                            'projects' => $projects
+                        );
+                    }
+                }
+            }
+        }
+        return $ret;
     }
 
     
