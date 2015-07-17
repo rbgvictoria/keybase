@@ -54,11 +54,11 @@
                     <?php if ($lead['automatic']): ?>
                         <li style="color:gray"><?=$lead['lead']?></li>    
                     <?php else: ?>    
-                        <li><a href="<?=base_url()?>key/nothophoenix/<?=$keyid?>/<?=$lead['parentid']?>"><?=$lead['lead']?></a></li>
+                        <li><a href="<?=site_url()?>key/nothophoenix/<?=$keyid?>/<?=$lead['parentid']?>"><?=$lead['lead']?></a></li>
                     <?php endif; ?>
                     <?php endforeach; ?>
                     <?php if (count($node) > 1): ?>
-                    <li class="pending"><a href="<?=base_url()?>key/nothophoenix/<?=$keyid?>/<?=$currentnode?>">Pending question</a></li>
+                    <li class="pending"><a href="<?=site_url()?>key/nothophoenix/<?=$keyid?>/<?=$currentnode?>">Pending question</a></li>
                     <?php endif; ?>
                     </ol>
                 <?php else: ?>
@@ -77,7 +77,7 @@
             
             ?>
             <div id="remaining">
-                <h3>Remaining taxa (<span id="num_remaining"><?=count($remaining)?></span>)<span id="keypanel_filter"><a class="colorbox_ajax" href="<?=base_url()?>key/filterkey/<?=$keyid?>"></a></span></h3>
+                <h3>Remaining taxa (<span id="num_remaining"><?=count($remaining)?></span>)<span id="keypanel_filter"><a class="colorbox_ajax" href="<?=site_url()?>key/filterkey/<?=$keyid?>"></a></span></h3>
                 <div>
                 <?php 
                     if ($remaining) {
@@ -85,7 +85,7 @@
                             $entity = array();
                             $entity[] = '<span class="entity">';
                             if ($item['media'])
-                                $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
+                                $entity[] = '<img src="' . site_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
                             if ($item['url'])
                                 $entity[] = '<a class="external" href="' . $item['url'] . '">';
@@ -95,7 +95,7 @@
                                 $entity[] = '</a>';
 
                             if ($item['tokey'])
-                                $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
+                                $entity[] = '&nbsp;<a href="' . site_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                             if ($item['LinkTo']) {
                                 $entity[] = ': ';
                                 if ($item['linkToUrl'])
@@ -104,7 +104,7 @@
                                 if ($item['linkToUrl'])
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
+                                    $entity[] = '&nbsp;<a href="' . site_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
                             }
                             $entity[] = '</span>';
                             echo implode('', $entity);
@@ -126,7 +126,7 @@
                             $entity = array();
                             $entity[] = '<span class="entity">';
                             if ($item['media'])
-                                $entity[] = '<img src="' . base_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
+                                $entity[] = '<img src="' . site_url() . 'images/' . $item['media'] . '" alt="Image of ' . $item['name'] . '"/>';
                             
                             if ($item['url'])
                                 $entity[] = '<a class="external" href="' . $item['url'] . '">';
@@ -136,7 +136,7 @@
                                 $entity[] = '</a>';
 
                             if ($item['tokey'])
-                                $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
+                                $entity[] = '&nbsp;<a href="' . site_url() . 'key/nothophoenix/' . $item['tokey'] . '">&#x25BA;</a>';
                             if ($item['LinkTo']) {
                                 $entity[] = ': ';
                                 if ($item['linkToUrl'])
@@ -145,7 +145,7 @@
                                 if ($item['linkToUrl'])
                                     $entity[] = '</a>';
                                 if ($item['LinkToKey'])
-                                    $entity[] = '&nbsp;<a href="' . base_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
+                                    $entity[] = '&nbsp;<a href="' . site_url() . 'key/nothophoenix/' . $item['LinkToKey'] . '">&#x25BA;</a>';
                             }
                             $entity[] = '</span>';
                             echo implode('', $entity);

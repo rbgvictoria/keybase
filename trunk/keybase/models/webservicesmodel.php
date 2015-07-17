@@ -1,8 +1,11 @@
 <?php
 
 class WebServicesModel extends KeyModel {
+    private $filterProjects;
     private $filterKeys;
     private $filterKeyIDs;
+    private $filterItems;
+    private $filterNumItems;
     
     public function __construct() {
         parent::__construct();
@@ -336,7 +339,11 @@ class WebServicesModel extends KeyModel {
      * @param integer $project
      * @return array
      */
-    public function getProjectKeys($project) {
+    public function getProjectKeys($project, $filter=false) {
+        $andWhere = '';
+        if ($filter) {
+            $andWhere = ' AND k.KeysID IN (' . implode(',', $filter) . ')';
+        }
         $query = $this->db->query("SELECT k.KeysID, k.Name, k.TaxonomicScopeID, i.Name AS TaxonomicScope, s.KeysID AS ParentKeyID, s.Name AS ParentKeyName
             FROM `keys` k
             LEFT JOIN (
@@ -351,7 +358,7 @@ class WebServicesModel extends KeyModel {
             GROUP BY KeyID
             ) as s ON k.KeysID=s.KeyID
             LEFT JOIN items i ON k.TaxonomicScopeID=i.ItemsID
-            WHERE k.ProjectsID=$project
+            WHERE k.ProjectsID=$project{$andWhere}
             ORDER BY k.Name");
         return $query->result();
     }
@@ -360,23 +367,63 @@ class WebServicesModel extends KeyModel {
     public function globalFilter($filter) {
         $this->filterKeys = array();
         $this->filterKeyIDs = array();
-        $this->db->select('FilterItems, Filter');
+        $this->db->select('FilterItems, Filter, FilterProjects, FilterID, Name, TimestampCreated');
         $this->db->from('globalfilter');
         $this->db->where('FilterID', $filter);
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
             $filterItems = unserialize($row->FilterItems);
-            $projects = array_keys(unserialize($row->Filter));
+            $projects = NULL;
+            if ($row->FilterProjects) {
+                $projects = unserialize($row->FilterProjects);
+            }
+            elseif ($row->Filter) {
+                $projects = array_keys(unserialize($row->Filter));
+            }
+            $this->getGlobalFilterProjects($projects);
             $this->getGlobalFilterKeys($filterItems, $projects);
-            return $this->filterKeys;
+            $this->getGlobalFilterItems();
+            return (object) array(
+                'filterID' => $row->FilterID,
+                'filterName' => $row->Name,
+                'created' => $row->TimestampCreated,
+                'numItems' => count($this->filterItems),
+                'numItemsOrig' => count(unserialize($row->FilterItems)),
+                'numKeys' => count($this->filterKeys),
+                'projects' => $this->filterProjects,
+                'items' => $this->filterItems,
+                'keys' => $this->filterKeys
+            );
         }
         else {
             return FALSE;
         }
     }
     
-    private function getGlobalFilterKeys($items, $projects) {
+    private function getGlobalFilterProjects($projects) {
+        $this->db->select('ProjectsID AS projectID, Name AS projectName, taxonomicScopeID');
+        $this->db->from('projects');
+        $this->db->where_in('ProjectsID', $projects);
+        $query = $this->db->get();
+        $this->filterProjects = $query->result();
+    }
+    
+    private function getGlobalFilterItems() {
+        $itemIDs = array();
+        foreach ($this->filterKeys as $key) {
+            $itemIDs = array_merge($itemIDs, $key->items);
+        }
+        $itemIDs = array_unique($itemIDs);
+        
+        $this->db->select('ItemsID AS itemID, Name AS itemName');
+        $this->db->from('items');
+        $this->db->where_in('ItemsID', $itemIDs);
+        $query = $this->db->get();
+        $this->filterItems = $query->result();
+    }
+    
+    private function getGlobalFilterKeys($items, $projects=FALSE) {
         $newItems = array();
         $this->db->select('k.ProjectsID, k.KeysID, k.TaxonomicScopeID, k.Name AS KeyName, 
             group_concat(DISTINCT cast(l.ItemsID as char)) AS Items', FALSE);
@@ -385,22 +432,27 @@ class WebServicesModel extends KeyModel {
         $this->db->join('groupitem g0', 'l.ItemsID=g0.GroupID AND g0.OrderNumber=0', 'left', FALSE);
         $this->db->join('groupitem g1', 'l.ItemsID=g1.GroupID AND g1.OrderNumber=1', 'left', FALSE);
         $this->db->join('items i', 'coalesce(g0.MemberID, g1.MemberID, l.ItemsID)=i.ItemsID', 'inner', FALSE);
-        $this->db->where_in('k.ProjectsID', $projects);
+        if ($projects) {
+            $this->db->where_in('k.ProjectsID', $projects);
+        }
         $this->db->where_in('i.itemsID', $items);
         $this->db->group_by('k.KeysID');
         $query = $this->db->get();
         if ($query->num_rows()) {
             foreach ($query->result() as $row) {
                 $key = array();
-                $key['key_id'] = $row->KeysID;
-                $key['key_name'] = $row->KeyName;
-                $key['filter_items'] = explode(',', $row->Items);
+                $key['keyID'] = $row->KeysID;
+                $key['projectID'] = $row->ProjectsID;
+                $key['keyName'] = $row->KeyName;
+                $key['taxonomicScopeID'] = $row->TaxonomicScopeID;
+                $key['items'] = explode(',', $row->Items);
                 
-                if (in_array($key['key_id'], $this->filterKeyIDs)) {
-                    $k = array_search($key['key_id'], $this->filterKeyIDs);
-                    $this->filterKeys[$k]->filter_items = array_unique(array_merge($this->filterKeys[$k]->filter_items, $key['filter_items']));
+                if (in_array($key['keyID'], $this->filterKeyIDs)) {
+                    $k = array_search($key['keyID'], $this->filterKeyIDs);
+                    $this->filterKeys[$k]->items = array_unique(array_merge($this->filterKeys[$k]->items, $key['items']));
                 }
                 else {
+                    $this->filterKeyIDs[] = $key['keyID'];
                     $this->filterKeys[] = (object) $key;
                     $newItems[] = $row->TaxonomicScopeID;
                 }

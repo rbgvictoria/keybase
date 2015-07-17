@@ -133,7 +133,9 @@ class Key extends CI_Controller {
     
     public function project($project) {
         $this->load->model('projectmodel');
+        $this->data['js'][] = base_url() . 'js/jspath.min.js';
         $this->data['js'][] = base_url() . 'js/dynatree/jquery.dynatree.js';
+        $this->data['js'][] = base_url() . 'js/jquery.keybase.project_new.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.project.js?v=1.0';
         $this->data['css'][] = base_url() . 'css/dynatree/skin/ui.dynatree.css';
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
@@ -152,11 +154,6 @@ class Key extends CI_Controller {
         
         $this->data['projectid'] = $project;
         $this->data['project'] = $this->keymodel->getProjectData($project);
-        
-        //$this->data['keys_hierarchy'] = $this->keymodel->getProjectKeysLinked($project);
-        //$this->data['keys_orphaned'] = $this->keymodel->getProjectKeysOrphaned($project);
-        
-        //$this->data['keys'] = $this->keymodel->getProjectKeys($project);
         $this->data['users'] = $this->keymodel->getProjectUsers($project);
         $this->load->view('projectview', $this->data);
     }
@@ -912,7 +909,7 @@ class Key extends CI_Controller {
                 
                 $keysid = $this->keymodel->editKeyMetadata($keymetadata);
                 fputcsv($keyidsfile, array($id, $keysid));
-                //$this->lpxk->LpxkToKeybase($keysid, $path . '/key_' . $id . '.csv', 'delimitedtext', FALSE, 'comma', 1);
+                $this->lpxk->LpxkToKeybase($keysid, $path . '/key_' . $id . '.csv', 'delimitedtext', FALSE, 'comma', 1);
             }
             
         redirect('key/project/' . $this->input->post('project'));
@@ -973,6 +970,9 @@ class Key extends CI_Controller {
     
     public function filter() {
         $this->load->model('filtermodel');
+        $this->data['css'][] = base_url() . 'css/jquery.jsonview.css';
+        $this->data['js'][] = base_url() . 'js/jspath.min.js';
+        $this->data['js'][] = base_url() . 'js/jquery.jsonview.js';
         $this->data['js'][] = base_url() . 'js/dynatree/jquery.dynatree.js';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.globalfilter.js?v=1.0';
         $this->data['css'][] = base_url() . 'css/dynatree/skin/ui.dynatree.css';
@@ -1015,7 +1015,6 @@ class Key extends CI_Controller {
                 redirect('key/filter');
             }
         }
-        
         $this->load->view('importglobalfilterview', $this->data);
     }
     
@@ -1029,10 +1028,11 @@ class Key extends CI_Controller {
         $projects = $this->input->post('projects');
         if (!$projects[0]) $projects = FALSE;
 
-        $this->filtermodel->findInKeyBase($taxa, $projects);
-
-        $filterid = $this->filtermodel->getKeys($projects, $this->input->post('filter'), $this->input->post('filtername'));
-
+        $filterItems = $this->filtermodel->findInKeyBase($taxa, $projects);
+        
+        //$filterid = $this->filtermodel->getKeys($projects, $this->input->post('filter'), $this->input->post('filtername'));
+        $filterid = $this->filtermodel->updateFilter($projects, $this->input->post('filter'), $this->input->post('filtername'));
+        
         $this->data['itemsfound'] = $this->filtermodel->itemsFound();
         $this->data['itemsnotfound'] = $this->filtermodel->itemsNotFound();
         

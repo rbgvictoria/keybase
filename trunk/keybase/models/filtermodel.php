@@ -72,7 +72,6 @@ class FilterModel extends CI_Model {
             if ($projects)
                 $this->db->where_in('k.ProjectsID', $projects);
             $query = $this->db->get();
-            
             if ($query->num_rows()) {
                 $row = $query->row();
                 $this->found[] = $row->Name;
@@ -89,6 +88,7 @@ class FilterModel extends CI_Model {
         if ($this->notfound) {
             sort($this->notfound);
         }
+        return $this->items;
     }
     
     public function itemsFound() {
@@ -100,6 +100,7 @@ class FilterModel extends CI_Model {
     }
     
     public function getKeys($projects=FALSE, $filterid=FALSE, $filtername=FALSE) {
+        $projectids = $projects;
         $keys = array();
         foreach ($this->items as $item) {
             $this->db->select('p.ProjectsID, p.Name AS ProjectName, k.KeysID, k.Name AS KeyName, l.ItemsID, i.Name AS ItemName, h.NodeNumber');
@@ -192,6 +193,7 @@ class FilterModel extends CI_Model {
             'Name' => ($filtername) ? $filtername : NULL,
             'Filter' => serialize($this->filter),
             'FilterItems' => serialize($this->items),
+            'FilterProjects' => ($projectids) ? serialize($projectids) : NULL
         );
         if ($filterid) {
             $this->db->where("GlobalfilterID IN (SELECT GlobalFilterID FROM globalfilter WHERE FilterID='$filterid')", FALSE, FALSE);
@@ -219,6 +221,47 @@ class FilterModel extends CI_Model {
         $this->session->set_userdata('GlobalFilterOn', TRUE);
         
         return $filterid;
+    }
+    
+    public function updateFilter($projects=FALSE, $filterid=FALSE, $filtername=FALSE) {
+        $filterArray = array(
+            'Name' => ($filtername) ? $filtername : NULL,
+            'FilterItems' => serialize($this->items),
+            'FilterProjects' => ($projects) ? serialize($projects) : NULL,
+            'Filter' => NULL,
+        );
+        if ($this->notfound) {
+            $filterArray['ItemsNotFound'] = implode('|', $this->notfound);
+        }
+        
+        if ($filterid) {
+            $this->db->where("GlobalfilterID IN (SELECT GlobalFilterID FROM globalfilter WHERE FilterID='$filterid')", FALSE, FALSE);
+            $this->db->delete('globalfilter_key');
+            
+            $this->db->where('FilterID', $filterid);
+            $updateArray = array_merge($filterArray, array(
+                'TimestampModified' => date('Y-m-d H:i:s')
+            ));
+            $this->db->update('globalfilter', $updateArray);
+        }
+        else {
+            $filterid = uniqid();
+            $insertArray = array_merge($filterArray, array(
+                'FilterID' => $filterid,
+                'TimestampCreated' => date('Y-m-d H:i:s'),
+                'UsersID' => (isset($this->session->userdata['id'])) ? $this->session->userdata['id'] : NULL,
+                'IPAddress' => $this->input->ip_address(),
+                'SessionID' => $this->session->userdata('session_id'),
+                'FilterProjects' => ($projects) ? serialize($projects) : NULL,
+            ));
+            $this->db->insert('globalfilter', $insertArray);
+        }
+        
+        $this->session->set_userdata('GlobalFilter', $filterid);
+        $this->session->set_userdata('GlobalFilterOn', TRUE);
+        
+        return $filterid;
+        
     }
     
     public function getKeysFromFilter($filterid=FALSE) {

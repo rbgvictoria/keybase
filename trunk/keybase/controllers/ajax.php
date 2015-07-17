@@ -27,10 +27,10 @@ class Ajax extends CI_Controller {
         
         if (count($data) > 1) {
             foreach ($data as $lead) {
-                echo '<a class="lead" href="' . base_url() . 'key/nothophoenix/' . $key . '/' .
+                echo '<a class="lead" href="' . site_url() . 'key/nothophoenix/' . $key . '/' .
                         $lead['id'] . '">' . $lead['lead'] . '</a>';
                 if ($lead['media'])
-                    echo '<div class="featureimg"><img src="' . base_url() . 'images/' . 
+                    echo '<div class="featureimg"><img src="' . site_url() . 'images/' . 
                         $lead['media'] . '" alt="' . $lead['lead'] . '" /></div>';
             }
         }
@@ -245,7 +245,7 @@ class Ajax extends CI_Controller {
             for ($i = 0; $i < $n; $i++) {
                 $json .= '{ ';
                 $json .= '"title": "' . $linked[$i]['Name'] . '", ';
-                $json .= '"href": "' . base_url() . 'key/nothophoenix/' . $linked[$i]['KeysID'] . '",';
+                $json .= '"href": "' . site_url() . 'key/nothophoenix/' . $linked[$i]['KeysID'] . '",';
                 $json .= '"addClass":"keybase-dynatree-key"';
                 if ($i < $n - 1 && $linked[$i]['Depth'] < $linked[$i+1]['Depth'])
                     $json .= ', "children": [';
@@ -272,7 +272,7 @@ class Ajax extends CI_Controller {
             for ($i = 0; $i < $n; $i++) {
                 $json .= '{ ';
                 $json .= '"title": "' . $orphan[$i]['Name'] . '", ';
-                $json .= '"href": "' . base_url() . 'key/nothophoenix/' . $orphan[$i]['KeysID'] . '",';
+                $json .= '"href": "' . site_url() . 'key/nothophoenix/' . $orphan[$i]['KeysID'] . '",';
                 $json .= '"addClass": "keybase-dynatree-key"';
                 if ($i < $n - 1 && $orphan[$i]['Depth'] < $orphan[$i+1]['Depth'])
                     $json .= ', "children": [';
@@ -294,6 +294,33 @@ class Ajax extends CI_Controller {
         
         header('Content-type: application/json');
         echo $json;
+    }
+    
+    public function projectkeysHierarchical($project, $filterid=false) {
+        $this->load->model('keymodel');
+        $this->load->model('projectmodel');
+        $this->load->model('webservicesmodel');
+        $projectdata = $this->keymodel->getProjectData($project);
+        
+        $filter = false;
+        if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
+            $filter = $this->projectmodel->getFilterKeys($project);
+        }
+        elseif ($filterid) {
+            $filter = $this->projectmodel->getFilterKeys($project, $filterid);
+        }
+        
+        $keys = $this->webservicesmodel->getProjectKeys($project,$filter);
+        
+        $parentKeyIDs = array();
+        $keyIDs = array();
+        foreach ($keys as $index => $key) {
+            $parentKeyIDs[] = $key->ParentKeyID;
+            $keyIDs[] = $key->KeysID;
+        }
+        
+        print_r($parentKeyIDs);
+        
     }
     
     public function projectkeys_alphabetical($project) {
@@ -343,7 +370,7 @@ class Ajax extends CI_Controller {
         echo $json;
     }
 
-    public function getGlobalFilterKeys($filterid) {
+    /*public function getGlobalFilterKeys($filterid) {
         if (!$filterid) exit;
         $this->load->model('filtermodel');
         $data = $this->filtermodel->getKeysFromFilter($filterid);
@@ -359,7 +386,6 @@ class Ajax extends CI_Controller {
             $json .= '"title":"' . $filtername . '",';
             $json .= '"isFolder":true,';
             $json .= '"children":';
-            
             
             $json .= '[';
             foreach ($data as $pindex => $project) {
@@ -418,6 +444,21 @@ class Ajax extends CI_Controller {
             echo $json;
         }
 
+    }*/
+    
+    public function getGlobalFilterKeys($filterid) {
+        if (!$filterid) exit;
+        //$this->load->model('filtermodel');
+        //$filter = $this->filtermodel->getKeysFromFilter($filterid);
+        
+        $this->load->model('keymodel');
+        $this->load->model('webservicesmodel', 'ws');
+        $data = $this->ws->globalFilter($filterid);
+        $json = json_encode($data);
+        header('Content-type: application/json');
+        echo $json;
+           
+        
     }
     
     private function setGlobalFilter($filterid) {
