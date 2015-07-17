@@ -1,3 +1,5 @@
+var json;
+
 var href = location.href;
 var base_url;
 var site_url = href.substr(0, href.indexOf('/key/filter'));
@@ -103,7 +105,18 @@ function getStuff() {
         $('input#filtername').val(data.FilterName);
     });
     
-    $('div#globalfilter-keys').dynatree({
+    $.ajax({
+        url: site_url +  "/ajax/getGlobalfilterKeys/" + filterid,
+        success: function(data) {
+            json = data;
+            //var taxonomicScopeIDs = JSPath.apply('.taxonomicScopeID', json.keys);
+            filter();
+            
+            $('div#globalfilter-keys').JSONView(json);
+        }
+    });
+    
+    /*$('div#globalfilter-keys').dynatree({
         initAjax: {
             url: site_url + "/ajax/getGlobalfilterKeys/" + filterid
         },
@@ -119,7 +132,7 @@ function getStuff() {
             }
         }
     });
-    $('div#globalfilter-keys').dynatree("getTree").reload();
+    $('div#globalfilter-keys').dynatree("getTree").reload();*/
 
     $.getJSON(site_url + '/ajax/getGlobalFilterProjects/' + filterid, function(data) {
         $('select#projects').val(data);
@@ -137,3 +150,21 @@ function tabSize() {
         $('#globalfilter-keys').css({'height': '400px', 'overflow': 'visible'});
     }
 }
+
+function filter() {
+    $.each(json.projects, function(index, project ) {
+        var projectKeys = JSPath.apply('.{.projectID===$projectID}', json.keys, {projectID: project.projectID});
+        var itemIDs = JSPath.apply('.items', projectKeys);
+        
+        var rootKey = JSPath.apply('.{.taxonomicScopeID==="' + project.taxonomicScopeID + '"}', projectKeys);
+        console.log(rootKey);
+        
+        var orphans = [];
+        $.each(projectKeys, function(index,key) {
+            if (itemIDs.indexOf(key.taxonomicScopeID) === -1 && key.taxonomicScopeID !== project.taxonomicScopeID) {
+                orphans.push(key);
+            }
+        });
+        console.log(orphans);
+    });
+} 

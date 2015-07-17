@@ -58,7 +58,7 @@
                 </form>
             </div>
             <div id="filter">
-                <a href="<?=base_url()?>key/filter<?php 
+                <a href="<?=site_url()?>key/filter<?php 
                     if(isset($this->session->userdata['GlobalFilter'])) 
                         echo '/' . $this->session->userdata('GlobalFilter');?>">Filter keys</a>
             </div>

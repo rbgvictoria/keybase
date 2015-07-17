@@ -1,3 +1,8 @@
+var json;
+var hierarchy;
+
+
+
 $(function(){
     var href = location.href;
     var base_url;
@@ -22,18 +27,17 @@ $(function(){
         });
     });
     
-    $("#tree").dynatree({
-        initAjax: {
-            url: site_url + "/ajax/projectkeys_hierarchy/" + project
-        },
-        //autoCollapse: true,
-        onActivate: function(node) {
-            if (node.data.href) {
-                window.location.href=node.data.href;
-            }
-        },
-        onCreate: function(node) {
-            node.expand(true);
+    $.fn.keybaseProject.defaults.keyLinkClick = function(keyID) {
+        location.href = site_url + '/key/nothophoenix/' + keyID; 
+    };
+    
+    $.fn.keybaseProject.defaults.projectIconBaseUrl = base_url + "images/projecticons/";
+    
+    $.fn.keybaseProject.defaults.baseUrl = site_url + '/ws/projects/';
+    
+    $('#tree').keybaseProject('keysHierarchical', {
+        params: {
+            project: project
         }
     });
     
@@ -43,25 +47,29 @@ $(function(){
             "player": {
                 name: "Key player",
                 callback: function(key, options) {
-                    window.location.href = $(this).attr('href');
+                    var hash = $(this).attr('href').substr(1);
+                    window.location.href = site_url + '/key/nothophoenix/' + hash;
                 }
             },
             "bracketed": {
                 name: "Bracketed key",
                 callback: function(key, options) {
-                    window.location.href = $(this).attr('href').replace('nothophoenix', 'bracketedkey');
+                    var hash = $(this).attr('href').substr(1);
+                    window.location.href = site_url + '/key/bracketedkey/' + hash;
                 }
             },
             "indented": {
                 name: "Indented key",
                 callback: function(key, options) {
-                    window.location.href = $(this).attr('href').replace('nothophoenix', 'indentedkey');
+                    var hash = $(this).attr('href').substr(1);
+                    window.location.href = site_url + '/key/indentedkey/' + hash;
                 }
             },
             "about": {
                 name: "About",
                 callback: function(key, options) {
-                    window.location.href = $(this).attr('href').replace('nothophoenix', 'keydetail');
+                    var hash = $(this).attr('href').substr(1);
+                    window.location.href = site_url + '/key/keydetail/' + hash;
                 }
             },
             "sep1": "---------",
@@ -69,9 +77,9 @@ $(function(){
                 name: "Edit", 
                 icon: "edit", 
                 callback: function(key, options) {
-                    var href = $(this).attr('href');
-                    href = href.replace('nothophoenix', 'editkey') + '/cbox';
-                    $.colorbox({
+                    var hash = $(this).attr('href').substr(1);
+                    href = site_url + '/key/editkey/' + hash + '/cbox';
+                   $.colorbox({
                         href: href,
                         opacity: 0.40, 
                         transition: 'elastic', 
@@ -91,14 +99,15 @@ $(function(){
                             $('input[type="submit"]').button();
                         }
                     });
+                
                 }
             },
             "delete": {
                 name: "Delete", 
                 icon: "delete",
                 callback: function(key, options) {
-                    var href = $(this).attr('href');
-                    href = href.replace('nothophoenix', 'deletekey') + '/cbox';
+                    var hash = $(this).attr('href').substr(1);
+                    href = site_url + '/key/deletekey/' + hash + '/cbox';
                     $.colorbox({
                         href: href,
                         opacity: 0.40, 
@@ -118,9 +127,9 @@ $(function(){
                             });
                             $('input[type="submit"], button').button();
                             $('input.ok').focus();
-                            /*$('input.ok').click(function(e) {
-                                $('form').submit();
-                            });*/
+                            //$('input.ok').click(function(e) {
+                            //    $('form').submit();
+                            //});
                         }
                     });
                 }
