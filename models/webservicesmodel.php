@@ -431,7 +431,7 @@ class WebServicesModel extends KeyModel {
         $this->db->join('leads l', 'k.KeysID=l.KeysID');
         $this->db->join('groupitem g0', 'l.ItemsID=g0.GroupID AND g0.OrderNumber=0', 'left', FALSE);
         $this->db->join('groupitem g1', 'l.ItemsID=g1.GroupID AND g1.OrderNumber=1', 'left', FALSE);
-        $this->db->join('items i', 'coalesce(g0.MemberID, g1.MemberID, l.ItemsID)=i.ItemsID', 'inner', FALSE);
+        $this->db->join('items i', 'coalesce(g1.MemberID, g0.MemberID, l.ItemsID)=i.ItemsID', 'inner', FALSE);
         if ($projects) {
             $this->db->where_in('k.ProjectsID', $projects);
         }

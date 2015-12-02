@@ -63,24 +63,25 @@ class FilterModel extends CI_Model {
     public function findinKeyBase ($taxa, $projects=FALSE) {
         $this->found = array();
         $this->notfound = array();
-        foreach ($taxa as $name) {
+        //foreach ($taxa as $name) {
             $this->db->select('i.ItemsID, i.Name');
             $this->db->from('keys k');
             $this->db->join('leads l', 'k.KeysID=l.KeysID');
-            $this->db->join('items i', 'l.ItemsID=i.ItemsID');
-            $this->db->where('i.Name', $name);
+            $this->db->join('groupitem g0', 'l.ItemsID=g0.GroupID AND g0.OrderNumber=0', 'left', FALSE);
+            $this->db->join('groupitem g1', 'l.ItemsID=g1.GroupID AND g1.OrderNumber=1', 'left', FALSE);
+            $this->db->join('items i', 'COALESCE(g1.MemberID, g0.MemberID, l.ItemsID)=i.ItemsID', 'inner', FALSE);
+            $this->db->where_in('i.Name', $taxa);
             if ($projects)
                 $this->db->where_in('k.ProjectsID', $projects);
             $query = $this->db->get();
             if ($query->num_rows()) {
-                $row = $query->row();
-                $this->found[] = $row->Name;
-                $this->items[] = $row->ItemsID;
+                foreach ($query->result() as $row) {
+                    $this->found[] = $row->Name;
+                    $this->items[] = $row->ItemsID;
+                }
             }
-            else {
-                $this->notfound[] = $name;
-            }
-        }
+                $this->notfound[] = array_diff($taxa, $this->found);
+        //}
         
         if ($this->found) {
             sort($this->found);

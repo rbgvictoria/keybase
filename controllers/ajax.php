@@ -447,6 +447,7 @@ class Ajax extends CI_Controller {
     }*/
     
     public function getGlobalFilterKeys($filterid) {
+        //$this->output->enable_profiler();
         if (!$filterid) exit;
         //$this->load->model('filtermodel');
         //$filter = $this->filtermodel->getKeysFromFilter($filterid);

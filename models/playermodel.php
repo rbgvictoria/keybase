@@ -46,16 +46,42 @@ class PlayerModel extends CI_Model {
     public function keyInFilter($key) {
         $infilter = FALSE;
         if (isset($this->session->userdata['GlobalFilter']) && $this->session->userdata('GlobalFilter')) {
-            $this->db->select('GlobalFilterID, Filter');
+            $this->db->select('GlobalFilterID, FilterItems');
             $this->db->from('globalfilter');
             $this->db->where('FilterID', $this->session->userdata['GlobalFilter']);
             $query = $this->db->get();
             $row = $query->row();
-            $filter = unserialize($row->Filter);
-            foreach ($filter as $index => $keys) {
+            $filter = unserialize($row->FilterItems);
+            //echo implode(',', $filter);
+            /*
+             * SELECT k.KeysID, k.Name
+FROM leads l
+JOIN `keys` k ON l.KeysID=k.KeysID
+LEFT JOIN groupitem g ON l.ItemsID=g.GroupID AND OrderNumber=1
+-- JOIN items i ON l.ItemsID=i.ItemsID
+WHERE k.ProjectsID=11
+AND COALESCE(g.MemberID, l.ItemsID) IN ()
+GROUP BY k.KeysID;
+             */
+            
+            $this->db->select('k.KeysID');
+            $this->db->from('keys k');
+            $this->db->join('leads l', 'k.KeysID=l.KeysID');
+            $this->db->join('groupitem g', 'l.ItemsID=g.GroupID AND OrderNumber=1', 'left', FALSE);
+            $this->db->where_in('COALESCE(g.MemberID, l.ItemsID)', $filter, FALSE);
+            $this->db->group_by('k.KeysID');
+            $query = $this->db->get();
+            
+            foreach ($query->result() as $row) {
+                if ($row->KeysID == $key) {
+                    $infilter = true;
+                }
+            }
+            
+            /*foreach ($filter as $index => $keys) {
                 if (in_array($key, array_keys($keys)))
                     $infilter = TRUE;
-            }
+            }*/
         }
         return $infilter;
     }

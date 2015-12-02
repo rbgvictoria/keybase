@@ -996,9 +996,10 @@ class Key extends CI_Controller {
         if (!$this->input->post('taxa')) return FALSE;
         
         $taxa = preg_split("/[\r|\n]+/", trim($this->input->post('taxa')));
-        foreach ($taxa as $key=>$value)
+        foreach ($taxa as $key=>$value) {
             $taxa[$key] = trim($value);
-
+        }
+        
         $projects = $this->input->post('projects');
         if (!$projects[0]) $projects = FALSE;
 
