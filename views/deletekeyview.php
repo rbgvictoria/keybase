@@ -11,8 +11,6 @@
 
 <?=form_open()?>
 <?=form_hidden('projectid', $key['ProjectsID'])?>
-<div><?=form_checkbox(array('name'=>'skip_hierarchy','id'=>'skip_hierarchy','value'=>1))?>
-        <?=form_label('Skip hierarchy update', 'skip_hierarchy')?></div>
 <div id="delete-key-form-buttons">
     <?=form_button(array('content' => 'Cancel', 'class' => 'cancel'))?>
     <?=form_submit(array('name' => 'ok', 'value' => 'OK', 'class' => 'ok'))?>

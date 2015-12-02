@@ -31,8 +31,7 @@
                 'keyid'=>$keyid,
                 'projectid'=>$projectid,
                 'tempfilename'=>  $tempfilename,
-                'referer' => $referer,
-                'skip_hierarchy' => $this->input->post('skip_hierarchy')
+                'referer' => $referer
             ));
         ?>
         <p>
@@ -72,8 +71,7 @@
                 'projectid' => $projectid,
                 'tempfilename' => $tempfilename,
                 'delimiter' => $delimiter,
-                'referer' => $referer,
-                'skip_hierarchy' => $this->input->post('skip_hierarchy')
+                'referer' => $referer
             ));
         ?>
         <?php if ($errors): ?>
@@ -440,11 +438,6 @@
     </p-->
     </div>
 
-    <div>
-        <?=form_checkbox(array('name'=>'skip_hierarchy','id'=>'skip_hierarchy','value'=>1))?>
-        <?=form_label('Skip hierarchy update', 'skip_hierarchy')?>
-    </div>    
-    
     <p style="text-align: right">
         <?=form_submit('submit', 'Submit')?>
         <?=form_submit('cancel', 'Cancel')?>

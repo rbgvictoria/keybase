@@ -1,6 +1,5 @@
 <?php require_once('header.php'); ?>
 
-
 <div id="column-box">
     <div id="column1">
         <h1>Welcome to KeyBase</h1>
