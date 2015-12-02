@@ -52,7 +52,7 @@
     
     <div id="keymainmenu">
         <?php if($keyformat == 'player'): ?>
-        <span class="buttoncurrent" id="tab_player"><span>Player</span></span>
+        <span class="buttoncurrent" id="tab_player"><span>Interactive</span></span>
         <?php else: ?>
         <span class="button" id="tab_player"><?=anchor("/key/nothophoenix/$keyid", 'Player')?></span>
         <?php endif; ?>

@@ -158,15 +158,6 @@ class Key extends CI_Controller {
         $this->load->view('projectview', $this->data);
     }
     
-    public function update_hierarchy($projectid) {
-        $this->load->model('projectmodel');
-
-        if (isset($this->session->userdata['id']) && $this->projectmodel->IsProjectUser($projectid, $this->session->userdata['id']))
-            $this->hierarchy ($projectid);
-        redirect('key/project/' . $projectid);
-        
-    }
-    
     public function addprojectuser($project) {
         if (!isset($this->session->userdata['id']))
             redirect('key/project/' . $project);
@@ -303,7 +294,6 @@ class Key extends CI_Controller {
                         else {
                             $this->lpxk->LpxkToKeyBase($key, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
                         }
-                        $this->hierarchy($projectid);
                         redirect($this->input->post('referer'));
                     }
                     elseif ($_FILES['delimitedtext']['tmp_name']) {
@@ -315,9 +305,6 @@ class Key extends CI_Controller {
                         file_put_contents('uploads/' . $tempfilename, $tempfile);
                         $this->data['input_key'] = $this->detectDelimiter($key, $tempfilename);
                     }
-                }
-                if ($this->input->post('taxonomicscope') != $this->input->post('taxonomicscope_old') && !$this->input->post('skip_hierarchy')) {
-                    $this->hierarchy($projectid);
                 }
             }
         }
@@ -335,8 +322,6 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
-                if (!$this->input->post('skip_hierarchy'))
-                    $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
             }
         }
@@ -347,8 +332,6 @@ class Key extends CI_Controller {
                         'delimitedtext', FALSE, $this->input->post('delimiter'), 
                         $this->session->userdata['id']);
                 unlink('uploads/' . $this->input->post('tempfilename'));
-                if (!$this->input->post('skip_hierarchy'))
-                    $this->hierarchy($this->input->post('projectid'));
                 redirect('key/nothophoenix/' . $key);
         }
         
@@ -412,7 +395,6 @@ class Key extends CI_Controller {
                     else {
                         $this->lpxk->LpxkToKeyBase($keyid, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
                     }
-                    $this->hierarchy($projectid);
                     redirect('key/nothophoenix/' . $keyid);
                 }
                 elseif ($_FILES['delimitedtext']['tmp_name']) {
@@ -448,7 +430,6 @@ class Key extends CI_Controller {
                     'delimitedtext', FALSE, $this->input->post('delimiter'), 
                     $this->session->userdata['id']);
             unlink('uploads/' . $this->input->post('tempfilename'));
-            $this->hierarchy($projectid);
             redirect('key/nothophoenix/' . $keyid);
         }
         
@@ -677,11 +658,6 @@ class Key extends CI_Controller {
         $table[] = '</table>';
                 
         echo implode('', $table);
-    }
-    
-    public function hierarchy($projectid) {
-        $this->load->model('keyhierarchymodel');
-        $this->data['hierarchy'] = $this->keyhierarchymodel->getHierarchy($projectid);
     }
     
     public function addproject() {
@@ -946,8 +922,6 @@ class Key extends CI_Controller {
         
         if ($this->input->post('ok')) {
             $this->keymodel->deleteKey($key, $this->session->userdata['id']);
-            if (!$this->input->post('skip_hierarchy'))
-                $this->hierarchy($this->input->post('projectid'));
             redirect('key/project/' . $this->input->post('projectid'));
         }
         else {

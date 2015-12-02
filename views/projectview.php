@@ -43,9 +43,6 @@
                 <div id="edit-project">
                     <a class="button-link" href="<?=site_url()?>key/editproject/<?=$project['ProjectsID']?>">Edit project</a>
                 </div>
-                <div id="update_hierarchy">
-                    <a class="button-link" href="<?=site_url()?>key/update_hierarchy/<?=$project['ProjectsID']?>">Update key hierarchy</a>
-                </div>
                 <?php endif;?>
             </div>
             <div class="content-right">
