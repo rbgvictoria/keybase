@@ -1,9 +1,9 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Key extends CI_Controller {
+require_once 'keybase.php';
 
-    var $data;
-    
+class Key extends KeyBase {
+
     // error checking
     private $fromnodes;
     private $tonodes;
@@ -13,17 +13,7 @@ class Key extends CI_Controller {
 
     function  __construct() {
         parent::__construct();
-        $this->load->database();
-        $this->load->library('session');
-        $this->load->helper('url');
-        $this->load->helper('form');
-        $this->output->enable_profiler(TRUE);
         $this->load->model('keymodel');
-        
-        // Allow for custom style sheets and javascript
-        $this->data['css'] = array();
-        $this->data['js'] = array();
-        $this->data['iehack'] = FALSE;
     }
 
     public function index($edit=FALSE) {
@@ -172,13 +162,16 @@ class Key extends CI_Controller {
             else
                 $this->data['messages'][] = 'Please select a user.';
         }
+        if ($this->input->post('cancel')) {
+            redirect("key/project/$project");
+        }
         
         $this->load->view('addprojectuserview', $this->data);
     }
 
     public function nothophoenix($key, $node=null, $highestnode=null) {
         $this->load->model('nothophoenixmodel', 'phoenix');
-        $this->data['js'][] = base_url() . 'js/jquery.keypanel.js?v=1.0';
+        //$this->data['js'][] = base_url() . 'js/jquery.keypanel.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
         $this->data['iehack'] = TRUE;
         
@@ -216,7 +209,8 @@ class Key extends CI_Controller {
         // discarded taxa
         $this->data['discarded'] = $this->phoenix->getRemainingEntities($key, $remaining, 'discarded');
 
-        $this->load->view('nothophoenix_view', $this->data);
+        //$this->load->view('nothophoenix_view', $this->data);
+        $this->load->view('keyview', $this->data);
     }
     
     public function bracketedkey($key) {
@@ -634,7 +628,7 @@ class Key extends CI_Controller {
         }
     }
 
-    public function getinputkey($keyid, $tempfilename, $delimiter=FALSE) {
+    /*public function getinputkey($keyid, $tempfilename, $delimiter=FALSE) {
         $input_key = $this->detectDelimiter($keyid, $tempfilename, $delimiter);
         
         $maxcols = 0;
@@ -658,7 +652,7 @@ class Key extends CI_Controller {
         $table[] = '</table>';
                 
         echo implode('', $table);
-    }
+    }*/
     
     public function addproject() {
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
@@ -719,7 +713,7 @@ class Key extends CI_Controller {
             $filename = $this->export->exportToCsv($key);
             $csv = file_get_contents('temp_out/' . $filename);
             header('Content-type: text/csv');
-            header('Content-disposition: attachment;filename=' . $filename);
+            header('Content-disposition: filename=' . $filename);
             echo $csv;
         }
         elseif ($format == 'txt') {

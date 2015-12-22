@@ -2,7 +2,7 @@ var json;
 
 var href = location.href;
 var base_url;
-var site_url = href.substr(0, href.indexOf('/key/filter'));
+var site_url = href.substr(0, href.indexOf('/filters'));
 if (site_url.indexOf('index.php') > 0) {
     base_url = site_url.substr(0, site_url.indexOf('/index.php'));
 }
@@ -10,56 +10,39 @@ else {
     base_url = site_url + '/';
 }
 
-var uri = href.substr(href.indexOf('key/filter')).split('/');
+var uri = href.substr(href.indexOf('filters')).split('/');
 var filterid;
 
 $(function() {
-    $('a#import').button();
+    var filterHtml;
     
-    $('#globalfilter-tabs').tabs();
+    $('#filter').attr('size', $('#filter option').length);
     
-    $('select#filter').val(uri[2]);
-    if (uri.length > 2) {
+    if (uri.length > 2 && uri[2].length > 0) {
+        $('[data-toggle=tab]:eq(0)').tab('show');
+        $('li#view').css('display', 'block');
         filterid = uri[2];
-        $('#globalfilter-tabs').tabs({active: 0});
+        
+        $('[href$=' + filterid + ']').css({'font-weight': 'bold'}).prev('i').removeClass('fa-check-square').addClass('fa-check-square-o');
+        
         getStuff();
-        $('li#view').css('display', 'inline');
-        $('input#import').css('display', 'none');
+        //$('input#import').css('display', 'none');
     }
     else {
-        $('#globalfilter-tabs').tabs({active: 1});
+        
+        $('[data-toggle=tab]:eq(1)').tab('show');
+        $('li#view').css('display', 'none');
+
         $('input[name="update"]').val('Create filter');
         $('input#export, input#delete').css('display', 'none');
-        $('li#view').css('display', 'none');
-        $('li#manage').css('margin-left', '518px');
     }
     
-    $('select#filter').change(function(e) {
-        filterid = $(this).val();
-        
-        if (filterid != 0 ) {
-            $('#globalfilter-tabs').tabs({active: 0});
-            getStuff();
-            $('input[name="update"]').val('Update filter');
-            $('li#view').css('display', 'list-item');
-            $('li#manage').css('margin-left', '0px');
-            $('input#export, input#delete').css('display', 'inline');
-            $('input#import').css('display', 'none');
-        }
-        else {
-            $('#globalfilter-tabs').tabs({active: 1});
-            $('textarea#taxa').html('');
-            $('input#filterid').val(null);
-            $('input#filtername').val(null);
-            $('select#projects').val(null);
-            $('input[name="update"]').val('Create filter');
-            $('input#export, input#delete').css('display', 'none');
-            $('input#import').css({'display': 'inline'});
-            $('li#view').css('display', 'none');
-            $('li#manage').css('margin-left', '518px');
-        }
-        
-        $('select#filter').focus();
+    $('#project-filters').on('click', '.fa-plus-square-o', function(e) {
+        $(e.target).removeClass('fa-plus-square-o').addClass('fa-minus-square-o').nextAll('ul').show();
+    });
+    
+    $('#project-filters').on('click', '.fa-minus-square-o', function(e) {
+        $(e.target).removeClass('fa-minus-square-o').addClass('fa-plus-square-o').nextAll('ul').hide();
     });
     
     $('#globalfilter-keys').on('click', '.toggle', function(e) {
@@ -90,13 +73,16 @@ $(function() {
 
     });
     
-    tabSize();
+    /*tabSize();
     $(window).resize(function() {
         tabSize();
-    });
+    });*/
     
     
     $('select#filter').focus();
+    
+    
+    
 });
 
 function getStuff() {
@@ -105,35 +91,76 @@ function getStuff() {
         $('input#filtername').val(data.FilterName);
     });
     
+    $('#globalfilter-keys').html('<i class="fa fa-spinner fa-spin fa-lg"></i>');
+    
     $.ajax({
         url: site_url +  "/ajax/getGlobalfilterKeys/" + filterid,
         success: function(data) {
             json = data;
             //var taxonomicScopeIDs = JSPath.apply('.taxonomicScopeID', json.keys);
             filter();
+            $('div#globalfilter-keys').html(filterHtml);
+            $('#globalfilter-keys').on('click', '.fa.collapse', function(e) {
+                $(e.target).removeClass('collapse').addClass('expand').removeClass('fa-minus-square-o').addClass('fa-plus-square-o');
+                $(e.target).parents('li').eq(0).children('.fa-folder-open-o').removeClass('fa-folder-open-o').addClass('fa-folder-o');
+                $(e.target).parents('li').eq(0).children('ul').hide();
+            });
+            $('#globalfilter-keys').on('click', '.fa.expand', function(e) {
+                $(e.target).removeClass('expand').addClass('collapse').removeClass('fa-plus-square-o').addClass('fa-minus-square-o');
+                $(e.target).parents('li').eq(0).children('.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
+                $(e.target).parents('li').eq(0).children('ul').show();
+            });
             
-            $('div#globalfilter-keys').JSONView(json);
+            $('.keybase-filter-key').prepend('<span class="keybase-key-icon dynatree-icon"></span>');
+            $('.keybase-filter-project, .keybase-filter-first').prepend('<i class="fa fa-folder-open-o"></i>');
+            
+            $('.keybase-filter li').each(function() {
+                if ($(this).children('ul').length > 0) {
+                    $(this).prepend('<i class="fa fa-minus-square-o collapse"></i>');
+                }
+                else {
+                    $(this).prepend('<i class="fa fa-minus-square-o no-children"></i>');
+                }
+            });
+            
+            
+            $('.keybase-filter-key-num-items').addClass('expand');
+            $('#globalfilter-keys').on('click', '.keybase-filter-key-num-items.expand', function(e) {
+                $(e.target).removeClass('expand').addClass('collapse');
+                $(e.target).parents('li').eq(0).find('.keybase-filter-key-items').eq(0).css('display', 'block');
+            });
+            $('#globalfilter-keys').on('click', '.keybase-filter-key-num-items.collapse', function(e) {
+                $(e.target).removeClass('collapse').addClass('expand');
+                $(e.target).parents('li').eq(0).find('.keybase-filter-key-items').eq(0).hide();
+            });
+            
+            $('#globalfilter-keys').prepend("<div id=\"keybase-filter-item-toggle\"><div class=\"btn-group\" data-toggle=\"buttons\"> \
+                <label class=\"btn btn-default\"> \
+                  <input type=\"radio\" name=\"filter-item-toggle\" id=\"filter-item-expand\" checked>Expand items \
+                </label> \
+                <label class=\"btn btn-default active\"> \
+                  <input type=\"radio\" name=\"filter-item-toggle\" id=\"filter-item-collapse\">Collapse items \
+                </label> \
+              </div></div>");
+            
+            $('#globalfilter-keys').on('click', '.btn', function(e) {
+                if (!$(e.target).hasClass('active')) {
+                    if ($(e.target).children('input').eq(0).attr('id') === 'filter-item-expand') {
+                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('collapse');
+                        $('.keybase-filter-key-items').css('display', 'block');
+                    }
+                    else {
+                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('expand');
+                        $('.keybase-filter-key-items').hide();
+                    }
+                }
+            });
+            
+            
+            
         }
     });
     
-    /*$('div#globalfilter-keys').dynatree({
-        initAjax: {
-            url: site_url + "/ajax/getGlobalfilterKeys/" + filterid
-        },
-        //autoCollapse: true,
-        onActivate: function(node) {
-            if (node.data.href) {
-                    window.location.href=node.data.href;
-            }
-        },
-        onCreate: function(node) {
-            if (node.data.addClass !== "keybase-dynatree-items-folder") {
-                node.expand(true);
-            }
-        }
-    });
-    $('div#globalfilter-keys').dynatree("getTree").reload();*/
-
     $.getJSON(site_url + '/ajax/getGlobalFilterProjects/' + filterid, function(data) {
         $('select#projects').val(data);
     });
@@ -152,12 +179,20 @@ function tabSize() {
 }
 
 function filter() {
+    filterHtml = '<ul class="keybase-filter">';
+    filterHtml += '<li class="keybase-filter-first">';
+    filterHtml += '<span>' + json.filterName + ' [ID: ' + json.filterID + ']</span>';
     $.each(json.projects, function(index, project ) {
+        filterHtml += '<ul>';
+        filterHtml += '<li class="keybase-filter-project">';
+        filterHtml += '<span><a href="' + site_url + '/key/project/' + project.projectID + '">' + project.projectName + '</a></span>';
         var projectKeys = JSPath.apply('.{.projectID===$projectID}', json.keys, {projectID: project.projectID});
         var itemIDs = JSPath.apply('.items', projectKeys);
         
         var rootKey = JSPath.apply('.{.taxonomicScopeID==="' + project.taxonomicScopeID + '"}', projectKeys);
-        console.log(rootKey);
+        filterKey(rootKey[0]);
+        
+        
         
         var orphans = [];
         $.each(projectKeys, function(index,key) {
@@ -165,6 +200,59 @@ function filter() {
                 orphans.push(key);
             }
         });
-        console.log(orphans);
+        orphans.sort(function(a, b) {
+            if (a.keyName < b.keyName) {
+                return -1;
+            }
+            if (a.keyName > b.keyName) {
+                return 1;
+            }
+            return 0;
+        });
+        
+        $.each(orphans, function (index, key) {
+            filterKey(key);
+        });
+
+        filterHtml += '</li> <!-- /.keybase-filter-project -->';
+        filterHtml += '</ul>';
     });
-} 
+    filterHtml += '</li> <!-- /.keybasefilter-first -->';
+    filterHtml += '</ul> <!-- /.keybase-filter -->';
+}
+
+function filterKey(key) {
+    filterHtml += '<ul>';
+    filterHtml += '<li class="keybase-filter-key">';
+    filterHtml += '<span class="keybase-filter-key-name"><a href="' + site_url + '/keys/show/' + key.keyID + '">' + key.keyName + '</a> <span class="keybase-filter-key-num-items">(' + key.items.length + ' items)</span></span>';
+    
+    var items = JSPath.apply('.{.itemID==$itemID}', json.items, {itemID: key.items});
+    
+    var itemNames = JSPath.apply('.itemName', items);
+    
+    itemNames = itemNames.join(', ').replace(/{/g, '(').replace(/}/g, ')');
+    filterHtml += '<span class="keybase-filter-key-items">' + itemNames + '</span>';
+    
+    var itemIDs = [];
+    $.each(items, function(index, item) {
+        itemIDs.push(item.linkedItemID || item.itemID);
+    });
+    
+    var keys = JSPath.apply('.{.taxonomicScopeID==$itemID}', json.keys, {itemID: itemIDs});
+    keys.sort(function(a, b) {
+        if (a.keyName < b.keyName) {
+            return -1;
+        }
+        if (b.keyName < a.keyName) {
+            return 1;
+        }
+        return 0;
+    });
+    
+    $.each(keys, function (index, key) {
+        filterKey(key);
+    });
+    
+    filterHtml += '</li> <!-- /.keybase-filter-key -->';
+    filterHtml += '</ul>';
+}

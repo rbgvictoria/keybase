@@ -7,7 +7,7 @@ $(function() {
 		{ name: 'document',	   groups: [ 'mode', 'document' ] }
 	],
         height: 230,
-        contentsCss: '<?=base_url();?>css/ckeditor_styles.css',
+        contentsCss: base_url + 'css/ckeditor_styles.css',
         removePlugins: 'autogrow'
     });
     

@@ -1,6 +1,9 @@
 <?php 
+    // File: edit.php
+    // Location: views/projects/edit.php
+    
     if (!$cbox) {
-        require_once('header.php');
+        require_once 'views/header.php';
         echo '<div class="container">';
     }
     else {
@@ -92,7 +95,7 @@
 
 <?php 
     if (!$cbox) 
-        require_once('footer.php'); 
+        require_once 'views/footer.php'; 
     else 
         echo '</div><!-- end colorbox -->';
 ?>

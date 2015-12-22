@@ -367,7 +367,7 @@ class WebServicesModel extends KeyModel {
     public function globalFilter($filter) {
         $this->filterKeys = array();
         $this->filterKeyIDs = array();
-        $this->db->select('FilterItems, Filter, FilterProjects, FilterID, Name, TimestampCreated');
+        $this->db->select('FilterItems, FilterProjects, FilterID, Name, TimestampCreated');
         $this->db->from('globalfilter');
         $this->db->where('FilterID', $filter);
         $query = $this->db->get();
@@ -375,12 +375,7 @@ class WebServicesModel extends KeyModel {
             $row = $query->row();
             $filterItems = unserialize($row->FilterItems);
             $projects = NULL;
-            if ($row->FilterProjects) {
-                $projects = unserialize($row->FilterProjects);
-            }
-            elseif ($row->Filter) {
-                $projects = array_keys(unserialize($row->Filter));
-            }
+            $projects = unserialize($row->FilterProjects);
             $this->getGlobalFilterProjects($projects);
             $this->getGlobalFilterKeys($filterItems, $projects);
             $this->getGlobalFilterItems();

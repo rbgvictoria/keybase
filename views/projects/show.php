@@ -12,7 +12,7 @@
     }
 ?>
 
-<?php require_once('header.php'); ?>
+<?php require_once('views/header.php'); ?>
 
 
 <?php if($project): ?>
@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-md-12">
             <div id="breadcrumbs">&nbsp;</div>
-            <?php require_once('includes/globalfilter.php'); ?>
+            <?php //require_once('views/includes/globalfilter.php'); ?>
         </div> <!-- /.col -->
         <div class="col-md-12">
             <div id="project-page-header" class="clearfix">
@@ -50,7 +50,7 @@
                             <div class="col-md-4">
                                 <?php if (isset($this->session->userdata['id'])  && (in_array($userid, $prmanagers))):?>
                                 <div id="edit-project">
-                                    <a class="btn btn-default" href="<?=site_url()?>key/editproject/<?=$project['ProjectsID']?>">Edit project</a>
+                                    <a class="btn btn-default" href="<?=site_url()?>projects/edit/<?=$project['ProjectsID']?>">Edit project</a>
                                 </div>
                                 <?php endif;?>
                             </div>
@@ -77,6 +77,22 @@
                                 <button class="btn btn-default" type="submit" name="submith"><i class="fa fa-search"></i></button>
                                 </div>
                                 <?=form_close();?>
+                                
+                                <?php if ($projectFilters): ?>
+                                <?php 
+                                    $options = array();
+                                    $options[''] = 'Select filter...';
+                                    foreach ($projectFilters as $filter) {
+                                        $options[$filter['FilterID']] = $filter['FilterName'];
+                                    }
+                                ?>
+                                <br/>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="apply-filter"><i class="fa fa-filter"></i></span>
+                                    <?=form_dropdown('project-filter', $options, array(), 'class="form-control"'); ?>
+                                </div>
+                                <br/>
+                                <?php endif; ?>
 
                                 <?php if ($userid && in_array($userid, $prusers)):?>
                                 <div class="add-key">
@@ -159,4 +175,4 @@
 </div> <!-- /.container -->
 <?php endif;?>
 
-<?php require_once('footer.php'); ?>
+<?php require_once('views/footer.php'); ?>

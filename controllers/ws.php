@@ -75,9 +75,9 @@ class WS extends CI_Controller {
     private function projectKeys($project) {
         $this->load->model('projectmodel');
         $filter = false;
-        if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
+        /*if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
             $filter = $this->projectmodel->getFilterKeys($project);
-        }
+        }*/
         /*elseif ($filterid) {
             $filter = $this->projectmodel->getFilterKeys($project, $filterid);
         }*/

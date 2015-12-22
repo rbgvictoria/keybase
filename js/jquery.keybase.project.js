@@ -1,34 +1,11 @@
 var json;
 var hierarchy;
 
-
-
 $(function(){
-    var href = location.href;
-    var base_url;
-    var site_url = href.substr(0, href.indexOf('/key/project'));
-    if (site_url.indexOf('index.php') > 0) {
-        base_url = site_url.substr(0, site_url.indexOf('index.php'));
-    }
-    else {
-        base_url = site_url + '/';
-    }
-    var project = href.substr(href.indexOf('/project/')+9);
-    
-    var tab = $.QueryString['tab'];
-    if (!tab || tab > 3) {
-        tab = 1;
-    }
-    
-    $(function() {
-        $( "#project_tabs" ).tabs({
-            active: tab,
-            heightStyle: "auto" 
-        });
-    });
+    var project = href.substr(href.indexOf('/projects/show')+15);
     
     $.fn.keybaseProject.defaults.keyLinkClick = function(keyID) {
-        location.href = site_url + '/key/nothophoenix/' + keyID; 
+        location.href = site_url + '/keys/show/' + keyID;
     };
     
     $.fn.keybaseProject.defaults.projectIconBaseUrl = base_url + "images/projecticons/";
@@ -41,6 +18,8 @@ $(function(){
         }
     });
     
+    $('#tree li:gt(0)>span').addClass('keybase-dynatree-key');
+    
     $('#tree').contextMenu({
         selector: 'a', 
         items: {
@@ -48,28 +27,28 @@ $(function(){
                 name: "Key player",
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/nothophoenix/' + hash;
+                    window.location.href = site_url + '/keys/show/' + hash;
                 }
             },
             "bracketed": {
                 name: "Bracketed key",
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/bracketedkey/' + hash;
+                    window.location.href = site_url + '/keys/show/' + hash + '?mode=bracketed';
                 }
             },
             "indented": {
                 name: "Indented key",
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/indentedkey/' + hash;
+                    window.location.href = site_url + '/keys/show/' + hash + '?mode=indented';
                 }
             },
             "about": {
                 name: "About",
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/keydetail/' + hash;
+                    window.location.href = site_url + '/keys/show/' + hash + '?tab=3';
                 }
             },
             "sep1": "---------",
@@ -78,7 +57,7 @@ $(function(){
                 icon: "edit", 
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    href = site_url + '/key/editkey/' + hash + '/cbox';
+                    href = site_url + '/keys/edit/' + hash + '/cbox';
                    $.colorbox({
                         href: href,
                         opacity: 0.40, 
@@ -107,7 +86,7 @@ $(function(){
                 icon: "delete",
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    href = site_url + '/key/deletekey/' + hash + '/cbox';
+                    href = site_url + '/keys/delete/' + hash + '/cbox';
                     $.colorbox({
                         href: href,
                         opacity: 0.40, 
@@ -142,42 +121,18 @@ $(function(){
         var list = [];
         $.each(data, function(index, item) {
             var entity;
-            entity = "<li class=\"list\"><span class=\"keybase-dynatree-key\"><span class=\"dynatree-icon\"></span><a href=\"" + site_url + "/key/nothophoenix/" + item.KeysID + "\">" + item.Name + "</a></span>";
+            entity = "<li class=\"list\"><span class=\"keybase-dynatree-key\"><span class=\"dynatree-icon\"></span><a href=\"" + site_url + "/keys/show/" + item.KeysID + "\">" + item.Name + "</a></span>";
             if (item.Edit == 1) {
-                entity += "&nbsp;<a class=\"edit-key\" href=\"" + site_url + "/key/editkey/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_edit.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
+                entity += "&nbsp;<a class=\"edit-key\" href=\"" + site_url + "/keys/edit/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_edit.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
             }
             if (item.Delete == 1) {
-                entity += "&nbsp;<a class=\"delete-key\" href=\"" + site_url + "/key/deletekey/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_delete.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
+                entity += "&nbsp;<a class=\"delete-key\" href=\"" + site_url + "/keys/delete/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_delete.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
             }
             entity += "</li>";
             list.push(entity);
         });
         $('#list').html('<ul>' + list.join('') + '</ul>');
 
-        /*$("a.edit-key").on('click', function () {
-            var cbox_href = $(this).attr('href');
-            $(this).attr('href', cbox_href + '/cbox');
-            $(this).colorbox({
-                opacity: 0.40, 
-                transition: 'elastic', 
-                speed: 100,
-                innerWidth: 860,
-                innerHeight: "80%",
-                close: 'close',
-                onLoad: function() {
-                    $('#cboxClose').hide();
-                },
-                onComplete: function() {
-                    $('#colorbox').addClass('edit-project');
-                    $('#colorbox input[name="cancel"]').click(function(e) {
-                        e.preventDefault();
-                        $.colorbox.close();
-                    });
-                    $('input[type="submit"]').button();
-                }
-            });
-        });*/
-        
         $("a.delete-key").on('click', function() {
             var cbox_href = $(this).attr('href');
             $(this).attr('href', cbox_href + '/cbox');
@@ -289,24 +244,7 @@ $(function(){
             }
         });
     });*/
-    
-    tabSize();
-    $(window).resize(function() {
-        tabSize();
-    });
 });
-
-function tabSize() {
-    var tabheight = window.innerHeight-345;
-    if (tabheight > 300) {
-        $('.content-right').css({'height': tabheight + 'px', 'overflow': 'auto'});
-    }
-    else {
-        $('.content-right').css({'height': '300px', 'overflow': 'auto'});
-    }
-}
-
-
 
 (function($) {
     $.QueryString = (function(a) {
@@ -321,21 +259,3 @@ function tabSize() {
         return b;
     })(window.location.search.substr(1).split('&'))
 })(jQuery);
-
-$(function(){
-    $.extend({
-        getValues: function(url) {
-            var result = null;
-            $.ajax({
-                url: url,
-                type: 'get',
-                dataType: 'html',
-                async: false,
-                success: function(data) {
-                    result = data;
-                }
-            });
-           return result;
-        }
-    });    
-});

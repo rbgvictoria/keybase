@@ -20,7 +20,7 @@ class Admin extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('captcha');
-        $this->output->enable_profiler(true);
+        $this->output->enable_profiler(false);
         $this->load->model('authenticationmodel');
     }
 
@@ -101,8 +101,10 @@ class Admin extends CI_Controller {
             'word' => $this->authenticationmodel->getCaptchaWord(),
             'img_path' => './captcha/',
             'img_url' => base_url() . 'captcha/',
-            'img_width' => 200,
-            'img_height' => 30
+            'img_width' => 280,
+            'img_height' => 40,
+            'font_size' => 20,
+            'font_path' => '/var/www/lib/CodeIgniter_2.1.4/system/fonts/texb.ttf'
         );
         $captcha = create_captcha($vals);
         $this->authenticationmodel->storeCaptcha($captcha);

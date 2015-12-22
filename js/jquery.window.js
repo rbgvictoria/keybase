@@ -9,10 +9,10 @@ $(function() {
         base_url = site_url + '/';
     }
 
-    contentSize();
+    /*contentSize();
     $(window).resize(function() {
         contentSize();
-    });
+    });*/
     
     $('button, a.button-link, input[type="submit"]').button();
     

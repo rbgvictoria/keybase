@@ -1,4 +1,4 @@
-<?php require_once('header.php'); ?>
+<?php require_once('views/header.php'); ?>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -21,7 +21,7 @@
                             <span class="project">
                             <?=$key['ProjectName']?>:
                             </span>
-                            <?=anchor(site_url() . 'key/nothophoenix/' . $key['KeysID'], $key['KeyName']); ?>
+                            <?=anchor(site_url() . 'keys/show/' . $key['KeysID'], $key['KeyName']); ?>
                         </h3>
                         <div class="geographic-scope"><b>Geographic scope:</b> <?=$key['GeographicScope']?></div>
                     </div>
@@ -35,4 +35,4 @@
     </div> <!-- /.row -->
 </div> <!-- /.container -->
 
-<?php require_once('footer.php'); ?>
+<?php require_once('views/footer.php'); ?>

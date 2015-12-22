@@ -1,4 +1,7 @@
 <?php require_once('header.php'); ?>
+<div class="container">
+    <div class="row">
+        
 <?php require_once('keypageheader.php'); ?>
     
     <div id="keypanel">
@@ -156,4 +159,8 @@
             </div>
         </div>
     </div>
+
+    </div> <!-- /.row -->
+</div> <!-- /.row -->
+
 <?php require_once('footer.php'); ?>

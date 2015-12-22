@@ -28,6 +28,28 @@ class FilterModel extends CI_Model {
         return $ret;
     }
     
+    public function getProjectFilters($projectid=FALSE, $userid=FALSE) {
+        $this->db->select('p.ProjectsID AS ProjectID, p.Name AS ProjectName, f.FilterID, f.Name AS FilterName');
+        $this->db->from('projects p');
+        $this->db->join('filterproject fp', 'p.ProjectsID=fp.ProjectID');
+        $this->db->join('globalfilter f', 'fp.FilterID=f.GlobalFilterID AND f.IsProjectFilter=true', FALSE, FALSE);
+        $this->db->order_by('ProjectName');
+        $this->db->order_by('FilterName');
+        
+        if ($projectid) {
+            $this->db->where('p.ProjectsID', $projectid);
+        }
+        if ($userid) {
+            $this->db->join('projects_users pu', 'p.ProjectsID=pu.ProjectsID');
+            $this->db->join('users u', 'pu.UsersID=u.UsersID');
+            $this->db->where('u.UsersID', $userid);
+            $this->db->where('pu.Role', 'Manager');
+        }
+        
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+    
     public function getProjects() {
         $this->db->select('p.ProjectsID, p.Name');
         $this->db->from('projects p');
@@ -475,18 +497,14 @@ class FilterModel extends CI_Model {
     }
     
     public function getGlobalfilterProjects($filterid) {
-        $this->db->select('Filter');
+        $this->db->select('FilterProjects');
         $this->db->from('globalfilter');
         $this->db->where('FilterID', $filterid);
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
-            $filter = unserialize($row->Filter);
-            $ret = array();
-            foreach ($filter as $key=>$array) {
-                $ret[] = $key;
-            }
-            return $ret;
+            $projects = unserialize($row->FilterProjects);
+            return $projects;
         }
         else
             return FALSE;
