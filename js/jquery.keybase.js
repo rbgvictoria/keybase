@@ -552,9 +552,9 @@ $(function() {
 
                     html += '</span> <!-- /.to-item -->';
                 }
+                html += '</span> <!-- /.keybase-lead-text -->';
                 html += '</div> <!-- /.keybase-lead -->';
             }
-            html += '</span> <!-- /.keybase-lead-text -->';
             html += '</div> <!-- /.keybase-couplet -->';
 
         }

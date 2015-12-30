@@ -1310,7 +1310,7 @@
                 var items = lead.children;
                 html += '<div class="keybase-lead">';
                 html += '<span class="keybase-from-node">' + lead.fromNode + '</span>';
-                html += '<span class="keybase-lead-text">' + lead.title + '</span>';
+                html += '<span class="keybase-lead-text">' + lead.title;
                 if (lead.toNode !== undefined) {
                     html += '<span class="keybase-to-node"><a href="#l_' + lead.lead_id + '">' + lead.toNode + '</a></span>';
                 }
@@ -1344,6 +1344,7 @@
 
                     html += '</span> <!-- /.to-item -->';
                 }
+                html += '</span> <!-- /.keybase-lead-text -->';
                 html += '</div> <!-- /.keybase-lead -->';
             }
             html += '</div> <!-- /.keybase-couplet -->';
