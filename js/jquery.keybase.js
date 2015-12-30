@@ -104,9 +104,33 @@ $(function() {
      * 
      */
     if (location.href.indexOf('keys/show/') > -1) {
+        
         var key = location.href.substr(location.href.lastIndexOf('/') + 1);
         if (key.indexOf('?') > -1) {
             key = key.substring(0, key.indexOf('?'));
+        }
+        
+        if ($.QueryString.filter_id !== undefined) {
+            $.ajax({
+                url: site_url + '/ws/filterItems',
+                data: {
+                    "key_id": key,
+                    "filter_id": $.QueryString.filter_id
+                },
+                success: function(data) {
+                    doTheKeyThing(key, data);
+                }
+            });
+        }
+        
+        doTheKeyThing(key);
+        
+    }
+});
+
+    var doTheKeyThing = function(key, filter) {
+        if (filter === undefined) {
+            filter = [];
         }
         $.fn.keybase({
             baseUrl: base_url + "ws/keyJSON",
@@ -115,9 +139,11 @@ $(function() {
             title: false,
             source: false,
             reset: true,
+            filter_items: filter,
             remainingItemsDisplay: remainingItemsDisplay,
             discardedItemsDisplay: discardedItemsDisplay,
-            onLoad: showItems
+            onLoad: keybaseOnLoad,
+            onFilterWindowOpen: onFilterWindowOpen
         });
         var contentHeight = $('#keybase-player').offset().top + 600;
         if (contentHeight > $(window).height()-60) {
@@ -137,9 +163,9 @@ $(function() {
                     title: false,
                     source: false,
                     reset: false,
+                    filter_items: filter,
                     remainingItemsDisplay: remainingItemsDisplay,
-                    discardedItemsDisplay: discardedItemsDisplay,
-                    onLoad: showItems
+                    discardedItemsDisplay: discardedItemsDisplay
                 });
                 
             }    
@@ -188,9 +214,205 @@ $(function() {
                 $('body').css('height', $(window).height()-80);
             }
         });
-        
+                
     }
-});
+    
+    var onFilterWindowOpen = function() {
+        var key = location.href.substr(location.href.lastIndexOf('/') + 1);
+        if (key.indexOf('?') > -1) {
+            key = key.substring(0, key.indexOf('?'));
+        }
+
+        if ($('.external-filters').length === 0) {
+            $.ajax({
+                url: site_url + '/ws/projectFilters',
+                data: {
+                    key_id: key
+                },
+                success: function(data) {
+                    if (data.myFilters.length > 0 || data.projectFilters.length > 0) {
+                        var options;
+                        options += '<option value="">Select filter...</option>';
+                        if (data.myFilters.length > 0) {
+                            options += '<optgroup label="My filters">';
+                            $.each(data.myFilters, function(index, item) {
+                                options += '<option value="' + item.id + '">' + item.name + '</option>';
+                            });
+                            options += '</optgroup>';
+                        }
+                        if (data.projectFilters.length > 0) {
+                            options += '<optgroup label="Project filters">';
+                            $.each(data.projectFilters, function(index, item) {
+                                options += '<option value="' + item.id + '">' + item.name + '</option>';
+                            });
+                            options += '</optgroup>';
+                        }
+
+                        var html = '<div class="external-filters"> \
+                            <div class="input-group"> \
+                              <span class="input-group-addon" id="apply-filter"><i class="fa fa-filter"></i></span> \
+                              <select class="form-control" name="filter-id"></select>\
+                            </div> \
+                          </div>';
+                        $('.keybase-local-filter').before(html);
+                        $('.external-filters [name=filter-id]').html(options);
+                        if ($.fn.keybase.getters.activeFilter !== undefined || $.QueryString.filter_id !== undefined) {
+                            var activeFilter = ($.fn.keybase.getters.activeFilter() !== undefined) ? $.fn.keybase.getters.activeFilter() : false;
+                            if (activeFilter.length === false) {
+                                $.fn.keybase.setActiveFilter($.QueryString.filter_id);
+                                activeFilter = $.QueryString.filter_id;
+                            }
+                            $('.external-filters [name=filter-id]').val(activeFilter).after('<span class="input-group-addon" id="fdelete"><i class="fa fa-trash"></i></span>');
+                        }
+                        $('.external-filters [name=filter-id]').on('change', function() {
+                            // set active filter to the new filter
+                            $.fn.keybase.setActiveFilter($(this).val());
+                            var items = $.fn.keybase.getters.jsonKey().items;
+                            
+                            if ($(this).val().length > 0) {
+                                $.fn.keybase.setActiveFilter($(this).val());
+                                $(this).parent().append('<span class="input-group-addon" id="fspinner"><i class="fa fa-spinner fa-spin"></i></span>')
+                                $.ajax({
+                                    url: site_url + '/ws/filterItems',
+                                    data: {
+                                        key_id: key,
+                                        filter_id: $(this).val()
+                                    },
+                                    success: function(data) {
+                                        var filterItems = (data !== null) ? data : [];
+                                        
+                                        $.fn.keybase.setFilterItems(filterItems);
+                                       
+                                        var excl = [];
+                                        var incl = [];
+                                        $.each(items, function(index, item) {
+                                            var option = '<option value="' + item.item_id + '">' + item.item_name + '</option>';
+                                            if (filterItems.indexOf(item.item_id) > -1 || filterItems.indexOf(Number(item.item_id)) > -1) {
+                                                incl.push(option);
+                                            }
+                                            else {
+                                                excl.push(option);
+                                            }
+                                        });
+                                        $('select[name=includedItems]').html(incl);
+                                        $('select[name=excludedItems]').html(excl);
+                                        sortOptions('includedItems');
+                                        sortOptions('excludedItems');
+                                        $('label[for="initems"]').text('Included taxa (' + $('#initems>option').length + ')');
+                                        $('label[for="outitems"]').text('Excluded taxa (' + $('#outitems>option').length + ')');
+                                        
+                                        $('#fspinner').remove();
+                                    }
+                                });
+                                
+                            }
+                            else {
+                                var incl = [];
+                                $.fn.keybase.setFilterItems([]);
+                                $.each(items, function(index, item) {
+                                    var option = '<option value="' + item.item_id + '">' + item.item_name + '</option>';
+                                    incl.push(option);
+                                });
+                                $('select[name=includedItems]').html(incl);
+                                $('select[name=excludedItems]').html('');
+                                sortOptions('includedItems');
+                                $('label[for="initems"]').text('Included taxa (' + $('#initems>option').length + ')');
+                                $('label[for="outitems"]').text('Excluded taxa (' + $('#outitems>option').length + ')');
+                                $('#fdelete').remove();
+                            }
+                            
+                        });
+                        
+                        $('#fdelete').on('click', function() {
+                            $.fn.keybase.setActiveFilter('');
+                            $.fn.keybase.setFilterItems([]);
+                            $('select[name=filter-id]').val('');
+                            var items = $.fn.keybase.getters.jsonKey().items;
+                            var incl = [];
+                            $.each(items, function(index, item) {
+                                var option = '<option value="' + item.item_id + '">' + item.item_name + '</option>';
+                                incl.push(option);
+                            });
+                            $('select[name=includedItems]').html(incl);
+                            $('select[name=excludedItems]').html('');
+                            sortOptions('includedItems');
+                            $('label[for="initems"]').text('Included taxa (' + $('#initems>option').length + ')');
+                            $('label[for="outitems"]').text('Excluded taxa (' + $('#outitems>option').length + ')');
+                            $('#fdelete').remove();
+                        });
+                        
+                        $('.keybase-local-filter-ok').on('click', function() {
+                            $('.project a, #breadcrumbs a').each(function() {
+                                var href = $(this).attr('href');
+                                var newHref = updateHref(href);
+                                $(this).attr('href', newHref);
+                            });
+                            
+                            if ($.fn.keybase.getters.filterItems().length > 0) {
+                                if ($('[name=filter-id]').val().length > 0) {
+                                    $('.keybase-player-filter').css('background-color', '#ffcc00');
+                                }
+                                else {
+                                    $('.keybase-player-filter').css('background-color', '#33ee33');
+                                }
+                            }
+                        });
+                        
+                        
+                        $('.keybase-filter-buttons').on('click', 'button', function() {
+                            $('select[name=filter-id]').val('');
+                            $.fn.keybase.setActiveFilter('');
+                        });
+                    }
+                }
+            });
+        }
+    };
+    
+    var updateHref = function(href) {
+        var qstr;
+        var path;
+        if (href.indexOf('?') > -1) {
+            qstr = href.substr(href.indexOf('?')+1);
+            path = href.substr(0, href.indexOf('?'));
+        }
+        else {
+            qstr = '';
+            path = href;
+        }
+
+        var qobj = {};
+        if (qstr.length > 0) {
+            qobj = $.QueryStringHREF(qstr.split('&'));
+            delete qobj.filter_id;
+        }
+
+        var qstring = '';
+        filter_id = $.fn.keybase.getters.activeFilter();
+        if (filter_id !== undefined && filter_id.length > 0) {
+            qobj.filter_id = filter_id;
+        }
+        
+        qstring = $.ObjToString(qobj);
+
+        if (qstring.length > 0) {
+            return path + '?' + qstring;
+        }
+        else {
+            return path;
+        }
+    };
+    
+    var sortOptions = function(select) {
+        var options = $('[name=' + select + ']>option');
+        options.sort(function(a,b) {
+            if (a.text > b.text) return 1;
+            else if (a.text < b.text) return -1;
+            else return 0;
+        });
+        $('[name=' + select + ']').html(options);
+    };
+
 
     var remainingItemsDisplay = function(items, itemsDiv) {
         var list = keybaseItemsDisplay(items);
@@ -207,6 +429,15 @@ $(function() {
     };
     
     var keybaseItemsDisplay = function(items) {
+        var qstring;
+        var filter = $.fn.keybase.getters.activeFilter();
+        if (filter !== undefined && filter.length > 0) {
+            qstring = '?filter_id=' + filter;
+        }
+        else {
+            qstring = '';
+        }
+        
         var list = [];
         $.each(items, function(index, item) {
             var entity;
@@ -218,7 +449,7 @@ $(function() {
                 entity += item.item_name;
             }
             if (item.to_key) {
-                entity += '<a href="' + base_url + 'keys/show/' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
+                entity += '<a href="' + base_url + 'keys/show/' + item.to_key + qstring + '"><span class="keybase-player-tokey"></span></a>';
             }
             if (item.link_to_item_name) {
                 entity += ': ';
@@ -229,7 +460,7 @@ $(function() {
                     entity += item.link_to_item_name;
                 }
                 if (item.link_to_key) {
-                    entity += '<a href="' + base_url + 'keys/show/' + item.link_to_key + '"><span class="keybase-player-tokey"></span></a>';
+                    entity += '<a href="' + base_url + 'keys/show/' + item.link_to_key + qstring + '"><span class="keybase-player-tokey"></span></a>';
                 }
             }
             entity += '</li>';
@@ -247,28 +478,41 @@ $(function() {
 
     var indentedKey = function () {
         $.fn.keybase('indentedKey', {
-            indentedKeyDiv: '#keybase-indented'
+            indentedKeyDiv: '#keybase-indented',
+            onIndentedKeyComplete: onIndentedKeyComplete
         });
+    };
+    
+    var onIndentedKeyComplete = function() {
+        var contentHeight = $('#keybase-indented').offset().top + $('#keybase-indented').height();
+        if (contentHeight > $(window).height()-60) {
+            $('body').css('height', contentHeight);
+        }
+    };
+    
+    var keybaseOnLoad = function(json) {
+        showItems(json);
+        if ($.QueryString.filter_id !== undefined) {
+            $.fn.keybase.setActiveFilter($.QueryString.filter_id);
+            $('.keybase-player-filter').css('background-color', '#ffcc00');
+        }
     };
 
     var showItems = function(json) {
         var list = keybaseItemsDisplay(json.items);
         $('#items').html('<ul>' + list.join('') + '</ul>');
+        
     };
     
     var bracketedKeyDisplay = function(json) {
-        /*$(settings.bracketedKeyDiv).dynatree({
-            children: bracketed_key,
-            data: {mode: "all"},
-            expand: true
-        });*/
+        var bracketed_key = $.fn.keybase.getters.bracketedKey();
+        var settings = $.fn.keybase.getters.settings();
         var html = '<div class="keybase-bracketed-key">';
         var couplets = bracketed_key[0].children;
         for (var i = 0; i < couplets.length; i++)  {
             var couplet = couplets[i];
             var leads = couplet.children;
             html += '<div class="keybase-couplet" id="l_' + leads[0].parent_id + '">';
-            //html += '<span class="test">' + JSON.stringify(couplet.children) + '</span>';
             for (var j = 0; j < leads.length; j++) {
                 var lead = leads[j];
                 var items = lead.children;
@@ -316,16 +560,12 @@ $(function() {
         }
         html += '</div> <!-- /.keybase-bracketed_key -->';
         $(settings.bracketedKeyDiv).html(html);
-        
+        $(settings.bracketedKeyDiv).prepend('<div class="keybase-bracketed-key-filter"><span class="keybase-player-filter"><a href="#"><i class="fa fa-filter fa-lg"></i></a></span></div>')
+
         var contentHeight = $('#keybase-bracketed').offset().top + $('#keybase-bracketed').height();
         if (contentHeight > $(window).height()-60) {
             $('body').css('height', contentHeight);
         }
-
-        /*$('.keybase-bracketed-key .keybase-lead').each(function() {
-            var divHeight = $(this).height();
-            $(this).find('.keybase-from-node').eq(0).css({'height': divHeight + 'px'});
-        });*/
     };
     
 
@@ -340,5 +580,27 @@ $(function() {
             b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
         }
         return b;
-    })(window.location.search.substr(1).split('&'))
+    })(window.location.search.substr(1).split('&'));
+    
+    $.QueryStringHREF = function(a) {
+        if (a == "") return {};
+        var b = {};
+        for (var i = 0; i < a.length; ++i)
+        {
+            var p=a[i].split('=');
+            if (p.length !== 2) continue;
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+        }
+        return b;
+    };
+    
+    $.ObjToString = function(obj) {
+        var arr = [];
+        for (var p in obj) {
+            if (obj.hasOwnProperty(p)) {
+                arr.push(p + '=' + obj[p]);
+            }
+        }
+        return arr.join('&');
+    };
 })(jQuery);

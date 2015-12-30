@@ -85,6 +85,10 @@
     padding-left: 25px;
 }
 
+.keybase-player-path li {
+    list-style-type: none;
+}
+
 .keybase-player-tokey::after {
     display: inline-block;
     padding-left: 5px;
@@ -99,7 +103,7 @@
     top: 50%;
     left: 50%;
     width: 576px;
-    height: 520px;
+    /*height: 520px;*/
     transform: translate(-50%);
     background: #fff;
     z-index: 1001;
@@ -312,4 +316,15 @@ select[name=includedItems], select[name=excludedItems] {
 .keybase-indented-key .keybase-couplet li:first-child>.keybase-lead>.keybase-from-node::after {
     content: '.';
     color: #fff;
+}
+
+.external-filters {
+    margin-bottom: 10px;
+}
+
+/*
+*****************************************/
+.keybase-bracketed-key-filter, .keybase-indented-key-filter {
+    text-align: right;
+    margin-bottom: -25px;
 }

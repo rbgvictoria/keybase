@@ -59,13 +59,26 @@
                                 <div class="form-group">
                                     <?=form_label('ID', 'filterid', array('class' => 'col-sm-2 form-label'))?>
                                     <div class="col-sm-10">
-                                        <?=form_input(array('name'=>'filterid', 'id'=>'filterid', 'disabled'=>'disabled', 'class' => 'form-control', 'placeholder' => 'Filter ID'))?>
+                                        <?php if (isset($filterid)):?>
+                                        <?=form_hidden('filterid', $filterid); ?>
+                                        <?php endif;?>
+                                        <?=form_input(array('id'=>'filterid', 'disabled'=>'disabled', 'class' => 'form-control', 'placeholder' => 'Filter ID'))?>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <?=form_label('Project(s)', 'project', array('class' => 'col-sm-2 form-label')); ?>
                                     <div class="col-sm-10">
-                                        <?=form_multiselect('projects[]', $projects, $this->input->post('projects'), 'id="projects" class="form-control"');?>
+                                         <?=form_multiselect('projects[]', $projects, $this->input->post('projects'), "id=\"projects\" class=\"form-control\"");?>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <span class="col-md-2"></span>
+                                    <div class="checkbox col-md-10">
+                                        <label>
+                                            <input type="checkbox" name="isProjectFilter" value="">
+                                            Is project filter
+                                        </label>
                                     </div>
                                 </div>
 

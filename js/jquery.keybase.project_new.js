@@ -1,10 +1,10 @@
 /**
  * Created by NKlaze on 10/04/2015.
  */
+var settings;
 
 (function ( $ ) {
     var elem;
-    var settings;
 
     $.fn.keybaseProject = function(action, options) {
         elem = $(this);
@@ -152,11 +152,12 @@
     };
 
     $.fn.keybaseProject.defaults = {
-        projectIconBaseUrl: "/keybase/images/projecticons/"
+        projectIconBaseUrl: "/keybase/images/projecticons/",
+        filter: []
     };
 
     $.fn.keybaseProject.defaults.keyLinkClick = function(keyID) {
-        location.href = '/keybase/key/show/' + keyID;
+        location.href = '/keybase/keys/show/' + keyID;
     };
 
     var hierarchical = function() {
@@ -192,6 +193,9 @@
                     child.title = item.name;
                     child.href = '#' + item.id;
                     child.expand = true;
+                    if (settings.filter.length > 0 && settings.filter.indexOf(item.id) === -1) {
+                        child.addClass = 'collapse';
+                    }
                     delete child.id;
                     delete child.name;
                     delete child.name;
@@ -224,15 +228,17 @@
 
             //parent.children = children;
             $.each(children, function(index, key) {
-                var child = $.extend({}, key);
-                child.title = key.name;
-                child.href = "#" + key.id;
-                child.expand = true;
-                delete child.id;
-                delete child.name;
-                delete child.parent_id;
-                parent.children.push(child);
-                hierarchicalListNode(key.id, child);
+                if (settings.filter.length === 0 || settings.filter.indexOf(key.id) > -1) {
+                    var child = $.extend({}, key);
+                    child.title = key.name;
+                    child.href = "#" + key.id;
+                    child.expand = true;
+                    delete child.id;
+                    delete child.name;
+                    delete child.parent_id;
+                    parent.children.push(child);
+                    hierarchicalListNode(key.id, child);
+                }
             });
         }
     };

@@ -75,13 +75,6 @@ class WS extends CI_Controller {
     private function projectKeys($project) {
         $this->load->model('projectmodel');
         $filter = false;
-        /*if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
-            $filter = $this->projectmodel->getFilterKeys($project);
-        }*/
-        /*elseif ($filterid) {
-            $filter = $this->projectmodel->getFilterKeys($project, $filterid);
-        }*/
-        
         $data = $this->ws->getProjectKeys($project, $filter);
         $keys = array();
         foreach ($data as $row) {
@@ -241,6 +234,70 @@ class WS extends CI_Controller {
         $data['leads'] = $this->ws->getLeads($_GET['key_id']);
         
         $json = json_encode($data);
+        header('Access-Control-Allow-Origin: *');  
+        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
+        header('Content-type: application/json');
+        if (isset($_GET['callback']) && $_GET['callback'])
+            echo $_GET['callback'] . '(' . $json . ')';
+        else
+            echo $json;
+    }
+    
+    public function filterItems() {
+        if (!$this->input->get('filter_id') || !$this->input->get('key_id')) {
+            exit();
+        }
+        
+        $data = $this->ws->getFilterItemsForKey($this->input->get('filter_id'), $this->input->get('key_id'));
+        $json = json_encode($data, JSON_NUMERIC_CHECK);
+        header('Access-Control-Allow-Origin: *');  
+        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
+        header('Content-type: application/json');
+        if (isset($_GET['callback']) && $_GET['callback'])
+            echo $_GET['callback'] . '(' . $json . ')';
+        else
+            echo $json;
+    }
+    
+    public function projectFilters() {
+        if (!$this->input->get('key_id') && !$this->input->get('project_id')) {
+            exit();
+        }
+        
+        if ($this->input->get('project_id')) {
+            $project = $this->input->get('project_id');
+        }
+        else {
+            $project = $this->keymodel->getProjectID($this->input->get('key_id'));
+        }
+        
+        $this->load->model('filtermodel');
+        $myFilters = $this->filtermodel->getFilters($project);
+        $projectFilters = $this->filtermodel->getProjectFilters($project);
+        $obj = (object) array(
+            'myFilters' => array(),
+            'projectFilters' => array()
+        );
+        if ($myFilters):
+            foreach ($myFilters as $key => $value):
+                $obj->myFilters[] = (object) array(
+                    'id' => $key,
+                    'name' => $value
+                );
+            endforeach;
+        endif;
+        if ($projectFilters):
+            foreach ($projectFilters as $filter):
+                $obj->projectFilters[] = (object) array(
+                    'id' => $filter['FilterID'],
+                    'name' => $filter['FilterName']
+                );
+            endforeach;
+        endif;
+        
+        $json = json_encode($obj);
         header('Access-Control-Allow-Origin: *');  
         header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');

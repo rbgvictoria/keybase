@@ -8,7 +8,6 @@ class Keys extends KeyBase {
     function  __construct() {
         parent::__construct();
         $this->load->model('keymodel');
-        $this->output->enable_profiler(false);
     }
     
     function index() {

@@ -527,6 +527,7 @@ ul.keybase-filter li {
 
 .keybase-filter-key-num-items {
     cursor: pointer;
+    font-size: 13px;
 }
 
 .keybase-filter-key-num-items.collapse {
@@ -535,7 +536,8 @@ ul.keybase-filter li {
 
 .keybase-filter-key-items {
     display: none;
-    margin-left: 52px;
+    padding-left: 40px;
+    font-size: 13px;
 }
 
 .fa.expand, .fa.collapse, .fa.no-children {
@@ -550,8 +552,8 @@ ul.keybase-filter li {
 
 .keybase-filter .fa-folder-open-o, .keybase-filter .fa-folder-o {
     color: #666;
-    margin-right: 5px;
-    margin-left: 5px;
+    /*margin-right: 3px;
+    margin-left: 3px;*/
 }
 
 .keybase-filter-first>span {
@@ -592,4 +594,14 @@ ul#project-filters>li>ul {
 
 #project-filters>li>ul>li>a:focus {
     outline: solid 1px #337ab7;
+}
+
+div#project-filters {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#globalfilter-keys .fa-minus-square-o~span, 
+#globalfilter-keys .fa-plus-square-o~span {
+    margin-left: 2px;
 }

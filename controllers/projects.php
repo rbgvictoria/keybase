@@ -26,21 +26,13 @@ class Projects extends KeyBase {
         $this->data['js'][] = base_url() . 'js/ckeditor_customconfig.js?v=1.0';
         $this->data['js'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.js';
         $this->data['css'][] = base_url() . 'js/medialize-jQuery-contextMenu/jquery.contextMenu.css';
-
-        /*$this->data['infilter'] = $this->keymodel->projectInFilter($project);
-        if (isset($this->session->userdata['GlobalFilter'])) {
-            $this->data['filterkeys'] = $this->projectmodel->getFilterKeys($project);
-            $taxa = $this->keymodel->getTaxa($project, $this->data['filterkeys']);
-        }
-        else {
-            $taxa = $this->keymodel->getTaxa($project);
-        }*/
-
         $this->data['projectid'] = $project;
         $this->data['project'] = $this->keymodel->getProjectData($project);
         $this->data['users'] = $this->keymodel->getProjectUsers($project);
         $this->load->model('filtermodel');
+        $this->data['myFilters'] = $this->filtermodel->getFilters($project);
         $this->data['projectFilters'] = $this->filtermodel->getProjectFilters($project);
+        $this->data['manageFilters'] = $this->filtermodel->manageFilters($project);
         $this->load->view('projects/show', $this->data);
     }
     
@@ -90,8 +82,6 @@ class Projects extends KeyBase {
         }
     }
     
-    
-
 }
 
 /* End of file projects.php */

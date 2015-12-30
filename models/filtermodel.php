@@ -11,15 +11,21 @@ class FilterModel extends CI_Model {
         parent::__construct();
     }
     
-    public function getFilters() {
+    public function getFilters($project=FALSE) {
         $ret = array();
-        $this->db->select('GlobalFilterID, FilterID, Name');
-        $this->db->from('globalfilter');
+        $this->db->select('f.GlobalFilterID, f.FilterID, f.Name');
+        $this->db->from('globalfilter f');
         if (isset($this->session->userdata['id']))
-            $this->db->where('UsersID', $this->session->userdata('id'));
+            $this->db->where('f.UsersID', $this->session->userdata('id'));
         else
-            $this->db->where('SessionID', $this->session->userdata('session_id'));
-        $this->db->order_by('TimestampCreated');
+            $this->db->where('f.SessionID', $this->session->userdata('session_id'));
+        $this->db->order_by('f.TimestampCreated');
+        
+        if ($project) {
+            $this->db->join('filterproject fp', 'f.GlobalFilterID=fp.FilterID');
+            $this->db->where('fp.ProjectID', $project);
+        }
+        
         $query = $this->db->get();
         if ($query->num_rows()) {
             foreach ($query->result() as $row)
@@ -50,6 +56,19 @@ class FilterModel extends CI_Model {
         return $query->result_array();
     }
     
+    public function manageFilters($project) {
+        $this->db->select('f.GlobalFilterID, f.FilterID, f.Name, u.Username, pu.Role, f.IsProjectFilter=1 AS IsProjectFilter', FALSE);
+        $this->db->from('globalfilter f');
+        $this->db->join('filterproject fp', 'f.GlobalFilterID=fp.FilterID');
+        $this->db->join('projects_users pu', 'fp.ProjectID=pu.ProjectsID AND f.UsersID=pu.UsersID');
+        $this->db->join('users u', 'pu.UsersID=u.UsersID');
+        $this->db->where('fp.ProjectID', $project);
+        $this->db->group_by('f.GlobalFilterID');
+        $this->db->having('count(f.GlobalFilterID)=1');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    
     public function getProjects() {
         $this->db->select('p.ProjectsID, p.Name');
         $this->db->from('projects p');
@@ -64,6 +83,18 @@ class FilterModel extends CI_Model {
                 $ret[$row->ProjectsID] = $row->Name;
             return $ret;
         }
+    }
+    
+    public function setProjectFilter() {
+        $isProjectFilter = ($this->input->post('is_project_filter')) ? 'true' : 'false';
+        $filter = $this->input->post('filter_id');
+        $update = "UPDATE globalfilter SET IsProjectFilter=$isProjectFilter WHERE FilterID='$filter'";
+        $this->db->query($update);
+        return $update;
+        
+        /*$this->db->where('FilterID', $this->input->post('filter_id'));
+        $this->db->update('globalfilter', array('IsProjectFilter' => $this->input->post('is_project_filter')));
+        return $this->db->last_query();*/
     }
     
     public function getKeysFiltered($taxa, $projects=FALSE) {
@@ -102,7 +133,7 @@ class FilterModel extends CI_Model {
                     $this->items[] = $row->ItemsID;
                 }
             }
-                $this->notfound[] = array_diff($taxa, $this->found);
+            $this->notfound = array_diff($taxa, $this->found);
         //}
         
         if ($this->found) {
@@ -240,18 +271,26 @@ class FilterModel extends CI_Model {
             $this->db->insert('globalfilter', $insertArray);
         }
         
-        $this->session->set_userdata('GlobalFilter', $filterid);
-        $this->session->set_userdata('GlobalFilterOn', TRUE);
-        
         return $filterid;
     }
     
     public function updateFilter($projects=FALSE, $filterid=FALSE, $filtername=FALSE) {
+        if ($filterid) {
+            $this->db->select('GlobalFilterID');
+            $this->db->where('FilterID', $filterid);
+        }
+        else {
+            $this->db->select('MAX(GlobalFilterID)+1 AS GlobalFilterID', FALSE);
+        }
+        $this->db->from('globalfilter');
+        $query = $this->db->get();
+        $row = $query->row();
+        $id = $row->GlobalFilterID;
+        
         $filterArray = array(
             'Name' => ($filtername) ? $filtername : NULL,
             'FilterItems' => serialize($this->items),
-            'FilterProjects' => ($projects) ? serialize($projects) : NULL,
-            'Filter' => NULL,
+            'FilterProjects' => ($projects) ? serialize($projects) : NULL
         );
         if ($this->notfound) {
             $filterArray['ItemsNotFound'] = implode('|', $this->notfound);
@@ -270,6 +309,7 @@ class FilterModel extends CI_Model {
         else {
             $filterid = uniqid();
             $insertArray = array_merge($filterArray, array(
+                'GlobalFilterID' => $id,
                 'FilterID' => $filterid,
                 'TimestampCreated' => date('Y-m-d H:i:s'),
                 'UsersID' => (isset($this->session->userdata['id'])) ? $this->session->userdata['id'] : NULL,
@@ -280,101 +320,18 @@ class FilterModel extends CI_Model {
             $this->db->insert('globalfilter', $insertArray);
         }
         
-        $this->session->set_userdata('GlobalFilter', $filterid);
-        $this->session->set_userdata('GlobalFilterOn', TRUE);
-        
+        $this->db->where('FilterID', $id);
+        $this->db->delete('filterproject');
+        if ($projects) {
+            foreach ($projects as $project) {
+                $this->db->insert('filterproject', array(
+                    'FilterID' => $id,
+                    'ProjectID' => $project
+                ));
+            }
+        } 
         return $filterid;
         
-    }
-    
-    public function getKeysFromFilter($filterid=FALSE) {
-        $this->db->select('Filter');
-        $this->db->from('globalfilter');
-        if ($filterid) 
-            $this->db->where('FilterID', $filterid);
-        else
-            $this->db->where('FilterID', $this->session->userdata['GlobalFilter']);
-        $query = $this->db->get();
-        if ($query->num_rows()) {
-            $row = $query->row();
-            $this->filter = unserialize($row->Filter);
-            
-            $projects = array();
-            foreach ($this->filter as $i => $project) {
-                $proj = array();
-                $this->db->select('p.Name AS ProjectName');
-                $this->db->from('projects p');
-                $this->db->where('ProjectsID', $i);
-                $p_query = $this->db->get();
-                $p_row = $p_query->row();
-                $proj = array(
-                    'id' => $i,
-                    'name' => $p_row->ProjectName
-                );
-                
-                $keys = array();
-                
-                $this->db->select("k.KeysID, k.Name AS KeyName, 
-                    IF(h.NodeNumber IS NOT NULL, LPAD(h.NodeNumber, 6, '0'), 'ZZZ') AS NodeNumber, 
-                    IF(h.Depth IS NOT NULL, h.Depth, 1) AS Depth", FALSE);
-                $this->db->from('keys k');
-                $this->db->join('keyhierarchy h', 'k.KeysID=h.KeysID AND k.ProjectsID=h.ProjectsID', 'left');
-                $this->db->where_in('k.KeysID', array_keys($project));
-                $this->db->order_by('NodeNumber');
-                $this->db->order_by('KeyName');
-                $k_query = $this->db->get();
-                
-                $linked_keys = array();
-                foreach ($k_query->result() as $k_row) {
-                    $linked_keys[] = $k_row->KeysID;
-                    $key = array(
-                        'id' => $k_row->KeysID,
-                        'name' => $k_row->KeyName,
-                        'nodenumber' => $k_row->NodeNumber,
-                        'depth' => $k_row->Depth,
-                    );
-                    
-                    $this->db->select('i.ItemsID, i.Name AS ItemName');
-                    $this->db->from('items i');
-                    $this->db->where_in('i.ItemsID', $this->filter[$i][$k_row->KeysID]);
-                    $this->db->order_by('ItemName');
-                    $i_query = $this->db->get();
-                    $items = array();
-                    foreach ($i_query->result() as $i_row) {
-                        $items[] = array(
-                            'id' => $i_row->ItemsID,
-                            'name' => $i_row->ItemName
-                        );
-                    }
-                    $key['items'] = $items;
-                    $keys[] = $key;
-                }
-                $proj['keys'] = $keys;
-                $projects[] = $proj;
-            }
-            return $projects;
-        }
-    }
-    
-    public function retrieveFilterForKey($key) {
-        $this->db->select('ProjectsID');
-        $this->db->from('keys');
-        $this->db->where('KeysID', $key);
-        $query = $this->db->get();
-        if ($query->num_rows()) {
-            $row = $query->row();
-            $project = $row->ProjectsID;
-
-            $this->db->select('Filter');
-            $this->db->from('globalfilter');
-            $this->db->where('FilterID', $this->session->userdata['GlobalFilter']);
-            $query = $this->db->get();
-            if ($query->num_rows()) {
-                $row = $query->row();
-                $this->filter = unserialize($row->Filter);
-                return $this->filter[$project][$key];
-            }
-        }
     }
     
     public function getInItems($key, $filter) {
@@ -568,8 +525,6 @@ class FilterModel extends CI_Model {
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
-            $this->db->where('GlobalFilterID', $row->GlobalFilterID);
-            $this->db->delete('globalfilter_key');
             $this->db->where('GlobalFilterID', $row->GlobalFilterID);
             $this->db->delete('globalfilter');
         }

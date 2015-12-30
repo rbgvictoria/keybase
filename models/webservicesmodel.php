@@ -483,6 +483,27 @@ class WebServicesModel extends KeyModel {
         return $ret;
     }
 
+    public function getFilterItemsForKey($filter, $key) {
+        $this->globalFilter($filter);
+       
+        /*$this->db->select('ItemsID');
+        $this->db->from('leads');
+        $this->db->where('KeysID', $key);
+        $this->db->where('ItemsID IS NOT NULL', FALSE, FALSE);
+        $this->db->group_by('ItemsID');
+        $query = $this->db->get();
+        $keyItems = array();
+        foreach($query->result() as $row) {
+            $keyItems[] = $row->ItemsID;
+        }*/
+        
+        $k = array_search($key, $this->filterKeyIDs);
+        if ($k !== FALSE) {
+            return $this->filterKeys[$k]->items;
+        }
+        
+    }
+
     
 
 

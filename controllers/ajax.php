@@ -331,12 +331,12 @@ class Ajax extends CI_Controller {
         if (isset($this->session->userdata['id']) && $this->session->userdata['id'])
             $user = $this->session->userdata['id'];
 
-        $filter = false;
+        /*$filter = false;
         if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
             $filter = $this->projectmodel->getFilterKeys($project);
-        }
+        }*/
 
-        $data = $this->keymodel->getProjectKeys($project, $user, $filter);
+        $data = $this->keymodel->getProjectKeys($project, $user);
         $json = json_encode($data);
         header('Content-type: application/json');
         echo $json;
@@ -456,8 +456,14 @@ class Ajax extends CI_Controller {
         $this->load->model('webservicesmodel', 'ws');
         $data = $this->ws->globalFilter($filterid);
         $json = json_encode($data);
+        header('Access-Control-Allow-Origin: *');  
+        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
         header('Content-type: application/json');
-        echo $json;
+        if (isset($_GET['callback']) && $_GET['callback'])
+            echo $_GET['callback'] . '(' . $json . ')';
+        else
+            echo $json;
            
         
     }

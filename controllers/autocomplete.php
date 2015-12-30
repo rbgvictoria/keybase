@@ -18,10 +18,10 @@ class AutoComplete extends CI_Controller {
         $q = strtolower($_GET["term"]);
         
         $filter = FALSE;
-        if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
+        /*if (isset($this->session->userdata['GlobalFilterOn']) && $this->session->userdata['GlobalFilterOn']) {
             $this->load->model('projectmodel');
             $filter = $this->projectmodel->getFilterKeys($project);
-        }
+        }*/
 
         $items = $this->autocompletemodel->getProjectTaxa($project, $q, $filter);
 

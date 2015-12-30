@@ -100,37 +100,32 @@ function getStuff() {
             //var taxonomicScopeIDs = JSPath.apply('.taxonomicScopeID', json.keys);
             filter();
             $('div#globalfilter-keys').html(filterHtml);
-            $('#globalfilter-keys').on('click', '.fa.collapse', function(e) {
-                $(e.target).removeClass('collapse').addClass('expand').removeClass('fa-minus-square-o').addClass('fa-plus-square-o');
+            $('#globalfilter-keys').on('click', '.fa-folder-open-o, .fa-minus-square-o', function(e) {
+                $(e.target).removeClass('fa-minus-square-o').addClass('fa-plus-square-o');
                 $(e.target).parents('li').eq(0).children('.fa-folder-open-o').removeClass('fa-folder-open-o').addClass('fa-folder-o');
                 $(e.target).parents('li').eq(0).children('ul').hide();
             });
-            $('#globalfilter-keys').on('click', '.fa.expand', function(e) {
-                $(e.target).removeClass('expand').addClass('collapse').removeClass('fa-plus-square-o').addClass('fa-minus-square-o');
+            $('#globalfilter-keys').on('click', '.fa-folder-o, .fa-plus-square-o', function(e) {
+                $(e.target).removeClass('fa-plus-square-o').addClass('fa-minus-square-o');
                 $(e.target).parents('li').eq(0).children('.fa-folder-o').removeClass('fa-folder-o').addClass('fa-folder-open-o');
                 $(e.target).parents('li').eq(0).children('ul').show();
             });
             
             $('.keybase-filter-key').prepend('<span class="keybase-key-icon dynatree-icon"></span>');
-            $('.keybase-filter-project, .keybase-filter-first').prepend('<i class="fa fa-folder-open-o"></i>');
+            $('.keybase-filter-project, .keybase-filter-first').prepend('<i class="fa fa-folder-open-o fa-fw"></i>');
             
             $('.keybase-filter li').each(function() {
-                if ($(this).children('ul').length > 0) {
-                    $(this).prepend('<i class="fa fa-minus-square-o collapse"></i>');
-                }
-                else {
-                    $(this).prepend('<i class="fa fa-minus-square-o no-children"></i>');
-                }
+                $(this).prepend('<i class="fa fa-minus-square-o fa-fw"></i>');
             });
             
             
             $('.keybase-filter-key-num-items').addClass('expand');
             $('#globalfilter-keys').on('click', '.keybase-filter-key-num-items.expand', function(e) {
-                $(e.target).removeClass('expand').addClass('collapse');
+                $(e.target).removeClass('expand').addClass('collapse').children('.fa').eq(0).removeClass('fa-caret-right').addClass('fa-caret-down');
                 $(e.target).parents('li').eq(0).find('.keybase-filter-key-items').eq(0).css('display', 'block');
             });
             $('#globalfilter-keys').on('click', '.keybase-filter-key-num-items.collapse', function(e) {
-                $(e.target).removeClass('collapse').addClass('expand');
+                $(e.target).removeClass('collapse').addClass('expand').children('.fa').eq(0).removeClass('fa-caret-down').addClass('fa-caret-right');
                 $(e.target).parents('li').eq(0).find('.keybase-filter-key-items').eq(0).hide();
             });
             
@@ -146,11 +141,15 @@ function getStuff() {
             $('#globalfilter-keys').on('click', '.btn', function(e) {
                 if (!$(e.target).hasClass('active')) {
                     if ($(e.target).children('input').eq(0).attr('id') === 'filter-item-expand') {
-                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('collapse');
+                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('collapse').each(function() {
+                            $(this).children('.fa').removeClass('fa-caret-right').addClass('fa-caret-down');
+                        });
                         $('.keybase-filter-key-items').css('display', 'block');
                     }
                     else {
-                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('expand');
+                        $('.keybase-filter-key-num-items').removeClass('expand').removeClass('collapse').addClass('expand').each(function() {
+                            $(this).children('.fa').removeClass('fa-caret-down').addClass('fa-caret-right');
+                        });
                         $('.keybase-filter-key-items').hide();
                     }
                 }
@@ -185,7 +184,7 @@ function filter() {
     $.each(json.projects, function(index, project ) {
         filterHtml += '<ul>';
         filterHtml += '<li class="keybase-filter-project">';
-        filterHtml += '<span><a href="' + site_url + '/key/project/' + project.projectID + '">' + project.projectName + '</a></span>';
+        filterHtml += '<span><a href="' + site_url + '/projects/show/' + project.projectID + '?filter_id=' + json.filterID + '">' + project.projectName + '</a></span>';
         var projectKeys = JSPath.apply('.{.projectID===$projectID}', json.keys, {projectID: project.projectID});
         var itemIDs = JSPath.apply('.items', projectKeys);
         
@@ -224,7 +223,7 @@ function filter() {
 function filterKey(key) {
     filterHtml += '<ul>';
     filterHtml += '<li class="keybase-filter-key">';
-    filterHtml += '<span class="keybase-filter-key-name"><a href="' + site_url + '/keys/show/' + key.keyID + '">' + key.keyName + '</a> <span class="keybase-filter-key-num-items">(' + key.items.length + ' items)</span></span>';
+    filterHtml += '<span class="keybase-filter-key-name"><a href="' + site_url + '/keys/show/' + key.keyID + '?filter_id=' + json.filterID + '">' + key.keyName + '</a> <span class="keybase-filter-key-num-items">' + key.items.length + ' items <i class="fa fa-caret-right"></i></span></span>';
     
     var items = JSPath.apply('.{.itemID==$itemID}', json.items, {itemID: key.items});
     

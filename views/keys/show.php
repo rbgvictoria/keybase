@@ -12,6 +12,8 @@
         if ($user['Role'] == 'Manager')
             $prmanagers[] = $user['UsersID'];
     }
+    
+    $qstr = ($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
 
     require_once 'views/header.php';
 ?>
@@ -23,7 +25,6 @@
 
             <div id="breadcrumbs">
             <?php if (isset($breadcrumbs) && $breadcrumbs): ?>
-                <?php $qstr = ($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : ''; ?>
                 <ol class="breadcrumb">
                 <?php foreach (array_reverse($breadcrumbs) as $crumb): ?>
                     <li><?=anchor(site_url() . 'keys/show/' . $crumb['KeysID'] . $qstr, $crumb['Name'])?></li>
@@ -52,7 +53,7 @@
                         <?php
                             if ($project) {
                                 echo '<span class="project">';
-                                echo anchor(site_url() . 'projects/show/' . $project['ProjectsID'], $project['Name']) . ':';
+                                echo anchor(site_url() . 'projects/show/' . $project['ProjectsID'] . $qstr, $project['Name']) . ':';
                                 echo '</span>';
                             }
                         ?>

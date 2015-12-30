@@ -301,21 +301,6 @@ class KeyModel extends CI_Model {
             return FALSE;
     }
     
-    public function projectInFilter($project) {
-        $infilter = FALSE;
-        if (isset($this->session->userdata['GlobalFilter']) && $this->session->userdata('GlobalFilter')) {
-            $this->db->select('GlobalFilterID, Filter');
-            $this->db->from('globalfilter');
-            $this->db->where('FilterID', $this->session->userdata['GlobalFilter']);
-            $query = $this->db->get();
-            $row = $query->row();
-            $filter = unserialize($row->Filter);
-            if (in_array($project, array_keys($filter)))
-                $infilter = TRUE;
-        }
-        return $infilter;
-    }
-    
     public function getProjectKeys($projectid, $userid=false, $filter=false) {
         $this->db->select('k.KeysID, k.Name, k.Description, k.CreatedByID');
         $this->db->from('keys k');

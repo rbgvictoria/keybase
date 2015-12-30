@@ -9,7 +9,6 @@ class Filters extends KeyBase {
         parent::__construct();
         $this->load->model('keymodel');
         $this->load->model('filtermodel');
-        $this->output->enable_profiler(true);
     }
     
     function index() {
@@ -23,14 +22,13 @@ class Filters extends KeyBase {
         $this->data['filterid'] = $filterid;
         
         if ($this->input->post('update')) {
-            $this->update_filter();
+            $this->edit();
         }
         elseif ($this->input->post('export')) {
-            redirect('webservices/getFilter?id=' . $this->input->post('filter'));
+            $this->export();
         }
         elseif ($this->input->post('delete')) {
-            $this->filtermodel->deleteGlobalFilter($this->input->post('filter'));
-            redirect('/key/filter');
+            $this->delete();
         }
         
         $this->data['projects'] = $this->filtermodel->getProjects();
@@ -42,7 +40,43 @@ class Filters extends KeyBase {
         $this->load->view('filters/show', $this->data);
     }
     
+    private function edit() {
+        if (!$this->input->post('taxa')) return FALSE;
+        
+        $taxa = preg_split("/[\r|\n]+/", trim($this->input->post('taxa')));
+        foreach ($taxa as $key=>$value) {
+            $taxa[$key] = trim($value);
+        }
+        
+        $projects = $this->input->post('projects');
+        if (!$projects[0]) $projects = FALSE;
+
+        $filterItems = $this->filtermodel->findInKeyBase($taxa, $projects);
+        
+        //$filterid = $this->filtermodel->getKeys($projects, $this->input->post('filter'), $this->input->post('filtername'));
+        $filterid = $this->filtermodel->updateFilter($projects, $this->input->post('filterid'), $this->input->post('filtername'));
+        
+        $this->data['itemsfound'] = $this->filtermodel->itemsFound();
+        $this->data['itemsnotfound'] = $this->filtermodel->itemsNotFound();
+        
+        redirect('filters/show/' . $filterid);
+    }
     
+    private function delete() {
+        $this->filtermodel->deleteGlobalFilter($this->input->post('filterid'));
+        redirect('filters');
+    }
+    
+    private function export() {
+        redirect('webservices/getFilter?id=' . $this->input->post('filterid'));
+    }
+
+    public function setProjectFilter() {
+        $this->load->model('filtermodel');
+        $lastQuery = $this->filtermodel->setProjectFilter();
+        echo json_encode($lastQuery);
+    }
+
     
 }
 
