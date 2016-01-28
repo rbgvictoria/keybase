@@ -55,7 +55,7 @@
               
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <!--li class="home-link"><a href="<?=site_url()?>"><span class="glyphicon glyphicon-home"></span></a></li-->
+            <li class="home-link"><a href="<?=site_url()?>"><span class="glyphicon glyphicon-home"></span></a></li>
             <li><a href="<?=site_url()?>projects">Projects</a></li>
             <li><a href="<?=site_url()?>filters">Filters</a></li>
             <li class="dropdown">

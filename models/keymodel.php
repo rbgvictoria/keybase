@@ -416,7 +416,7 @@ class KeyModel extends CI_Model {
             'Description' => $data['description'],
             'TaxonomicScope' => $data['taxonomicscope'],
             'GeographicScope' => $data['geographicscope'],
-            'Notes' => (isset($data['notes'])) ? $data['Notes'] : FALSE,
+            'Notes' => (isset($data['notes'])) ? $data['notes'] : FALSE,
             'ProjectsID' => $data['projectid'],
             'CreatedByID' => $data['createdbyid'],
         );

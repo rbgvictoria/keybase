@@ -1113,7 +1113,7 @@
             indentedKeyHtml += '<li>';
             indentedKeyHtml += '<div class="keybase-lead">';
             indentedKeyHtml += '<span class="keybase-from-node">' + lead.fromNode + '</span>';
-            indentedKeyHtml += '<span class="keybase-lead-text">' + '[' + lead.lead_id + '] ' + lead.title + '</span>';
+            indentedKeyHtml += '<span class="keybase-lead-text">' + lead.title + '</span>';
             var child = lead.children[0];
             if (child.title === "Couplet") {
                 indentedKeyHtml += '</div> <!-- /.keybase-lead -->';

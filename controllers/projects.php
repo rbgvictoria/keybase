@@ -61,8 +61,7 @@ class Projects extends KeyBase {
         $this->load->view('projects/edit', $this->data);
     }
     
-    public function add() {
-        $this->output->enable_profiler();
+    public function create() {
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
         $this->data['js'][] = base_url() . 'js/jquery.keybase.editproject.js?v=1.0';
         if (isset($this->session->userdata['id'])) {

@@ -341,24 +341,6 @@ $(function() {
                             $('#fdelete').remove();
                         });
                         
-                        $('.keybase-local-filter-ok').on('click', function() {
-                            $('.project a, #breadcrumbs a').each(function() {
-                                var href = $(this).attr('href');
-                                var newHref = updateHref(href);
-                                $(this).attr('href', newHref);
-                            });
-                            
-                            if ($.fn.keybase.getters.filterItems().length > 0) {
-                                if ($('[name=filter-id]').val().length > 0) {
-                                    $('.keybase-player-filter').css('background-color', '#ffcc00');
-                                }
-                                else {
-                                    $('.keybase-player-filter').css('background-color', '#33ee33');
-                                }
-                            }
-                        });
-                        
-                        
                         $('.keybase-filter-buttons').on('click', 'button', function() {
                             $('select[name=filter-id]').val('');
                             $.fn.keybase.setActiveFilter('');
@@ -367,6 +349,25 @@ $(function() {
                 }
             });
         }
+        
+        $('.keybase-local-filter-ok').on('click', function() {
+            if ($.fn.keybase.getters.filterItems().length > 0) {
+                if ($('[name=filter-id]').length > 0 && $('[name=filter-id]').val().length > 0) {
+                    $('.project a, #breadcrumbs a').each(function() {
+                        var href = $(this).attr('href');
+                        var newHref = updateHref(href);
+                        $(this).attr('href', newHref);
+                    });
+
+                    $('.keybase-player-filter').css('background-color', '#ffcc00');
+                }
+                else {
+                    $('.keybase-player-filter').css('background-color', '#33ee33');
+                }
+            }
+        });
+
+                        
     };
     
     var updateHref = function(href) {

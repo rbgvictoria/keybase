@@ -13,6 +13,7 @@
         }
     }
 ?>
+<?php endif; ?>
 
 <?php require_once('views/header.php'); ?>
 
@@ -22,14 +23,12 @@
     <div class="row">
         <div class="col-md-12">
             <div id="breadcrumbs">&nbsp;</div>
-            <?php //require_once('views/includes/globalfilter.php'); ?>
         </div> <!-- /.col -->
         <div class="col-md-12">
             <div id="project-page-header" class="clearfix">
                 <div id="projecticon">
                     <img src="<?=base_url()?>images/projecticons/<?=($project['ProjectIcon']) ? $project['ProjectIcon'] : 'project_icon_default.png'?>" alt=""/>
                 </div>
-                <?php endif; ?>
                 <div id="title">
                     <h2><?=$project['Name']?></h2>
                     <div class="project-summary">This project currently includes <?=$project['NumKeys']?> keys to <?=$project['NumTaxa']?> taxa</div>
@@ -76,7 +75,7 @@
                         <?php endif; ?>
                         
                         <div style="margin-top: 10px">
-                            <?=anchor('filters', 'Add new filter', array('class' => 'btn btn-default')); ?>
+                            <?=anchor('filters', 'Create new filter', array('class' => 'btn btn-default')); ?>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -135,7 +134,7 @@
 
                                     <?php if ($userid && in_array($userid, $prusers)):?>
                                     <div class="add-key">
-                                        <a href="<?=site_url()?>key/addKey/<?=$project['ProjectsID']?>" class="btn btn-default">Add new key</a>
+                                        <a href="<?=site_url()?>keys/create/<?=$project['ProjectsID']?>" class="btn btn-default">Create new key</a>
                                     </div>
                                     <?php endif; ?>
                                 </div> <!-- /#keys-control-panel -->

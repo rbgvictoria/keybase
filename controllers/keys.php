@@ -113,7 +113,7 @@ class Keys extends KeyBase {
         $this->load->view('keys/edit', $this->data);
     }
     
-    public function add($projectid=FALSE) {
+    public function create($projectid=FALSE) {
         $this->data['projectid'] = ($projectid) ? $projectid : $this->input->post('projectid');
         
         $projectdata = $this->keymodel->getProjectData($this->data['projectid']);

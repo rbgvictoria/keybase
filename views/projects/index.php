@@ -8,7 +8,7 @@
             <?php endforeach;?>
             <?php if (isset($this->session->userdata['id'])): ?>
             <div>
-                <a class="btn btn-default" href="projects/add">Create new project</a>
+                <a class="btn btn-default" href="projects/create">Create new project</a>
             </div>
             <?php endif; ?>
         </div>

@@ -57,7 +57,7 @@
                 <?php endif; ?>
 
                 <h3>Cite this key</h3>
-                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$project['Name']?>: <?=$keyname?>. <?=anchor(site_url() . 'key/uid/' . $key['UID'], site_url() . 'key/uid/' . $key['UID'])?> [Seen: <?=date('d-m-Y')?>].</p>
+                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$project['Name']?>: <?=$keyname?>. <?=anchor(site_url() . 'keys/show/' . $keyid, site_url() . 'keys/show/' . $keyid)?> [Seen: <?=date('d-m-Y')?>].</p>
             </div>
             
             <div role="tabpanel" class="tab-pane" id="items"></div>
