@@ -1,5 +1,23 @@
 /**
- * Created by NKlaze on 10/04/2015.
+ * Copyright 2016, Atlas of Living Australia (ALA)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Version 1.0.0
+ * 
+ * Created by Niels Klazenga on 10/04/2015.
  *
  * $.fn.keybase([action], options);
  *
@@ -26,7 +44,8 @@
  *   playerEvents: function(),
  *   playerWindow: function(),
  *   remainingItemsDisplay: function(items, itemsDiv),
- *   resultDisplay: function(result, resultDiv)
+ *   resultDisplay: function(result, resultDiv),
+ *   renderItemLink: function(item)
  * };
  *
  * Possible actions are 'player', 'indentedKey' and 'bracketedKey'. Action is optional: if no action is given, 'player'
@@ -415,9 +434,9 @@
         // KeyBase Player menu
         $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.currentNode + ' h3');
         $('<span>', {class: settings.cssClass.stepBack}).appendTo('.keybase-player-menu');
-        $('<a>', {href: '#'}).appendTo('.' + settings.cssClass.stepBack);
+        $('<a>', {href: '#', title: 'Step back'}).appendTo('.' + settings.cssClass.stepBack);
         $('<span>', {class: settings.cssClass.startOver}).appendTo('.keybase-player-menu');
-        $('<a>', {href: '#'}).appendTo('.' + settings.cssClass.startOver);
+        $('<a>', {href: '#', title: 'Start over'}).appendTo('.' + settings.cssClass.startOver);
 
         $('body').on('click', '.keybase-player-filter a', function(e) {
             e.preventDefault();
@@ -427,7 +446,7 @@
         // Local filter button
         $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.remainingItems + ' h3');
         $('<span>', {class: 'keybase-player-filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-menu');
-        $('<a>', {href: '#'}).appendTo('.keybase-player-filter');
+        $('<a>', {href: '#', title: 'Filter'}).appendTo('.keybase-player-filter');
         
         if ($('link[rel=stylesheet][href*=font-awesome]').length > 0) {
             $('.keybase-player-filter a').html('<i class="fa fa-filter fa-lg fa-lg"></i>');
@@ -566,6 +585,36 @@
          });
         $(pathDiv).eq(0).children('div').eq(0).html('<ol>' + leads.join('') + '</ol>');
     };
+    
+    /**
+     * 
+     */
+    $.fn.keybase.defaults.renderItemLink = function(item) {
+        var link = '';
+        if (item.url) {
+            link += '<a href="' + item.url + '">' + item.item_name + '</a>';
+        }
+        else {
+            link += item.item_name;
+        }
+        if (item.to_key) {
+            link += '<a href="' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
+        }
+
+        if (item.link_to_id) {
+            link += ': ';
+            if (item.link_to_url) {
+                link += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
+            }
+            else {
+                link += item.link_to_item_name;
+            }
+            if (item.link_to_key) {
+                link += '<a href="' + item.link_to_key + '"><span class="keybase-player-tokey"></span></a>';
+            }
+        }
+        return link;
+    }
 
 
     /**
@@ -607,27 +656,7 @@
         $.each(items, function(index, item) {
             var entity;
             entity = '<li>';
-            if (item.url) {
-                entity += '<a href="' + item.url + '">' + item.item_name + '</a>';
-            }
-            else {
-                entity += item.item_name;
-            }
-            if (item.to_key) {
-                entity += '<a href="/keybase/key/show/' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
-            }
-            if (item.link_to_item_name) {
-                entity += ': ';
-                if (item.link_to_url) {
-                    entity += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
-                }
-                else {
-                    entity += item.link_to_item_name;
-                }
-                if (item.link_to_key) {
-                    entity += '<a href="/keybase/key/show/' + item.link_to_key + '"><span class="keybase-player-tokey"></span></a>';
-                }
-            }
+            entity += settings.renderItemLink(item);
             entity += '</li>';
             list.push(entity);
         });
@@ -1083,7 +1112,7 @@
             taxa.expand = true;
             return taxa;
     };
-
+    
     /**
      * function indentedKeyDisplay
      * 
@@ -1122,30 +1151,7 @@
             else {
                 var item = JSPath.apply('.items{.item_id==' + child.children[0].item_id + '}', json)[0];
                 indentedKeyHtml += '<span class="keybase-to-item">';
-                if (item.url) {
-                    indentedKeyHtml += '<a href="' + item.url + '">' + item.item_name + '</a>';
-                }
-                else {
-                    indentedKeyHtml += item.item_name;
-                }
-                if (item.to_key) {
-                    indentedKeyHtml += '<a href="' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
-                }
-
-                if (item.link_to_id) {
-                    indentedKeyHtml += ': ';
-                    if (item.link_to_url) {
-                        indentedKeyHtml += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
-                    }
-                    else {
-                        indentedKeyHtml += item.link_to_item_name;
-                    }
-                    if (item.link_to_key) {
-                        indentedKeyHtml += '<a href="' + item.link_to_key + '"><span class="keybase-player-tokey"></span></a>';
-                    }
-
-                }
-
+                indentedKeyHtml += settings.renderItemLink(item);
                 indentedKeyHtml += '</span> <!-- /.keybase-to-item -->';
                 indentedKeyHtml += '</div> <!-- /.keybase-lead -->';
             }
@@ -1318,30 +1324,7 @@
                     var toItem = items[0].children[0];
                     var item = JSPath.apply('.items{.item_id==' + toItem.item_id + '}', json)[0];
                     html += '<span class="keybase-to-item">';
-                    if (item.url) {
-                        html += '<a href="' + item.url + '">' + item.item_name + '</a>';
-                    }
-                    else {
-                        html += item.item_name;
-                    }
-                    if (item.to_key) {
-                        html += '<a href="' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
-                    }
-
-                    if (item.link_to_id) {
-                        html += ': ';
-                        if (item.link_to_url) {
-                            html += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
-                        }
-                        else {
-                            html += item.link_to_item_name;
-                        }
-                        if (item.link_to_key) {
-                            html += '<a href="' + item.link_to_key + '"><span class="keybase-player-tokey"></span></a>';
-                        }
-
-                    }
-
+                    html += settings.renderLink(toItem);
                     html += '</span> <!-- /.to-item -->';
                 }
                 html += '</span> <!-- /.keybase-lead-text -->';
