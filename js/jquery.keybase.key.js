@@ -446,7 +446,7 @@
         // Local filter button
         $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.remainingItems + ' h3');
         $('<span>', {class: 'keybase-player-filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-menu');
-        $('<a>', {href: '#', title: 'Filter'}).appendTo('.keybase-player-filter');
+        $('<a>', {href: '#', title: 'Filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-filter');
         
         if ($('link[rel=stylesheet][href*=font-awesome]').length > 0) {
             $('.keybase-player-filter a').html('<i class="fa fa-filter fa-lg fa-lg"></i>');
@@ -627,7 +627,7 @@
      */
     $.fn.keybase.defaults.remainingItemsDisplay = function(items, itemsDiv) {
         var list = itemsDisplay(items);
-        $(itemsDiv).eq(0).children('h3').eq(0).html('Remaining items (' + items.length + ')');
+        $(itemsDiv).eq(0).children('h3').eq(0).children('.keybase-num-remaining').eq(0).html(items.length);
         $(itemsDiv).eq(0).children('div').eq(0).html('<ul>' + list.join('') + '</ul>');
     };
     
@@ -1126,7 +1126,7 @@
         indentedKeyHtml += '</div> <!-- /.keybase-indented-key -->';
 
         $(settings.indentedKeyDiv).html(indentedKeyHtml);
-        $(settings.indentedKeyDiv).prepend('<div class="keybase-indented-key-filter"><span class="keybase-player-filter"><a href="#"><i class="fa fa-filter fa-lg"></i></a></span></div>')
+        $(settings.indentedKeyDiv).prepend('<div class="keybase-indented-key-filter"><span class="keybase-player-filter"><a href="#" title="Filter"><i class="fa fa-filter fa-lg"></i></a></span></div>')
 
         settings.onIndentedKeyComplete();
     };
@@ -1324,7 +1324,7 @@
                     var toItem = items[0].children[0];
                     var item = JSPath.apply('.items{.item_id==' + toItem.item_id + '}', json)[0];
                     html += '<span class="keybase-to-item">';
-                    html += settings.renderLink(toItem);
+                    html += settings.renderItemLink(item);
                     html += '</span> <!-- /.to-item -->';
                 }
                 html += '</span> <!-- /.keybase-lead-text -->';
@@ -1335,7 +1335,7 @@
         }
         html += '</div> <!-- /.keybase-bracketed_key -->';
         $(settings.bracketedKeyDiv).html(html);
-        $(settings.bracketedKeyDiv).prepend('<div class="keybase-bracketed-key-filter"><span class="keybase-player-filter"><a href="#"><i class="fa fa-filter fa-lg"></i></a></span></div>')
+        $(settings.bracketedKeyDiv).prepend('<div class="keybase-bracketed-key-filter"><span class="keybase-player-filter"><a href="#" title="Filter"><i class="fa fa-filter fa-lg"></i></a></span></div>')
 
         settings.onBracketedKeyComplete();
     };
