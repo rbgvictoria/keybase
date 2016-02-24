@@ -83,11 +83,11 @@
                             </div>
 
                             <div id="bracketed" class="tab-pane" rol="tabpanel">
-                                <div id="keybase-bracketed" class="clearfix"></div>
+                                <div id="keybase-bracketed" class="clearfix"><i class="fa fa-spinner fa-spin fa-2x keybase-spinner"></i></div>
                             </div>
 
                             <div id="indented" class="tab-pane" rol="tabpanel">
-                                <div id="keybase-indented" class="clearfix"></div>
+                                <div id="keybase-indented" class="clearfix"><i class="fa fa-spinner fa-spin fa-2x keybase-spinner"></i></div>
                             </div>
 
                             <div id="about" class="tab-pane" rol="tabpanel">
