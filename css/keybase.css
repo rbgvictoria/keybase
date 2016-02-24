@@ -605,3 +605,7 @@ div#project-filters {
 #globalfilter-keys .fa-plus-square-o~span {
     margin-left: 2px;
 }
+
+.keybase-spinner {
+    color: #0088cc;
+}
