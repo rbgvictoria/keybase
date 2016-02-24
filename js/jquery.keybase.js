@@ -125,6 +125,18 @@ $(function() {
         
         doTheKeyThing(key);
         
+        $('[href=#bracketed]').on('show.bs.tab', function() {
+            if ($.fn.keybase.getters.bracketedKey() === undefined) {
+                bracketedKey();
+            }
+        });
+        
+        $('[href=#indented]').on('show.bs.tab', function() {
+            if ($.fn.keybase.getters.indentedKey() === undefined) {
+                indentedKey();
+            }
+        });
+        
     }
 });
 
@@ -140,8 +152,7 @@ $(function() {
             source: false,
             reset: true,
             filter_items: filter,
-            remainingItemsDisplay: remainingItemsDisplay,
-            discardedItemsDisplay: discardedItemsDisplay,
+            renderItemLink: renderItemLink,
             onLoad: keybaseOnLoad,
             onFilterWindowOpen: onFilterWindowOpen
         });
@@ -149,8 +160,13 @@ $(function() {
         if (contentHeight > $(window).height()-60) {
             $('body').css('height', contentHeight);
         }
-        bracketedKey();
-        indentedKey();
+        
+        if ($.QueryString.mode === 'bracketed') {
+            bracketedKey();
+        }
+        if ($.QueryString.mode === 'indented') {
+            indentedKey();
+        }
         
         $('a[href=#player]').click(function() {
             if (($.QueryString.mode !== undefined && $.QueryString.mode !== 'interactive') || 
@@ -164,12 +180,9 @@ $(function() {
                     source: false,
                     reset: false,
                     filter_items: filter,
-                    remainingItemsDisplay: remainingItemsDisplay,
-                    discardedItemsDisplay: discardedItemsDisplay
+                    renderItemLink: renderItemLink
                 });
-                
             }    
-            
         });
         
         $('a[href=#player]').click(function() {
@@ -415,20 +428,6 @@ $(function() {
     };
 
 
-    var remainingItemsDisplay = function(items, itemsDiv) {
-        var list = keybaseItemsDisplay(items);
-        $(itemsDiv).eq(0).find('h3 .keybase-num-remaining').eq(0).html(items.length);
-        $(itemsDiv).eq(0).children('div').eq(0).html('<ul>' + list.join('') + '</ul>');
-    };
-    
-    var discardedItemsDisplay = function(items, itemsDiv) {
-        var list = keybaseItemsDisplay(items);
-        $(itemsDiv).eq(0).find('h3 .keybase-num-discarded').eq(0).html(items.length);
-        $(itemsDiv).eq(0).children('div').eq(0).html('<ul>' + list.join('') + '</ul>');
-        
-        // filter
-    };
-    
     var keybaseItemsDisplay = function(items) {
         var qstring;
         var filter = $.fn.keybase.getters.activeFilter();
@@ -443,27 +442,7 @@ $(function() {
         $.each(items, function(index, item) {
             var entity;
             entity = '<li>';
-            if (item.url) {
-                entity += '<a href="' + item.url + '">' + item.item_name + '</a>';
-            }
-            else {
-                entity += item.item_name;
-            }
-            if (item.to_key) {
-                entity += '<a href="' + base_url + 'keys/show/' + item.to_key + qstring + '"><span class="keybase-player-tokey"></span></a>';
-            }
-            if (item.link_to_item_name) {
-                entity += ': ';
-                if (item.link_to_url) {
-                    entity += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
-                }
-                else {
-                    entity += item.link_to_item_name;
-                }
-                if (item.link_to_key) {
-                    entity += '<a href="' + base_url + 'keys/show/' + item.link_to_key + qstring + '"><span class="keybase-player-tokey"></span></a>';
-                }
-            }
+            entity += renderItemLink(item);
             entity += '</li>';
             list.push(entity);
         });
@@ -473,19 +452,63 @@ $(function() {
     var bracketedKey = function () {
         $.fn.keybase('bracketedKey', {
             bracketedKeyDiv: '#keybase-bracketed',
-            bracketedKeyDisplay: bracketedKeyDisplay
+            renderItemLink: renderItemLink,
+            onBracketedKeyComplete: onBracketedKeyComplete
         });
     };
 
     var indentedKey = function () {
         $.fn.keybase('indentedKey', {
             indentedKeyDiv: '#keybase-indented',
+            renderItemLink: renderItemLink,
             onIndentedKeyComplete: onIndentedKeyComplete
         });
     };
     
+    var renderItemLink = function(item) {
+        var mode = '';
+        if ($('.nav-tabs .active').text() === 'Bracketed') {
+            mode = '?mode=bracketed';
+        }
+        if ($('.nav-tabs .active').text() === 'Indented') {
+            mode = '?mode=indented';
+        }
+        
+        var link = '';
+        if (item.url) {
+            link += '<a href="' + item.url + '">' + item.item_name + '</a>';
+        }
+        else {
+            link += item.item_name;
+        }
+        if (item.to_key) {
+            link += '<a href="' + item.to_key + mode + '"><span class="keybase-player-tokey"></span></a>';
+        }
+
+        if (item.link_to_id) {
+            link += ': ';
+            if (item.link_to_url) {
+                link += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
+            }
+            else {
+                link += item.link_to_item_name;
+            }
+            if (item.link_to_key) {
+                link += '<a href="' + item.link_to_key + 'mode' + '"><span class="keybase-player-tokey"></span></a>';
+            }
+        }
+        return link;
+    };
+    
     var onIndentedKeyComplete = function() {
         var contentHeight = $('#keybase-indented').offset().top + $('#keybase-indented').height();
+        if (contentHeight > $(window).height()-60) {
+            $('body').css('height', contentHeight);
+        }
+    };
+    
+    var onBracketedKeyComplete = function() {
+        var contentHeight = $('#keybase-bracketed').offset().top + $('#keybase-bracketed').height();
         if (contentHeight > $(window).height()-60) {
             $('body').css('height', contentHeight);
         }
@@ -503,72 +526,7 @@ $(function() {
         var list = keybaseItemsDisplay(json.items);
         $('#items').html('<ul>' + list.join('') + '</ul>');
         
-    };
-    
-    var bracketedKeyDisplay = function(json) {
-        var bracketed_key = $.fn.keybase.getters.bracketedKey();
-        var settings = $.fn.keybase.getters.settings();
-        var html = '<div class="keybase-bracketed-key">';
-        var couplets = bracketed_key[0].children;
-        for (var i = 0; i < couplets.length; i++)  {
-            var couplet = couplets[i];
-            var leads = couplet.children;
-            html += '<div class="keybase-couplet" id="l_' + leads[0].parent_id + '">';
-            for (var j = 0; j < leads.length; j++) {
-                var lead = leads[j];
-                var items = lead.children;
-                html += '<div class="keybase-lead">';
-                html += '<span class="keybase-from-node">' + lead.fromNode + '</span>';
-                html += '<span class="keybase-lead-text">' + lead.title;
-                if (lead.toNode !== undefined) {
-                    html += '<span class="keybase-to-node"><a href="#l_' + lead.lead_id + '">' + lead.toNode + '</a></span>';
-                }
-                else {
-                    var toItem = items[0].children[0];
-                    var item = JSPath.apply('.items{.item_id==' + toItem.item_id + '}', json)[0];
-                    html += '<span class="keybase-to-item">';
-                    if (item.url) {
-                        html += '<a href="' + item.url + '">' + item.item_name + '</a>';
-                    }
-                    else {
-                        html += item.item_name;
-                    }
-                    if (item.to_key) {
-                        html += '<a href="' + item.to_key + '?mode=bracketed"><span class="keybase-player-tokey"></span></a>';
-                    }
-
-                    if (item.link_to_id) {
-                        html += ': ';
-                        if (item.link_to_url) {
-                            html += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
-                        }
-                        else {
-                            html += item.link_to_item_name;
-                        }
-                        if (item.link_to_key) {
-                            html += '<a href="' + item.link_to_key + '?mode=bracketed"><span class="keybase-player-tokey"></span></a>';
-                        }
-
-                    }
-
-                    html += '</span> <!-- /.to-item -->';
-                }
-                html += '</span> <!-- /.keybase-lead-text -->';
-                html += '</div> <!-- /.keybase-lead -->';
-            }
-            html += '</div> <!-- /.keybase-couplet -->';
-
-        }
-        html += '</div> <!-- /.keybase-bracketed_key -->';
-        $(settings.bracketedKeyDiv).html(html);
-        $(settings.bracketedKeyDiv).prepend('<div class="keybase-bracketed-key-filter"><span class="keybase-player-filter"><a href="#"><i class="fa fa-filter fa-lg"></i></a></span></div>')
-
-        var contentHeight = $('#keybase-bracketed').offset().top + $('#keybase-bracketed').height();
-        if (contentHeight > $(window).height()-60) {
-            $('body').css('height', contentHeight);
-        }
-    };
-    
+    };    
 
 (function($) {
     $.QueryString = (function(a) {
