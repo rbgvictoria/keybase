@@ -601,7 +601,7 @@
             link += '<a href="' + item.to_key + '"><span class="keybase-player-tokey"></span></a>';
         }
 
-        if (item.link_to_id) {
+        if (item.link_to_item_id) {
             link += ': ';
             if (item.link_to_url) {
                 link += '<a href="' + item.link_to_url + '">' + item.link_to_item_name + '</a>';
