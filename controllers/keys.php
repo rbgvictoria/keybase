@@ -74,6 +74,7 @@ class Keys extends KeyBase {
                     $this->data['input_key'] = $this->_detectDelimiter($key, $tempfilename);
                 }
             }
+            else redirect('keys/show/' . $key);
         }
         
         if ($this->input->post('submit2')) {
@@ -216,8 +217,9 @@ class Keys extends KeyBase {
         if (!isset($this->session->userdata['id'])) exit;
         
         if ($this->input->post('ok')) {
+            $projectID = $this->keymodel->getProjectID($key);
             $this->keymodel->deleteKey($key, $this->session->userdata['id']);
-            redirect('key/projects/show/' . $this->input->post('projectid'));
+            redirect('projects/show/' . $projectID);
         }
         else {
             $this->data['cbox'] = $cbox;

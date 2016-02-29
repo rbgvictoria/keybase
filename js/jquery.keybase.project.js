@@ -172,28 +172,8 @@ $(function(){
                 icon: "edit", 
                 callback: function(key, options) {
                     var hash = $(this).attr('href').substr(1);
-                    href = site_url + '/keys/edit/' + hash + '/cbox';
-                   $.colorbox({
-                        href: href,
-                        opacity: 0.40, 
-                        transition: 'elastic', 
-                        speed: 100,
-                        innerWidth: 860,
-                        innerHeight: "80%",
-                        close: 'close',
-                        onLoad: function() {
-                            $('#cboxClose').hide();
-                        },
-                        onComplete: function() {
-                            $('#colorbox').addClass('edit-project');
-                            $('#colorbox input[name="cancel"]').click(function(e) {
-                                e.preventDefault();
-                                $.colorbox.close();
-                            });
-                            $('input[type="submit"]').button();
-                        }
-                    });
-                
+                    href = site_url + '/keys/edit/' + hash;
+                    window.location.href = href;
                 }
             },
             "delete": {
