@@ -15,5 +15,6 @@
                 </div>
             </div>
         </footer>
+        <?php require_once 'views/includes/analyticstracker.php'; ?>
     </body>
 </html>
