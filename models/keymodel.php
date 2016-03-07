@@ -412,16 +412,16 @@ class KeyModel extends CI_Model {
     
     public function editKeyMetadata($data, $userid=FALSE) {
         $updateArray = array(
-            'Name' => $data['name'],
+            'Name' => $data['key_name'],
             'Description' => $data['description'],
-            'TaxonomicScope' => $data['taxonomicscope'],
-            'GeographicScope' => $data['geographicscope'],
+            'TaxonomicScope' => $data['taxonomic_scope'],
+            'GeographicScope' => $data['geographic_scope'],
             'Notes' => (isset($data['notes'])) ? $data['notes'] : FALSE,
-            'ProjectsID' => $data['projectid'],
-            'CreatedByID' => $data['createdbyid'],
+            'ProjectsID' => $data['project_id'],
+            'CreatedByID' => $data['created_by_id'],
         );
         
-        if (!isset($data['keyid'])) {
+        if (!isset($data['key_id'])) {
             $insertArray = $updateArray;
             $this->db->select('MAX(KeysID) AS max, MAX(UID) AS maxuid', FALSE);
             $this->db->from('keys');
@@ -430,16 +430,16 @@ class KeyModel extends CI_Model {
             $keysid = ($row->max) ? $row->max + 1 : 1;
             $insertArray['KeysID'] = $keysid;
             $insertArray['UID'] = ($row->maxuid) ? str_pad($row->maxuid + 1, 6, '0', STR_PAD_LEFT) : '000001';
-            $insertArray['Name'] = $data['name'];
+            $insertArray['Name'] = $data['key_name'];
             $this->db->insert('keys', $insertArray);
             $insertArray = array();
         } else
-            $keysid = $data['keyid'];
+            $keysid = $data['key_id'];
         
-        if ($data['taxonomicscope']) {
+        if ($data['taxonomic_scope']) {
             $this->db->select('ItemsID');
             $this->db->from('items');
-            $this->db->where('Name', $data['taxonomicscope']);
+            $this->db->where('Name', $data['taxonomic_scope']);
             $query = $this->db->get();
             if ($query->num_rows()) {
                 $row = $query->row();
@@ -454,74 +454,79 @@ class KeyModel extends CI_Model {
                 $itemsid = ($row->max) ? $row->max + 1 : 1;
                 $updateArray['TaxonomicScopeID'] = $itemsid;
                 $insertArray['ItemsID'] = $itemsid;
-                $insertArray['Name'] = $data['taxonomicscope'];
+                $insertArray['Name'] = $data['taxonomic_scope'];
                 $this->db->insert('items', $insertArray);
             }
         }
 
-        if ($data['authors'] || $data['title']) {
-            $updArray = array(
-                'Authors' => $data['authors'],
-                'Year' => $data['year'],
-                'Title' => $data['title'],
-                'InAuthors' => $data['inauthors'],
-                'InTitle' => $data['intitle'],
-                'Edition' => $data['edition'],
-                'Journal' => $data['journal'],
-                'Volume' => $data['volume'],
-                'Part' => $data['part'],
-                'Pages' => $data['pages'],
-                'Publisher' => $data['publisher'],
-                'PlaceOfPublication' => $data['placeofpublication'],
-                'Url' => $data['url'],
-            );
-            if (isset($data['modified']))
-                $updArray['Modified'] = $data['modified'];
-            else
-                $updArray['Modified'] = NULL;
-
-            $this->db->select('SourcesID');
-            $this->db->from('keys');
-            $this->db->where('KeysID', $keysid);
-            $query = $this->db->get();
-            $row = $query->row();
-            if ($row->SourcesID) {
-                $updateArray['SourcesID'] = $row->SourcesID;
-                $this->db->where('SourcesID', $row->SourcesID);
-                $this->db->update('sources', $updArray);
-            }
-            else {
-                $this->db->select('MAX(SourcesID) AS max', FALSE);
-                $this->db->from('sources');
-                $query = $this->db->get();
-                $row = $query->row();
-                $sourcesid  = ($row->max) ? $row->max + 1 : 1;
-                $updateArray['SourcesID'] = $sourcesid;
-                $updArray['SourcesID'] = $sourcesid;
-                $this->db->insert('sources', $updArray);
-            }
+        if ($data['source']) {
+            $updateArray['SourcesID'] = $this->updateSource($keysid, $data['source']);
         }
-        elseif (isset($data['sourceid'])) {
-            $updateArray['SourcesID'] = $data['sourceid'];
+        elseif (isset($data['source_id'])) {
+            $updateArray['SourcesID'] = $data['source_id'];
         }
         $timestamp = date('Y-m-d H:i:s');
         $updateArray['TimestampModified'] = $timestamp;
         $this->db->where('KeysID', $keysid);
         $this->db->update('keys', $updateArray);
         
-        if (isset($data['keyid']) && (!empty($data['changecomment']))) {
+        if (isset($data['key_id']) && (!empty($data['change_comment']))) {
             $changesArray = array(
-                'KeysID' => $data['keyid'],
+                'KeysID' => $data['key_id'],
                 'TimestampModified' => $timestamp,
             );
-            if (isset($data['changecomment'])) 
-                $changesArray['Comment'] = $data['changecomment'];
+            if (isset($data['change_comment'])) 
+                $changesArray['Comment'] = $data['change_comment'];
             if ($userid)
                 $changesArray['ModifiedByAgentID'] = $userid;
             $this->db->insert('changes', $changesArray);
         }
         
         return $keysid;
+    }
+    
+    private function updateSource($keyid, $source) {
+        $updArray = array(
+            'Authors' => $source['author'],
+            'Year' => $source['publication_year'],
+            'Title' => $source['title'],
+            'InAuthors' => $source['in_author'],
+            'InTitle' => $source['in_title'],
+            'Edition' => $source['edition'],
+            'Journal' => $source['journal'],
+            'Volume' => $source['volume'],
+            'Part' => $source['part'],
+            'Pages' => $source['page'],
+            'Publisher' => $source['publisher'],
+            'PlaceOfPublication' => $source['place_of_publication'],
+            'Url' => $source['url'],
+        );
+        if (isset($source['is_modified']))
+            $updArray['Modified'] = $source['is_modified'];
+        else
+            $updArray['Modified'] = NULL;
+
+        $this->db->select('SourcesID');
+        $this->db->from('keys');
+        $this->db->where('KeysID', $keyid);
+        $query = $this->db->get();
+        $row = $query->row();
+        if ($row->SourcesID) {
+            $sourceid = $row->SourcesID;
+            $this->db->where('SourcesID', $row->SourcesID);
+            $this->db->update('sources', $updArray);
+        }
+        else {
+            $this->db->select('MAX(SourcesID) AS max', FALSE);
+            $this->db->from('sources');
+            $query = $this->db->get();
+            $row = $query->row();
+            $sourceid  = ($row->max) ? $row->max + 1 : 1;
+            $updArray['SourcesID'] = $sourceid;
+            $this->db->insert('sources', $updArray);
+        }
+        
+        return $sourceid;
     }
     
     public function addProject($data) {
@@ -710,7 +715,8 @@ class KeyModel extends CI_Model {
     }
     
     public function getChanges($keyid) {
-        $this->db->select("CONCAT_WS(' ', u.FirstName, u.LastName) AS FullName,TimestampModified, c.`Comment`", FALSE);
+        $this->db->select("CONCAT_WS(' ', u.FirstName, u.LastName) AS full_name,
+            TimestampModified as timestamp_modified, c.`comment`", FALSE);
         $this->db->from('changes c');
         $this->db->join('users u', 'c.ModifiedByAgentID=u.UsersID');
         $this->db->where('c.KeysID', $keyid);

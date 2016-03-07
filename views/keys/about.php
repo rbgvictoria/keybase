@@ -3,12 +3,12 @@
         <ul class="nav nav-pills">
             <li role="presentation" class="active"><a href="#metadata" aria-controls="metadata" role="tab" data-toggle="tab">Metadata</a></li>
             <li role="presentation"><a href="#items" aria-controls="items" role="tab" data-toggle="tab">Items</a></li>
-            <?php if(isset($changes) && $changes):?>
-            <li role="presentation"><a href="#items" aria-controls="changes" role="tab" data-toggle="tab">Changes</a></li>
+            <?php if($key->changes):?>
+            <li role="presentation"><a href="#changes" aria-controls="changes" role="tab" data-toggle="tab">Changes</a></li>
             <?php endif; ?>
             <li role="presentation"><a href="#export" aria-controls="items" role="tab" data-toggle="tab">Export</a></li>
             <?php if (isset($this->session->userdata['id'])  && (in_array($userid, $prmanagers))):?>
-            <li role="presentation"><a href="<?=site_url()?>keys/edit/<?=$keyid?>">Edit</a></li>
+            <li role="presentation"><a href="<?=site_url()?>keys/edit/<?=$key->key_id?>">Edit</a></li>
             <?php endif;?>
         </ul>
         
@@ -19,63 +19,63 @@
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-4 text-left">Taxonomic scope</label>
                         <div class="col-sm-8 col-md-10">
-                            <p class="form-control-static"><?=$key['TaxonomicScope']?></p>
+                            <p class="form-control-static"><?=$key->taxonomic_scope?></p>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-4 text-left">Geographic scope</label>
                         <div class="col-sm-8 col-md-10">
-                            <p class="form-control-static"><?=$key['GeographicScope']?></p>
+                            <p class="form-control-static"><?=$key->geographic_scope?></p>
                         </div>
                     </div>
-                   <?php if ($key['Description']): ?>
+                   <?php if ($key->description): ?>
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-4 text-left">Description</label>
                         <div class="col-sm-8 col-md-10">
-                            <p class="form-control-static"><?=$key['Description']?></p>
+                            <p class="form-control-static"><?=$key->description?></p>
                         </div>
                     </div>
                     <?php endif; ?>
-                    <?php if ($key['Notes']): ?>
+                    <?php if ($key->notes): ?>
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-4 text-left">Notes</label>
                         <div class="col-sm-8 col-md-10">
-                            <p class="form-control-static"><?=$key['Notes']?></p>
+                            <p class="form-control-static"><?=$key->notes?></p>
                         </div>
                     </div>
                     <?php endif; ?>
                 </div>
 
 
-                <?php if ($citation): ?>
+                <?php if ($key->source->citation): ?>
                 <h3>Source/attribution</h3>
-                <p><?=substr($citation, strpos($citation, ':')+2)?>
-                <?php if ($key['Url']): ?>
-                    [<?=anchor($key['Url'], $key['Url']); ?>]
+                <p><?=substr($key->source->citation, strpos($key->source->citation, ':')+2)?>
+                <?php if ($key->source->url): ?>
+                    [<?=anchor($key->source->url, $key->source->url); ?>]
                 <?php endif; ?>    
                 </p>
                 <?php endif; ?>
 
                 <h3>Cite this key</h3>
-                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$project['Name']?>: <?=$keyname?>. <?=anchor(site_url() . 'keys/show/' . $keyid, site_url() . 'keys/show/' . $keyid)?> [Seen: <?=date('d-m-Y')?>].</p>
+                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$key->project->project_name?>: <?=$key->key_name?>. <?=anchor(site_url() . 'keys/show/' . $key->key_id, site_url() . 'keys/show/' . $key->key_id)?> [Seen: <?=date('d-m-Y')?>].</p>
             </div>
             
             <div role="tabpanel" class="tab-pane" id="items"></div>
             
-            <?php if(isset($changes) && $changes):?>
-            <div role="tabpanel" class="tab-pane" id="changes">
-                <h3>Changes (<?=count($changes)?>)</h3>
-                <table>
+            <?php if($key->changes):?>
+            <div  id="changes" role="tabpanel" class="tab-pane clearfix">
+                <h3>Changes (<?=count($key->changes)?>)</h3>
+                <table class="table table-bordered table-condensed">
                     <tr>
                         <th>Time modified</th>
                         <th>Modified by</th>
                         <th>Comment</th>
                     </tr>
-                <?php foreach ($changes as $change): ?>
+                <?php foreach ($key->changes as $change): ?>
                     <tr>
-                        <td><?=$change['TimestampModified']?></td>
-                        <td><?=$change['FullName']?></td>
-                        <td><?=$change['Comment']?></td>
+                        <td><?=$change->timestamp_modified?></td>
+                        <td><?=$change->full_name?></td>
+                        <td><?=$change->comment?></td>
                     </tr>
                 <?php endforeach; ?>
                 </table>
@@ -83,11 +83,13 @@
             <?php endif;?>
             
             <div class="tab-pane" role="tabpanel" id="export">
+                <?php $wsUrl = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/'; ?>
                 <div class="btn-group" role="group">
-                    <a href="<?=site_url()?>key/export/lpxk/<?=$key['KeysID']?>/" class="btn btn-default">LPXK</a>
-                    <a href="<?=site_url()?>key/export/csv/<?=$key['KeysID']?>/" class="btn btn-default">CSV</a>
-                    <a href="<?=site_url()?>key/export/txt/<?=$key['KeysID']?>/" class="btn btn-default">TXT</a>
-                    <a href="<?=site_url()?>key/export/sdd/<?=$key['KeysID']?>/" class="btn btn-default">SDD</a>
+                    <a href="<?=$wsUrl?>export/csv/<?=$key->key_id?>/" class="btn btn-default">CSV</a>
+                    <a href="<?=$wsUrl?>export/txt/<?=$key->key_id?>/" class="btn btn-default">TXT</a>
+                    <a href="<?=$wsUrl?>export/lpxk/<?=$key->key_id?>/" class="btn btn-default">LPXK</a>
+                    <a href="<?=$wsUrl?>export/sdd/<?=$key->key_id?>/" class="btn btn-default">SDD</a>
+                    <a href="<?=$wsUrl?>key/<?=$key->key_id?>/" class="btn btn-default">KeyBase format (JSON)</a>
                 </div>
             </div>
             

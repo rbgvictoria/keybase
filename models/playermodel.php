@@ -52,17 +52,6 @@ class PlayerModel extends CI_Model {
             $query = $this->db->get();
             $row = $query->row();
             $filter = unserialize($row->FilterItems);
-            //echo implode(',', $filter);
-            /*
-             * SELECT k.KeysID, k.Name
-FROM leads l
-JOIN `keys` k ON l.KeysID=k.KeysID
-LEFT JOIN groupitem g ON l.ItemsID=g.GroupID AND OrderNumber=1
--- JOIN items i ON l.ItemsID=i.ItemsID
-WHERE k.ProjectsID=11
-AND COALESCE(g.MemberID, l.ItemsID) IN ()
-GROUP BY k.KeysID;
-             */
             
             $this->db->select('k.KeysID');
             $this->db->from('keys k');
@@ -170,25 +159,11 @@ GROUP BY k.KeysID;
     function getBreadCrumbs($key) {
         $this->BreadCrumbs = array();
         $this->getCrumb($key);
-        return $this->BreadCrumbs;
+        return array_reverse($this->BreadCrumbs);
     }
     
     function getCrumb($key) {
-        /*
-SELECT coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) AS KeysID, coalesce(pk.Name, gpk.Name, gltpk.Name) AS `Name`
-FROM (`keys` k)
-LEFT JOIN `leads` l ON `k`.`TaxonomicScopeID`=`l`.`ItemsID`
-LEFT JOIN `keys` pk ON `l`.`KeysID`=`pk`.`KeysID` AND k.ProjectsID=pk.ProjectsID
-LEFT JOIN groupitem g ON k.TaxonomicScopeID=g.MemberID AND g.OrderNumber=0
-LEFT JOIN leads gl ON g.GroupID=gl.ItemsID
-LEFT JOIN `keys` gpk ON gl.KeysID=gpk.KeysID AND k.ProjectsID=gpk.ProjectsID
-LEFT JOIN groupitem glt ON k.TaxonomicScopeID=glt.MemberID AND glt.OrderNumber=1
-LEFT JOIN leads gltl ON glt.GroupID=gltl.ItemsID
-LEFT JOIN `keys` gltpk ON gltl.KeysID=gltpk.KeysID AND k.ProjectsID=gltpk.ProjectsID
-WHERE `k`.`KeysID` =  '8' AND coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) IS NOT NULL
-         */
-        
-        $this->db->select('coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) AS KeysID, coalesce(pk.Name, gpk.Name, gltpk.Name) AS Name', FALSE);
+        $this->db->select('coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) AS key_id, coalesce(pk.Name, gpk.Name, gltpk.Name) AS key_name', FALSE);
         $this->db->from('keys k');
         $this->db->join('leads l', 'k.TaxonomicScopeID=l.ItemsID', 'left');
         $this->db->join('keys pk', 'l.KeysID=pk.KeysID AND k.ProjectsID=pk.ProjectsID', 'left');
@@ -204,7 +179,7 @@ WHERE `k`.`KeysID` =  '8' AND coalesce(pk.KeysID, gpk.KeysID, gltpk.KeysID) IS N
         if ($query->num_rows()) {
             $row = $query->row_array();
             $this->BreadCrumbs[] = $row;
-            $this->getCrumb($row['KeysID']);
+            $this->getCrumb($row['key_id']);
         }
     }
     

@@ -609,3 +609,13 @@ div#project-filters {
 .keybase-spinner {
     color: #0088cc;
 }
+
+/* Make sure buttons that are first or last  in a form-group align properly 
+***************************************/
+.form-group .btn:first-child, .form-group .checkbox:first-child {
+    margin-left: 15px;
+}
+
+.form-group .btn:last-child {
+    margin-right: 15px;
+}

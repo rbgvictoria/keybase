@@ -9,6 +9,7 @@ class WS extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
+        $this->load->helper('json');
         $this->output->enable_profiler(false);
         $this->load->model('keymodel');
         $this->load->model('webservicesmodel', 'ws');
@@ -232,16 +233,27 @@ class WS extends CI_Controller {
         $data['items'] = $this->ws->getKeyItems($_GET['key_id']);
         $data['first_step'] = $this->ws->getRootNode($_GET['key_id']);
         $data['leads'] = $this->ws->getLeads($_GET['key_id']);
-        
-        $json = json_encode($data);
-        header('Access-Control-Allow-Origin: *');  
-        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
-        header('Content-type: application/json');
-        if (isset($_GET['callback']) && $_GET['callback'])
-            echo $_GET['callback'] . '(' . $json . ')';
-        else
-            echo $json;
+        echo json_output($data);
+    }
+    
+    public function key_meta($id) {
+        $this->load->model('playermodel');
+        $data = $this->ws->getKey($id);
+        $data['source'] = (object) $this->ws->getSource($id);
+        $data['source']->is_modified = ($data['source']->is_modified) ? true : false;
+        $data['citation'] = $this->keymodel->getCitation($id);
+        $data['project'] = (object) $this->ws->getProjectDetails($id);
+        $data['project']->project_icon = site_url() . 'images/projecticons/' . $data['project']->project_icon;
+        $data['breadcrumbs'] = $this->playermodel->getBreadCrumbs($id);
+        $changes = $this->keymodel->getChanges($id);
+        $data['changes'] = ($changes) ? $changes : null;
+        echo json_output($data);
+    }
+    
+    public function get_bread_crumbs($id) {
+        $this->load->model('playermodel');
+        $data = $this->playermodel->getBreadCrumbs($id);
+        echo json_output($data);
     }
     
     public function filterItems() {
@@ -381,8 +393,6 @@ class WS extends CI_Controller {
             }
         }
     }
-    
-    
 }
 
 /* End of file ws.php */

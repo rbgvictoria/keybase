@@ -27,7 +27,6 @@ class Exportmodel extends CI_Model {
         $this->reorderedKey['Title'] = $this->getKeyName($keyid);
         $result = $this->getKey($keyid);
         $this->reorderKey($result);
-        
         return $this->reorderedKey;
     }
     
