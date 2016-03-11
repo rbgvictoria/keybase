@@ -10,7 +10,7 @@ class Keys extends KeyBase {
         $this->load->model('keymodel');
         $this->load->library('KeyService');
         $this->load->library('UserService');
-        $this->output->enable_profiler(false);
+        $this->output->enable_profiler(true);
     }
     
     function index() {
@@ -73,7 +73,7 @@ class Keys extends KeyBase {
         $this->load->view('keys/edit', $this->data);
     }
     
-    private function edit_save($key) {
+    private function edit_save($key=FALSE) {
         if ($_FILES['delimitedtext']['tmp_name']) {
             $this->data['key_metadata'] = $this->input->post();
             $filename = $_FILES['delimitedtext']['tmp_name'];
@@ -94,12 +94,15 @@ class Keys extends KeyBase {
             }
         }
         else {
-            $this->keymodel->editKeyMetadata($this->input->post(), $this->session->userdata['id']);
+            $post['key_metadata'] = json_encode($this->input->post());
+            $post['keybase_user_id'] = $this->session->userdata('id');
+            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_meta_post/' . $key;
+            $result = curl_post($url, $post, TRUE);
             redirect('keys/show/' . $key);
         }
     }
     
-    private function edit_load_key($key) {
+    private function edit_load_key($key=FALSE) {
         $this->data['key_metadata'] = $this->input->post('key_metadata');
         $errors = $this->_checkForErrors($this->input->post('keyid'), 
                 $this->input->post('tempfilename'), $this->input->post('delimiter'));
@@ -108,19 +111,21 @@ class Keys extends KeyBase {
         }
     }
     
-    private function edit_save_key($key) {
+    private function edit_save_key($key=FALSE) {
         $post = array();
         $post['key_metadata'] = json_encode($this->input->post('key_metadata'));
         $post['file_content'] = '@uploads/' . $this->input->post('tempfilename') . ';type=text/csv';
-        $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_post/' . $key;
-        $result = curl_post($url, $post, TRUE);
-        //if (json_decode($result) == $key) {
-            unlink('uploads/' . $this->input->post('tempfilename'));
-            redirect('keys/show/' . $key);
-        /*}
+        $post['keybase_user_id'] = $this->session->userdata('id');
+        
+        if ($key) {
+            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_post/' . $key;
+        }
         else {
-            echo 'Something went wrong somewhere: ' . $result;
-        }*/
+            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_post';
+        }
+        $result = curl_post($url, $post, TRUE);
+        unlink('uploads/' . $this->input->post('tempfilename'));
+        redirect('keys/show/' . $result);
     }
     
     public function create($projectid=FALSE) {
@@ -130,6 +135,8 @@ class Keys extends KeyBase {
         
         $projectdata = $this->keymodel->getProjectData($meta->project->project_id);
         $meta->project->project_name = $projectdata['Name'];
+        $this->data['key'] = $meta;
+        $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         
         $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js?v=1.0';
         if (!isset($this->session->userdata['id']))
@@ -143,73 +150,20 @@ class Keys extends KeyBase {
             if (!($_FILES['loadfile']['tmp_name'] || $_FILES['delimitedtext']['tmp_name'] 
                     || $this->input->post('loadurl'))) {
                 $this->data['message'][] = 'Please select a key file to upload.';
-                echo 'Please select a key file to upload.';
             }
             if (isset($this->data['message'])) {
                 $this->load->view('keys/edit', $this->data);
                 return;
             }
-            
-            if ($this->input->post('key_id'))
-                $keyid = $this->input->post('key_id');
-            else
-                $keyid = $this->keymodel->editKeyMetadata($this->input->post());
-
-            if ($_FILES['loadfile']['tmp_name']) {
-                $filename = $_FILES['loadfile']['tmp_name'];
-            }
-            elseif ($this->input->post('loadurl')){
-                $filename = $this->input->post('loadurl');
-            }
-            elseif ($_FILES['delimitedtext']['tmp_name']) {
-                $filename = $_FILES['delimitedtext']['tmp_name'];
-            }
-            if ($filename) {
-                $this->load->model('lpxktokeybasemodel', 'lpxk');
-                $delimiter = $this->input->post('delimiter');
-                if ($this->input->post('loadurl') || $_FILES['loadfile']['tmp_name']) {
-                    if ($this->input->post('loadurl') && $this->input->post('loadimages')) {
-                        $this->lpxk->LpxkToKeyBase($keyid, $filename, 'lpxk', TRUE, FALSE, $this->session->userdata['id']);
-                    }
-                    else {
-                        $this->lpxk->LpxkToKeyBase($keyid, $filename, 'lpxk', FALSE, FALSE, $this->session->userdata['id']);
-                    }
-                    redirect('keys/show/' . $keyid);
-                }
-                elseif ($_FILES['delimitedtext']['tmp_name']) {
-                    $tempfile = file_get_contents($_FILES['delimitedtext']['tmp_name']);
-                    $tempfilename = uniqid();
-                    file_put_contents('uploads/' . $tempfilename, $tempfile);
-                    $this->data['input_key'] = $this->_detectDelimiter($keyid, $tempfilename);
-                    $this->data['keyid'] = $keyid;
-                }
-            }
+            $this->edit_save();
         }
         
         if ($this->input->post('submit2')) {
-            $errors = $this->_checkForErrors($this->input->post('keyid'), 
-                    $this->input->post('tempfilename'), $this->input->post('delimiter'));
-            if ($errors) {
-                $cbox = FALSE;
-            }
-            else {
-                $this->load->model('lpxktokeybasemodel', 'lpxk');
-                $this->lpxk->LpxkToKeybase($this->input->post('keyid'), 'uploads/' . $this->input->post('tempfilename'), 
-                        'delimitedtext', FALSE, $this->input->post('delimiter'), 
-                        $this->session->userdata['id']);
-                unlink('uploads/' . $this->input->post('tempfilename'));
-                redirect('keys/show/' . $this->input->post('keyid'));
-            }
+            $this->edit_load_key();
         }
         
         if ($this->input->post('submit3')) {
-            $keyid = $this->input->post('keyid');
-            $this->load->model('lpxktokeybasemodel', 'lpxk');
-            $this->lpxk->LpxkToKeybase($keyid, 'uploads/' . $this->input->post('tempfilename'), 
-                    'delimitedtext', FALSE, $this->input->post('delimiter'), 
-                    $this->session->userdata['id']);
-            unlink('uploads/' . $this->input->post('tempfilename'));
-            redirect('keys/show/' . $keyid);
+            $this->edit_save_key();
         }
         
         if ($this->input->post('cancel')) {
@@ -220,17 +174,19 @@ class Keys extends KeyBase {
             redirect($this->input->post('referer'));
         }
 
-        $this->data['key'] = $meta;
-        $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         $this->load->view('keys/edit', $this->data);
     }
     
     public function delete($key, $cbox=FALSE) {
-        if (!isset($this->session->userdata['id'])) exit;
+        if (!$this->session->userdata('id')) exit;
         
         if ($this->input->post('ok')) {
             $projectID = $this->keymodel->getProjectID($key);
-            $this->keymodel->deleteKey($key, $this->session->userdata['id']);
+            
+            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_delete';
+            $post = array();
+            $post['keybase_user_id'] = $this->session->userdata('id');
+            $result = curl_delete($url, $key, $post, TRUE);
             redirect('projects/show/' . $projectID);
         }
         else {

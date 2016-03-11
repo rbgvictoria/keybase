@@ -11,7 +11,7 @@
                 <?php
                     if ($key->project->project_id || $key->project->project_name) {
                         echo '<span class="project">';
-                        echo anchor('key/project/' . $key->project->project_id, ($key->project->project_name) ? $key->project->project_name : $key->project->project_name) . ': ';
+                        echo anchor('projects/show/' . $key->project->project_id, $key->project->project_name) . ': ';
                         echo '</span>';
                     }
                     if (isset($key->key_name)) {
@@ -30,7 +30,6 @@
                 <?php endforeach; ?>
             </ul>
             <?php endif; ?>
-
             <?php if (isset($input_key) && $input_key): ?>
             <?php require_once('views/keys/edit_2.php'); ?>
 

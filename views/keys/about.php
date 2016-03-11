@@ -58,6 +58,19 @@
 
                 <h3>Cite this key</h3>
                 <p><b>KeyBase</b> (<?=date('Y')?>). <?=$key->project->project_name?>: <?=$key->key_name?>. <?=anchor(site_url() . 'keys/show/' . $key->key_id, site_url() . 'keys/show/' . $key->key_id)?> [Seen: <?=date('d-m-Y')?>].</p>
+                
+                <div class="kb-meta">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-4"><b>Created by</b></div>
+                        <div class="col-md-4 col-sm-8"><?=($key->created_by) ? $key->created_by->full_name : '&nbsp;'; ?></div>
+                        <div class="col-md-2 col-sm-4"><b>Date created</b></div>
+                        <div class="col-md-4 col-sm-8"><?=($key->timestamp_created) ? date('Y-m-d', strtotime($key->timestamp_created)) : '&nbsp;'; ?></div>
+                        <div class="col-md-2 col-sm-4"><b>Modified by</b></div>
+                        <div class="col-md-4 col-sm-8"><?=($key->modified_by) ? $key->modified_by->full_name : '&nbsp;'; ?></div>
+                        <div class="col-md-2 col-sm-4"><b>Date modified</b></div>
+                        <div class="col-md-4 col-sm-8"><?=($key->timestamp_modified) ? date('Y-m-d', strtotime($key->timestamp_modified)) : '&nbsp;' ?></div>
+                    </div>
+                </div>
             </div>
             
             <div role="tabpanel" class="tab-pane" id="items"></div>

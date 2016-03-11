@@ -1,7 +1,7 @@
             <?=form_open()?>
                 <?php   
                     echo form_hidden(array(
-                        'keyid'=>$key->key_id,
+                        'keyid'=>(isset($key->key_id)) ? $key->key_id : FALSE,
                         'projectid'=>$key->project->project_id,
                         'tempfilename'=>  $tempfilename,
                         'referer' => $referer,

@@ -619,3 +619,11 @@ div#project-filters {
 .form-group .btn:last-child {
     margin-right: 15px;
 }
+
+/* Key metadata about
+***************************************/
+.kb-meta {
+    margin-top: 30px;
+    border-top: solid 1px #ccc;
+    padding-top: 10px;
+}

@@ -497,7 +497,7 @@ class LpxkToKeyBaseModel extends CI_Model {
     private function updateKeys () {
         $data = array(
             'TimestampModified' => date('Y-m-d H:i:s'),
-            'ModifiedByID' => $this->session->userdata['id'],
+            'ModifiedByID' => $this->session->userdata('id'),
         );
         $this->db->where('KeysID', $this->keysid);
         $this->db->update('keys', $data);

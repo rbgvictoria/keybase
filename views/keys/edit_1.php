@@ -2,6 +2,10 @@
             <h3>Key metadata</h3>
             <hr />
             <?php 
+                if ($this->input->post()) {
+                    $key = json_decode(json_encode($this->input->post()));
+                }
+            
                 $data = array(
                     'name' => 'key_name',
                     'id' => 'key_name',
@@ -10,10 +14,17 @@
                     'class' => 'form-control'
                 );
                 if (isset($key)) {
+                    $project = FALSE;
+                    if (isset($key->project_id)) {
+                        $project = $key->project_id;
+                    }
+                    elseif (isset($key->project->project_id)) {
+                        $project = $key->project->project_id;
+                    }
                     echo form_hidden(array(
                         'key_id'=>(isset($key->key_id)) ? $key->key_id : FALSE, 
-                        'project_id'=>$key->project->project_id,
-                        'created_by_id'=>(isset($key->creator)) ? $key->creator->user_id : FALSE,
+                        'project_id'=>$project,
+                        'created_by_id'=>(isset($key->created_by->user_id)) ? $key->created_by->user_id : $this->session->userdata('id'),
                         'taxonomic_scope_old'=>(isset($key->taxonomic_scope)) ? $key->taxonomic_scope : FALSE,
                         'referer'=>$referer
                     ));
