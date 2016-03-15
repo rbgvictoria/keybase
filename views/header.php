@@ -8,23 +8,23 @@
     <!--link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css"-->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/jqueryui.autocomplete.css" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/colorbox/colorbox.css" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.player.css" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/jqueryui.autocomplete.css');?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/colorbox/colorbox.css');?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.player.css');?>" />
     <?php if (isset($css)): ?>
         <?php foreach ($css as $link): ?>
     <link rel="stylesheet" type="text/css" href="<?=$link?>" />
         <?php endforeach; ?>
     <?php endif; ?>
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/keybase.css?v=1.0" />
-    <script type="text/javascript" src="<?=base_url()?>js/jquery-1.9.1.min.js"></script>
-    <script type="text/javascript" src="<?=base_url()?>js/jquery.keybase.key.js"></script>
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.css'); ?>" />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.key.js'); ?>"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jspath.min.js"></script>
-    <script type="text/javascript" src="<?=base_url()?>js/jquery.keybase.js"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.js'); ?>"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.colorbox.js"></script>
-    <script type="text/javascript" src="<?=base_url()?>js/colorbox/jquery.keybase.colorbox.js?v=1.0"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/colorbox/jquery.colorbox.js'); ?>"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/colorbox/jquery.keybase.colorbox.js'); ?>"></script>
     <?php if (isset($js)): ?>
         <?php foreach ($js as $file): ?>
     <script type="text/javascript" src="<?=$file?>"></script>

@@ -10,7 +10,7 @@ class Keys extends KeyBase {
         $this->load->model('keymodel');
         $this->load->library('KeyService');
         $this->load->library('UserService');
-        $this->output->enable_profiler(true);
+        $this->output->enable_profiler(false);
     }
     
     function index() {
