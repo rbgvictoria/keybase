@@ -73,7 +73,7 @@
     var remainingItemsElem;
     var discardedItemsElem;
 
-    var filter_items = [];
+    var filter_items;
     var filter_leads = [];
     var filter_parents = [];
     var filter_nodes = [];
@@ -105,13 +105,22 @@
             options = arguments[0];
         }
 
+        var action;
         if (arguments.length === 2) {
-            var action = arguments[0];
+            action = arguments[0];
             options = arguments[1];
         }
 
         settings = $.extend(true, {}, $.fn.keybase.defaults, settings, options);
-        filter_items = settings.filter_items;
+        
+        if (settings.filter_items.length > 0) {
+            filter_items = settings.filter_items;
+        }
+        else {
+            if (!(filter_items !== undefined && filter_items.length > 0 && settings.reset !== true)) {
+                filter_items = [];
+            }
+        }
         $.fn.keybase.setActiveFilter = function(filter) {
             activeFilter = filter;
         }
@@ -181,7 +190,9 @@
                     }
 
                     if (action === "bracketedKey") {
+                        console.log(action);
                         bracketedKey();
+                        console.log(filter_items);
                         settings.bracketedKeyDisplay(json);
                     }
 
@@ -219,7 +230,6 @@
                 nextCouplet();
             }
             settings.playerEvents();
-
 
             if (action === "indentedKey") {
                 indentedKey();
@@ -280,6 +290,12 @@
 
         $('.' + settings.cssClass.startOver).off('click', 'a.first-node', startOverHandler);
         $('.' + settings.cssClass.startOver).on('click', 'a.first-node', startOverHandler);
+        
+        $('body').off('click', '.keybase-player-filter a', filterHandler);
+        $('body').on('click', '.keybase-player-filter a', filterHandler);
+        
+
+
     };
     
     /*
@@ -335,6 +351,17 @@
         next_id = $(event.target).attr('href').replace("#l_", "");
         nextCouplet();
     };
+    
+    /**
+     * filterHandler
+     * 
+     * @description Runs the localFilter function when the local filter button is clicked
+     * @param {type} event
+     */
+    var filterHandler = function(event) {
+        event.preventDefault();
+        localFilter();
+    };
 
     /**
      * playerWindow function
@@ -367,7 +394,61 @@
         $('<div>', {class: 'keybase-player-drag-updown'}).appendTo('.keybase-player-rightpane');
         discardedItemsElem = $('<div>', {class: settings.cssClass.discardedItems}).css(css).appendTo('.keybase-player-rightpane');
 
+        settings.resizePlayerWindow();
+        
+        $('<h3>', {html: 'Current node'}).appendTo(currentNodeElem);
+        $('<h3>', {html: 'Path'}).appendTo(pathElem);
+        $('<h3>', {html: 'Remaining items (<span class="keybase-num-remaining"></span>)'}).appendTo(remainingItemsElem);
+        $('<h3>', {html: 'Discarded items (<span class="keybase-num-discarded"></span>)'}).appendTo(discardedItemsElem);
 
+        $('<div>').appendTo(currentNodeElem);
+        $('<div>').appendTo(pathElem);
+        $('<div>').appendTo(remainingItemsElem);
+        $('<div>').appendTo(discardedItemsElem);
+
+        currentNodeElem.children('div').css('height', (currentNodeElem.height() -
+            currentNodeElem.children('h3').height() -
+            (parseInt(currentNodeElem.children('h3').css('padding-top'))*2)) + 'px');
+        pathElem.children('div').css('height', (pathElem.height() -
+            pathElem.children('h3').height() -
+            (parseInt(pathElem.children('h3').css('padding-top'))*2)) + 'px');
+        remainingItemsElem.children('div').css('height', (remainingItemsElem.height() -
+            remainingItemsElem.children('h3').height() -
+            (parseInt(remainingItemsElem.children('h3').css('padding-top'))*2)) + 'px');
+        discardedItemsElem.children('div').css('height', (discardedItemsElem.height() -
+            discardedItemsElem.children('h3').height() -
+            (parseInt(discardedItemsElem.children('h3').css('padding-top'))*2)) + 'px');
+
+        // KeyBase Player menu
+        $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.currentNode + ' h3');
+        $('<span>', {class: settings.cssClass.stepBack}).appendTo('.keybase-player-menu');
+        $('<a>', {href: '#', title: 'Step back'}).appendTo('.' + settings.cssClass.stepBack);
+        $('<span>', {class: settings.cssClass.startOver}).appendTo('.keybase-player-menu');
+        $('<a>', {href: '#', title: 'Start over'}).appendTo('.' + settings.cssClass.startOver);
+
+        // Local filter button
+        $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.remainingItems + ' h3');
+        $('<span>', {class: 'keybase-player-filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-menu');
+        $('<a>', {href: '#', title: 'Filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-filter');
+
+        if ($('link[rel=stylesheet][href*=font-awesome]').length > 0) {
+            $('.keybase-player-filter a').html('<i class="fa fa-filter fa-lg fa-lg"></i>');
+            $('.' + settings.cssClass.stepBack + ' a').html('<i class="fa fa-undo fa-lg fa-lg"></i>');
+            $('.' + settings.cssClass.startOver + ' a').html('<i class="fa fa-refresh fa-lg fa-lg"></i>');
+        }
+
+        // Resize Player panes
+        var position;
+        $('.keybase-player-window').on('mousedown', '.keybase-player-drag-leftright', dragLeftRight);
+        $('.keybase-player-leftpane').on('mousedown', '.keybase-player-drag-updown', dragUpDownLeftPane);
+        $('.keybase-player-rightpane').on('mousedown', '.keybase-player-drag-updown', dragUpDownRightPane);
+
+        $(document).mouseup(function(e){
+            $(document).unbind('mousemove');
+        });
+    };
+    
+    $.fn.keybase.defaults.resizePlayerWindow = function() {
         $('.keybase-player-window').css({
             'position': 'relative'
         });
@@ -406,130 +487,74 @@
         $('.' + settings.cssClass.path + ', .' + settings.cssClass.discardedItems).css({
             'top': (($('.keybase-player-window').height() * 0.5) + 3) + 'px'
         });
-
-        $('<h3>', {html: 'Current node'}).appendTo(currentNodeElem);
-        $('<h3>', {html: 'Path'}).appendTo(pathElem);
-        $('<h3>', {html: 'Remaining items (<span class="keybase-num-remaining"></span>)'}).appendTo(remainingItemsElem);
-        $('<h3>', {html: 'Discarded items (<span class="keybase-num-discarded"></span>)'}).appendTo(discardedItemsElem);
-
-        $('<div>').appendTo(currentNodeElem);
-        $('<div>').appendTo(pathElem);
-        $('<div>').appendTo(remainingItemsElem);
-        $('<div>').appendTo(discardedItemsElem);
-
-        currentNodeElem.children('div').css('height', (currentNodeElem.height() -
-            currentNodeElem.children('h3').height() -
-            (parseInt(currentNodeElem.children('h3').css('padding-top'))*2)) + 'px');
-        pathElem.children('div').css('height', (pathElem.height() -
-            pathElem.children('h3').height() -
-            (parseInt(pathElem.children('h3').css('padding-top'))*2)) + 'px');
-        remainingItemsElem.children('div').css('height', (remainingItemsElem.height() -
-            remainingItemsElem.children('h3').height() -
-            (parseInt(remainingItemsElem.children('h3').css('padding-top'))*2)) + 'px');
-        discardedItemsElem.children('div').css('height', (discardedItemsElem.height() -
-            discardedItemsElem.children('h3').height() -
-            (parseInt(discardedItemsElem.children('h3').css('padding-top'))*2)) + 'px');
-
-
-        // KeyBase Player menu
-        $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.currentNode + ' h3');
-        $('<span>', {class: settings.cssClass.stepBack}).appendTo('.keybase-player-menu');
-        $('<a>', {href: '#', title: 'Step back'}).appendTo('.' + settings.cssClass.stepBack);
-        $('<span>', {class: settings.cssClass.startOver}).appendTo('.keybase-player-menu');
-        $('<a>', {href: '#', title: 'Start over'}).appendTo('.' + settings.cssClass.startOver);
-
-        $('body').on('click', '.keybase-player-filter a', function(e) {
-            e.preventDefault();
-            localFilter();
+    }
+    
+    var dragLeftRight = function(event) {
+        event.preventDefault();
+        position = $('.keybase-player-window').offset();
+        $(document).mousemove(function(e){
+            if (e.pageX > position.left+190 &&
+                e.pageX < position.left+$('.keybase-player-window').width()-190) {
+                $('.keybase-player-leftpane').css("width",e.pageX-position.left);
+                $('.keybase-player-drag-leftright').css('left', e.pageX-position.left);
+                $('.keybase-player-rightpane').css({"left": e.pageX-position.left+6,
+                    "width": ($('.keybase-player-window').width()-$('.keybase-player-leftpane').width()-6) + 'px'});
+            }
         });
-
-        // Local filter button
-        $('<span>', {class: 'keybase-player-menu'}).appendTo('.' + settings.cssClass.remainingItems + ' h3');
-        $('<span>', {class: 'keybase-player-filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-menu');
-        $('<a>', {href: '#', title: 'Filter'}).appendTo('.' + settings.cssClass.remainingItems + ' .keybase-player-filter');
-        
-        if ($('link[rel=stylesheet][href*=font-awesome]').length > 0) {
-            $('.keybase-player-filter a').html('<i class="fa fa-filter fa-lg fa-lg"></i>');
-            $('.' + settings.cssClass.stepBack + ' a').html('<i class="fa fa-undo fa-lg fa-lg"></i>');
-            $('.' + settings.cssClass.startOver + ' a').html('<i class="fa fa-refresh fa-lg fa-lg"></i>');
-        }
-
-
-
-        // Resize Player panes
-        var position;
-        $('.keybase-player-window .keybase-player-drag-leftright').mousedown(function(e){
-            e.preventDefault();
-            position = $('.keybase-player-window').offset();
-            $(document).mousemove(function(e){
-                if (e.pageX > position.left+190 &&
-                    e.pageX < position.left+$('.keybase-player-window').width()-190) {
-                    $('.keybase-player-leftpane').css("width",e.pageX-position.left);
-                    $('.keybase-player-drag-leftright').css('left', e.pageX-position.left);
-                    $('.keybase-player-rightpane').css({"left": e.pageX-position.left+6,
-                        "width": ($('.keybase-player-window').width()-$('.keybase-player-leftpane').width()-6) + 'px'});
-                    //$('.keybase-player-leftpane>div').css('width', $('.keybase-player-leftpane').width()-2);
-                }
-            })
-        });
-
-        $('.keybase-player-leftpane .keybase-player-drag-updown').mousedown(function(e) {
-            e.preventDefault();
-            position = $('.keybase-player-leftpane').offset();
-            $(document).mousemove(function(e) {
-                if (e.pageY > position.top+29
-                    && e.pageY < position.top+$('.keybase-player-window').height()-32) {
-                    $('.keybase-player-leftpane .keybase-player-drag-updown').css('top', e.pageY-position.top+2);
-                    currentNodeElem.css("height", e.pageY-position.top);
-                    pathElem.css({'top': e.pageY-position.top+5,
-                        'height': ($('.keybase-player-window').height()-currentNodeElem.height()-6) + 'px'});
-                    currentNodeElem.children('div').css('height', (currentNodeElem.height() -
-                        currentNodeElem.children('h3').height() -
-                        (parseInt(currentNodeElem.children('h3').css('padding-top'))*2)) + 'px');
-                    pathElem.children('div').css('height', (pathElem.height() -
-                        pathElem.children('h3').height() -
-                        (parseInt(pathElem.children('h3').css('padding-top'))*2)) + 'px');
-                    if (pathElem.children('div').height() < 5) {
-                        pathElem.children('div').css('overflow', 'hidden').children().hide();
-                    }
-                    else {
-                        pathElem.children('div').css('overflow', 'auto').children().show();
-                    }
-                }
-            })
-        });
-
-        $('.keybase-player-rightpane .keybase-player-drag-updown').mousedown(function(e) {
-            e.preventDefault();
-            position = $('.keybase-player-rightpane').offset();
-            $(document).mousemove(function(e) {
-                if (e.pageY > position.top+29
-                    && e.pageY < position.top+$('.keybase-player-window').height()-32) {
-                    $('.keybase-player-rightpane .keybase-player-drag-updown').css('top', e.pageY-position.top+2);
-                    remainingItemsElem.css("height", e.pageY-position.top);
-                    discardedItemsElem.css({'top': e.pageY-position.top+5,
-                        'height': ($('.keybase-player-window').height() -
-                            remainingItemsElem.height()-6) + 'px'});
-                    remainingItemsElem.children('div').css('height', (remainingItemsElem.height() -
-                        remainingItemsElem.children('h3').height() -
-                        (parseInt(remainingItemsElem.children('h3').css('padding-top'))*2)) + 'px');
-                    discardedItemsElem.children('div').css('height', (discardedItemsElem.height() -
-                        discardedItemsElem.children('h3').height() -
-                        (parseInt(discardedItemsElem.children('h3').css('padding-top'))*2)) + 'px');
-                    if (discardedItemsElem.children('div').height() < 5) {
-                        discardedItemsElem.children('div').css('overflow', 'hidden').children().hide();
-                    }
-                    else {
-                        discardedItemsElem.children('div').css('overflow', 'auto').children().show();
-                    }
-                }
-            })
-        });
-
-        $(document).mouseup(function(e){
-            $(document).unbind('mousemove');
-        })
     };
+    
+    var dragUpDownLeftPane = function(event) {
+        event.preventDefault();
+        position = $('.keybase-player-leftpane').offset();
+        $(document).mousemove(function(e) {
+            if (e.pageY > position.top+29
+                && e.pageY < position.top+$('.keybase-player-window').height()-32) {
+                $('.keybase-player-leftpane .keybase-player-drag-updown').css('top', e.pageY-position.top+2);
+                currentNodeElem.css("height", e.pageY-position.top);
+                pathElem.css({'top': e.pageY-position.top+5,
+                    'height': ($('.keybase-player-window').height()-currentNodeElem.height()-6) + 'px'});
+                currentNodeElem.children('div').css('height', (currentNodeElem.height() -
+                    currentNodeElem.children('h3').height() -
+                    (parseInt(currentNodeElem.children('h3').css('padding-top'))*2)) + 'px');
+                pathElem.children('div').css('height', (pathElem.height() -
+                    pathElem.children('h3').height() -
+                    (parseInt(pathElem.children('h3').css('padding-top'))*2)) + 'px');
+                if (pathElem.children('div').height() < 5) {
+                    pathElem.children('div').css('overflow', 'hidden').children().hide();
+                }
+                else {
+                    pathElem.children('div').css('overflow', 'auto').children().show();
+                }
+            }
+        });
+    }
+    
+    var dragUpDownRightPane = function(event) {
+        event.preventDefault();
+        position = $('.keybase-player-rightpane').offset();
+        $(document).mousemove(function(e) {
+            if (e.pageY > position.top+29
+                && e.pageY < position.top+$('.keybase-player-window').height()-32) {
+                $('.keybase-player-rightpane .keybase-player-drag-updown').css('top', e.pageY-position.top+2);
+                remainingItemsElem.css("height", e.pageY-position.top);
+                discardedItemsElem.css({'top': e.pageY-position.top+5,
+                    'height': ($('.keybase-player-window').height() -
+                        remainingItemsElem.height()-6) + 'px'});
+                remainingItemsElem.children('div').css('height', (remainingItemsElem.height() -
+                    remainingItemsElem.children('h3').height() -
+                    (parseInt(remainingItemsElem.children('h3').css('padding-top'))*2)) + 'px');
+                discardedItemsElem.children('div').css('height', (discardedItemsElem.height() -
+                    discardedItemsElem.children('h3').height() -
+                    (parseInt(discardedItemsElem.children('h3').css('padding-top'))*2)) + 'px');
+                if (discardedItemsElem.children('div').height() < 5) {
+                    discardedItemsElem.children('div').css('overflow', 'hidden').children().hide();
+                }
+                else {
+                    discardedItemsElem.children('div').css('overflow', 'auto').children().show();
+                }
+            }
+        });
+    }
 
     /**
      * currentNodeDisplay function
@@ -1585,11 +1610,14 @@
     var setFilter = function() {
         filterLeads();
         next_id = rootNodeID;
+        if ($('.keybase-player-window').length === 0) {
+            settings.playerWindow();
+            settings.playerEvents();
+        }
         nextCouplet();
         
-        //settings.bracketedKeyDisplay(json);
         if ($('.keybase-player-filter-remove').length === 0) {
-            remainingItemsElem.children('h3').children('.keybase-player-menu').append('<span class="keybase-player-filter-remove"><a href="#"></a></span>');
+            $('.keybase-player-filter').after('<span class="keybase-player-filter-remove"><a href="#"></a></span>');
             if ($('link[rel=stylesheet][href*=font-awesome]').length > 0) {
                 $('.keybase-player-filter-remove a').html('<i class="fa fa-trash fa-lg fa-lg"></i>');
             }
