@@ -38,8 +38,18 @@ $(function() {
      * Autocomple on search box
      */
     $('#searchbox').autocomplete({
-            source: wsUrl + '/autocomplete_item_name',
-            minLength: 2
+        source: function( request, response ) {
+            $.ajax({
+                url: wsUrl + '/ws/autocomplete_item_name',
+                data: {
+                    term: request.term
+                },
+                success: function( data ) {
+                    response( data );
+                }
+            });
+        },
+        minLength: 2
     });
     
     var tab;
