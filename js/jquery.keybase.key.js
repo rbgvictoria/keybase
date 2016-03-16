@@ -83,6 +83,8 @@
     var indented_key;
     var indentedKeyHtml;
     
+    var i;
+    
     $.fn.keybase = function() {
         
         $.fn.keybase.getters = {
