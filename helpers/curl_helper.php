@@ -28,8 +28,8 @@ if (!function_exists('curl_post')) {
     function curl_post($url, $data, $proxy=FALSE) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch,CURLOPT_POST, TRUE);
-        curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 

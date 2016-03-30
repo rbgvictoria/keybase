@@ -7,7 +7,9 @@
     <link rel="shortcut icon" href="<?=base_url()?>favicon.ico">
     <!--link rel="stylesheet" href="http://openlayers.org/en/v3.3.0/css/ol.css" type="text/css"-->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="<?=base_url()?>css/dynatree/skin/ui.dynatree.css" />
+    <link rel="stylesheet" href="<?=base_url()?>js/contextMenu/jquery.contextMenu.min.css" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/jqueryui.autocomplete.css');?>" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/colorbox/colorbox.css');?>" />
     <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.player.css');?>" />
@@ -18,21 +20,23 @@
     <?php endif; ?>
     <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.css'); ?>" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.key.js'); ?>"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jspath.min.js"></script>
-    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.js'); ?>"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="<?=base_url()?>js/dynatree/jquery.dynatree.js"></script>
+    <script type="text/javascript" src="<?=base_url()?>js/contextMenu/jquery.contextMenu.min.js"></script>
+    <script type="text/javascript" src="http://data.rbg.vic.gov.au/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/colorbox/jquery.colorbox.js'); ?>"></script>
     <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/colorbox/jquery.keybase.colorbox.js'); ?>"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.key.js'); ?>"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.project.js'); ?>"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoVersion('js/jquery.keybase.js'); ?>"></script>
+    <script type="text/javascript" src="<?=base_url()?><?=autoversion('js/ckeditor_customconfig.js')?>"></script>
     <?php if (isset($js)): ?>
         <?php foreach ($js as $file): ?>
     <script type="text/javascript" src="<?=$file?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
-    <?php
-        if (isset($iehack) && $iehack) require_once('iehack.php');
-    ?>
     <?php if (isset($script) && $script): ?>
     <script type="text/javascript">
     <?=$script; ?>
@@ -61,12 +65,12 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
-                <li><a href="<?=site_url()?>key/st/about">About KeyBase</a></li>
-                <li><a href="<?=site_url()?>key/st/terms-of-use">Terms of use</a></li>
-                <li><a href="<?=site_url()?>key/st/citation">Citing KeyBase</a></li>
-                <li><a href="<?=site_url()?>key/st/help">Help</a></li>
+                <li><a href="<?=site_url()?>keybase/st/about">About KeyBase</a></li>
+                <li><a href="<?=site_url()?>keybase/st/terms-of-use">Terms of use</a></li>
+                <li><a href="<?=site_url()?>keybase/st/citation">Citing KeyBase</a></li>
+                <li><a href="<?=site_url()?>keybase/st/help">Help</a></li>
+                <li><a href="<?=site_url()?>keybase/st/news">News</a></li>
               </ul>
-              <li><a href="<?=site_url()?>key/st/news">News</a></li>
             </li>
           </ul>
           <?=form_open('keys/search', array('class' => 'navbar-form navbar-right')); ?>
@@ -83,7 +87,8 @@
     <div class="page-header">
         <div class="container">
             <div id="login" class="login">
-                <?php if (isset($this->session->userdata['name'])): ?>
+                <?php if ($this->session->userdata('name')): ?>
+                    <?=form_hidden('keybase-user-id', $this->session->userdata('id')); ?>
                     <?=$this->session->userdata['name']?> |
                     <?=anchor(base_url() . 'key/st/manage-account', 'Manage account')?> |
                     <?=anchor(base_url() . 'admin/logout', 'Log out')?>

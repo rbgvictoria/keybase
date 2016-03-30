@@ -5,19 +5,19 @@ require_once 'keybase.php';
 class Keys extends KeyBase {
     var $data;
 
-    function  __construct() {
+    public function  __construct() {
         parent::__construct();
-        $this->load->model('keymodel');
         $this->load->library('KeyService');
+        $this->load->library('ProjectService');
         $this->load->library('UserService');
         $this->output->enable_profiler(false);
     }
     
-    function index() {
+    public function index() {
         redirect(base_url());
     }
     
-    function show($id) {
+    public function show($id) {
         if (!$id) {
             redirect(site_url());
         }
@@ -39,9 +39,6 @@ class Keys extends KeyBase {
     }
 
     public function edit($key=FALSE) {
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js?v=1.0';
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.keymenu.js?v=1.0';
-        
         if (!$key)
             $key = $this->input->post('key_id');
         if (!$key) 
@@ -78,7 +75,6 @@ class Keys extends KeyBase {
             $this->data['key_metadata'] = $this->input->post();
             $filename = $_FILES['delimitedtext']['tmp_name'];
             if ($filename) {
-                $this->load->model('lpxktokeybasemodel', 'lpxk');
                 $delimiter = $this->input->post('delimiter');
                 $tempfile = file_get_contents($_FILES['delimitedtext']['tmp_name']);
                 $tempfilename = uniqid();
@@ -94,11 +90,9 @@ class Keys extends KeyBase {
             }
         }
         else {
-            $post['key_metadata'] = json_encode($this->input->post());
-            $post['keybase_user_id'] = $this->session->userdata('id');
-            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_meta_post/' . $key;
-            $result = curl_post($url, $post, TRUE);
-            redirect('keys/show/' . $key);
+            $data = array('key_metadata' => json_encode($this->input->post()));
+            $result = $this->keyservice->editKey($key, $data);
+            redirect('keys/show/' . $result);
         }
     }
     
@@ -112,18 +106,10 @@ class Keys extends KeyBase {
     }
     
     private function edit_save_key($key=FALSE) {
-        $post = array();
-        $post['key_metadata'] = json_encode($this->input->post('key_metadata'));
-        $post['file_content'] = '@uploads/' . $this->input->post('tempfilename') . ';type=text/csv';
-        $post['keybase_user_id'] = $this->session->userdata('id');
-        
-        if ($key) {
-            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_post/' . $key;
-        }
-        else {
-            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_post';
-        }
-        $result = curl_post($url, $post, TRUE);
+        $data = array();
+        $data['key_metadata'] = json_encode($this->input->post('key_metadata'));
+        $data['file_content'] = '@uploads/' . $this->input->post('tempfilename') . ';type=text/csv';
+        $result = $this->keyservice->editKey($key, $data);
         unlink('uploads/' . $this->input->post('tempfilename'));
         redirect('keys/show/' . $result);
     }
@@ -133,8 +119,10 @@ class Keys extends KeyBase {
         $meta->project = new stdClass();
         $meta->project->project_id = ($projectid) ? $projectid : $this->input->post('project_id');
         
-        $projectdata = $this->keymodel->getProjectData($meta->project->project_id);
-        $meta->project->project_name = $projectdata['Name'];
+        $url = $this->ws_url() . 'ws/project_meta_get/' . $meta->project->project_id;
+        $projectdata = $this->projectservice->getProjectMetadata($projectid);
+        $meta->project->project_name = $projectdata->project_name;
+
         $this->data['key'] = $meta;
         $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         
@@ -169,8 +157,6 @@ class Keys extends KeyBase {
         if ($this->input->post('cancel')) {
             if ($this->input->post('tempfilename') && file_exists('uploads/' . $this->input->post('tempfilename')))
                 unlink ('uploads/' . $this->input->post('tempfilename'));
-            if ($this->input->post('keyid'))
-                $this->keymodel->deleteKey($this->input->post('keyid'), $this->session->userdata['id']);
             redirect($this->input->post('referer'));
         }
 
@@ -179,19 +165,13 @@ class Keys extends KeyBase {
     
     public function delete($key, $cbox=FALSE) {
         if (!$this->session->userdata('id')) exit;
-        
+        $url = $this->ws_url() . 'ws/key_meta_get/' .$key;
+        $meta = $this->keyservice->getKeyMetadata($key);
+        $this->data['cbox'] = $cbox;
+        $this->data['key'] = $meta;
         if ($this->input->post('ok')) {
-            $projectID = $this->keymodel->getProjectID($key);
-            
-            $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_delete';
-            $post = array();
-            $post['keybase_user_id'] = $this->session->userdata('id');
-            $result = curl_delete($url, $key, $post, TRUE);
-            redirect('projects/show/' . $projectID);
-        }
-        else {
-            $this->data['cbox'] = $cbox;
-            $this->data['key'] = $this->keymodel->getKey($key);
+            $result = $this->keyservice->deleteKey($key);
+            redirect('projects/show/' . $meta->project->project_id);
         }
         $this->load->view('keys/delete', $this->data);
     }

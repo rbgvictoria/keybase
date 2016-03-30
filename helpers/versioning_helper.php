@@ -4,7 +4,7 @@ if ( ! function_exists('autoVersion')) {
     function autoVersion($url){
         $path = pathinfo($url);
         $ver = filemtime(getcwd() . '/' .$url);
-        echo $path['dirname']. '/'. $path['filename'] . '.' . $ver . '.' . $path['extension'];
+        return $path['dirname']. '/'. $path['filename'] . '.' . $ver . '.' . $path['extension'];
     }    
 }
 
