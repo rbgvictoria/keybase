@@ -7,9 +7,9 @@
     $prusers = array();
     $prmanagers = array();
     foreach ($users as $user) {
-        $prusers[] = $user['UsersID'];
-        if ($user['Role'] == 'Manager') {
-            $prmanagers[] = $user['UsersID'];
+        $prusers[] = $user->user_id;
+        if ($user->role == 'Manager') {
+            $prmanagers[] = $user->user_id;
         }
     }
 ?>
@@ -27,11 +27,11 @@
         <div class="col-md-12">
             <div id="project-page-header" class="clearfix">
                 <div id="projecticon">
-                    <img src="<?=base_url()?>images/projecticons/<?=($project['ProjectIcon']) ? $project['ProjectIcon'] : 'project_icon_default.png'?>" alt=""/>
+                    <img src="<?=base_url()?>images/projecticons/<?=($project->project_icon) ? $project->project_icon : 'project_icon_default.png'?>" alt=""/>
                 </div>
                 <div id="title">
-                    <h2><?=$project['Name']?></h2>
-                    <div class="project-summary">This project currently includes <?=$project['NumKeys']?> keys to <?=$project['NumTaxa']?> taxa</div>
+                    <h2><?=$project->project_name?></h2>
+                    <div class="project-summary">This project currently includes <?=$project->num_keys?> keys to <?=$project->num_items?> items</div>
                 </div>
             </div>
         </div> <!-- /.col -->
@@ -62,11 +62,11 @@
                             </thead>
                             <tbody>
                                 <?php foreach ($manageFilters as $filter): ?>
-                                <tr data-keybase-filter-id="<?=$filter->FilterID; ?>">
-                                    <td><?=$filter->Name; ?></td>
-                                    <td><?=$filter->Username; ?></td>
+                                <tr data-keybase-filter-id="<?=$filter->filter_id; ?>">
+                                    <td><?=$filter->filter_name; ?></td>
+                                    <td><?=$filter->user_name; ?></td>
                                     <td>
-                                        <input type="checkbox" class="is-project-filter"<?=($filter->IsProjectFilter) ? ' checked' : '';?>/>
+                                        <input type="checkbox" class="is-project-filter"<?=($filter->is_project_filter) ? ' checked' : '';?>/>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -83,14 +83,19 @@
                     <div role="tabpanel" class="tab-pane" id="about">
                         <div class="row">
                             <div class="col-md-4">
-                                <?php if (isset($this->session->userdata['id'])  && (in_array($userid, $prmanagers))):?>
+                                <?php if ($this->session->userdata('id')  && (in_array($userid, $prmanagers))):?>
                                 <div id="edit-project">
-                                    <a class="btn btn-default" href="<?=site_url()?>projects/edit/<?=$project['ProjectsID']?>">Edit project</a>
+                                    <a class="btn btn-default" href="<?=site_url()?>projects/edit/<?=$project->project_id?>">Edit project</a>
                                 </div>
                                 <?php endif;?>
+                                <?php if ($this->session->userdata('id') == 1): ?>
+                                <div id="delete-project">
+                                    <a class="btn btn-default" href="<?=site_url()?>projects/delete/<?=$project->project_id?>">Delete project</a>
+                                </div>
+                                <?php endif; ?>
                             </div>
                             <div class="col-md-8">
-                                <div class="textarea"><?=$project['Description']?></div>
+                                <div class="textarea"><?=$project->project_description?></div>
                             </div>
                         </div> <!-- /.row -->
                     </div>
@@ -123,7 +128,7 @@
                                                 <?php if ($projectFilters): ?>
                                                 <optgroup label="Project filters">
                                                 <?php foreach ($projectFilters as $filter): ?>
-                                                    <option value="<?=$filter['FilterID']?>"><?=$filter['FilterName']?></option>
+                                                    <option value="<?=$filter->filter_id?>"><?=$filter->filter_name?></option>
                                                 <?php endforeach; ?>
                                                 </optgroup>
                                                 <?php endif; ?>
@@ -134,7 +139,7 @@
 
                                     <?php if ($userid && in_array($userid, $prusers)):?>
                                     <div class="add-key">
-                                        <a href="<?=site_url()?>keys/create/<?=$project['ProjectsID']?>" class="btn btn-default">Create new key</a>
+                                        <a href="<?=site_url()?>keys/create/<?=$project->project_id?>" class="btn btn-default">Create new key</a>
                                     </div>
                                     <?php endif; ?>
                                 </div> <!-- /#keys-control-panel -->
@@ -142,7 +147,7 @@
                             <div class="col-md-8">
                                 <div id="tree">
                                     <i class="fa fa-spinner fa-spin"></i>
-                                    <noscript><?=anchor(site_url() . 'ajax/projectkeys_hierarchy/' . $project['ProjectsID'], 'Hierarchy of trees in JSON format'); ?></noscript>
+                                    <noscript><?=anchor(site_url() . 'ajax/projectkeys_hierarchy/' . $project->project_id, 'Hierarchy of trees in JSON format'); ?></noscript>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +159,7 @@
                             <div class="col-md-8">
                                 <div id="list">
                                     <i class="fa fa-spinner fa-spin"></i>
-                                    <noscript><?=anchor(site_url() . 'ajax/projectkeys_alphabetical/' . $project['ProjectsID'], 'Alphabetical list of trees in JSON format'); ?></noscript>
+                                    <noscript><?=anchor(site_url() . 'ajax/projectkeys_alphabetical/' . $project->project_id, 'Alphabetical list of trees in JSON format'); ?></noscript>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +170,7 @@
                             <div class="col-md-4">
                                 <?php if ($userid && in_array($userid, $prmanagers)): ?>
                                 <p>
-                                    <?=anchor('key/addprojectuser/' . $project['ProjectsID'], 'Add another user', array('class'=>'btn btn-default')); ?>
+                                    <?=anchor('key/addprojectuser/' . $project->project_id, 'Add another user', array('class'=>'btn btn-default')); ?>
                                 </p>
                                 <?php endif; ?>
                             </div>
@@ -173,10 +178,10 @@
                                 <table class="table">
                                     <?php foreach ($users as $user): ?>
                                     <tr>
-                                        <td><?=$user['FullName']?></td>
-                                        <td><?=$user['Role']?></td>
+                                        <td><?=$user->full_name?></td>
+                                        <td><?=$user->role?></td>
                                         <?php if (in_array($userid, $prmanagers)): ?>
-                                        <td><?=anchor('key/deleteprojectuser/' . $user['ProjectsUsersID'], '<i class="fa fa-trash-o"></i>', array('title' => 'Remove ' . $user['FullName'])); ?></td>
+                                        <td><?=anchor('key/deleteprojectuser/' . $user->project_user_id, '<i class="fa fa-trash-o"></i>', array('title' => 'Remove ' . $user->full_name)); ?></td>
                                         <?php endif; ?>
                                     </tr>
                                     <?php endforeach; ?>

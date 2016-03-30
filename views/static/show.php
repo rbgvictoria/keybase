@@ -1,4 +1,4 @@
-<?php require_once('header.php'); ?>
+<?php require_once('views/header.php'); ?>
 
 <div class="container">
     <div class="row">
@@ -10,7 +10,7 @@
                 <?php if ($page['PageTitle'] == 'Home'):?>
                 <li><?=anchor(base_url(), 'Home'); ?> (partly static only)</li>
                 <?php else: ?>
-                <li><?=anchor('key/st/' . $page['Uri'], $page['PageTitle'])?></li>
+                <li><?=anchor('keybase/st/' . $page['Uri'], $page['PageTitle'])?></li>
                 <?php endif; ?>
                 <?php endforeach; ?>
             </ul>
@@ -26,4 +26,4 @@
 
 
 
-<?php require_once('footer.php'); ?>
+<?php require_once('views/footer.php'); ?>

@@ -1,24 +1,13 @@
-<?php 
-    // File: edit.php
-    // Location: views/projects/edit.php
-    
-    if (!$cbox) {
-        require_once 'views/header.php';
-        echo '<div class="container">';
-    }
-    else {
-        echo '<!-- start colorbox --><div class="cbox-edit-project">';
-        echo '<div class="container-fluid">';
-    }
-?>
+<?php require_once 'views/header.php'; ?>
+<div class="container">
     <div class="row">
         <div class="col-md-6">
             
             <?=form_open();?>
-            <?=form_hidden('userid', $this->session->userdata['id']);?>
-            <?php if (isset($project['ProjectsID'])): ?>
-                <?=form_hidden('projectid', $project['ProjectsID']);?>
-                <h2>Edit project: <?=$project['Name']?></h2>
+            <?=form_hidden('userid', $this->session->userdata('id'));?>
+            <?php if (isset($project->project_id)): ?>
+                <?=form_hidden('projectid', $project->project_id);?>
+                <h2>Edit project: <?=$project->project_name?></h2>
             <?php else: ?>
                 <h2>Add project</h2>
             <?php endif; ?>
@@ -27,7 +16,7 @@
                     $data = array(
                         'name' => 'name',
                         'id' => 'name',
-                        'value' => (isset($project['Name'])) ? $project['Name'] : FALSE,
+                        'value' => (isset($project->project_name)) ? $project->project_name : FALSE,
                         'class' => 'form-control',
                     );
                 ?>
@@ -42,7 +31,7 @@
                     $data = array(
                         'name' => 'taxonomicscope',
                         'id' => 'taxonomicscope',
-                        'value' => (isset($project['TaxonomicScope'])) ? $project['TaxonomicScope'] : FALSE,
+                        'value' => (isset($project->taxonomic_scope)) ? $project->taxonomic_scope : FALSE,
                         'class' => 'form-control',
                     );
                 ?>
@@ -57,7 +46,7 @@
                     $data = array(
                         'name' => 'geographicscope',
                         'id' => 'geographicscope',
-                        'value' => (isset($project['GeographicScope'])) ? $project['GeographicScope'] : FALSE,
+                        'value' => (isset($project->geographic_scope)) ? $project->geographic_scope : FALSE,
                         'class' => 'form-control',
                     );
                 ?>
@@ -74,7 +63,7 @@
                         'name' => 'description',
                         'id' => 'description',
                         'class' => 'ckeditor form-control',
-                        'value' => (isset($project['Description'])) ? $project['Description'] : FALSE,
+                        'value' => (isset($project->project_description)) ? $project->project_description : FALSE,
                         'rows' => 10,
                         'cols' => 80,
                         'style' => 'vertical-align: top',
@@ -93,9 +82,4 @@
     </div> <!-- /.row -->
 </div> <!-- /.container -->
 
-<?php 
-    if (!$cbox) 
-        require_once 'views/footer.php'; 
-    else 
-        echo '</div><!-- end colorbox -->';
-?>
+<?php require_once 'views/footer.php'; ?>

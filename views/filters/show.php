@@ -21,12 +21,12 @@
                 <h3>Project filters</h3>
                 <ul id="project-filters">
                 <?php foreach ($projectFilters as $index => $filter): ?>
-                    <?php if ($index == 0 || $filter['ProjectID'] != $projectFilters[$index-1]['ProjectID']):?>
-                    <li><i class="fa fa-minus-square-o"></i><?=anchor(site_url() . 'projects/show/' . $filter['ProjectID'], $filter['ProjectName'])?>
+                    <?php if ($index == 0 || $filter->project_id != $projectFilters[$index-1]->project_id):?>
+                    <li><i class="fa fa-minus-square-o"></i><?=anchor(site_url() . 'projects/show/' . $filter->project_id, $filter->project_name)?>
                         <ul>
                     <?php endif; ?>
-                            <li><i class="fa fa-check-square"></i><?=anchor(site_url() . 'filters/show/' . $filter['FilterID'], $filter['FilterName'])?></li>
-                    <?php if ($index == count($projectFilters) -1 || $filter['ProjectID'] != $projectFilters[$index+1]['ProjectID']):?>
+                            <li><i class="fa fa-check-square"></i><?=anchor(site_url() . 'filters/show/' . $filter->filter_id, $filter->filter_name); ?></li>
+                    <?php if ($index == count($projectFilters)-1 || $filter->project_id != $projectFilters[$index+1]->project_id):?>
                         </ul>
                     </li>
                     <?php endif; ?>
@@ -66,9 +66,16 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <?php 
+                                        $options = array();
+                                        foreach ($projects as $project) {
+                                            $options[$project->project_id] = $project->project_name;
+                                        }
+                                    ?>
+                                    
                                     <?=form_label('Project(s)', 'project', array('class' => 'col-sm-2 form-label')); ?>
                                     <div class="col-sm-10">
-                                         <?=form_multiselect('projects[]', $projects, $this->input->post('projects'), "id=\"projects\" class=\"form-control\"");?>
+                                         <?=form_multiselect('projects[]', $options, $this->input->post('projects'), "id=\"projects\" class=\"form-control\"");?>
                                     </div>
                                 </div>
 
