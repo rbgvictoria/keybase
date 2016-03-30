@@ -20,6 +20,7 @@ class Admin extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('captcha');
+        $this->load->helper('versioning');
         $this->output->enable_profiler(false);
         $this->load->model('authenticationmodel');
     }
@@ -33,7 +34,7 @@ class Admin extends CI_Controller {
             $this->data['referer'] = $_SERVER['HTTP_REFERER'];
         else
             $this->data['referer'] = FALSE;
-        $this->load->view('login', $this->data);
+        $this->load->view('admin/login', $this->data);
     }
 
     function authenticate(){
@@ -46,10 +47,10 @@ class Admin extends CI_Controller {
             else 
                 redirect('key');
         else $message = 'Authentication failed';
-        $this->load->view('message', array("message" => $message));
+        $this->load->view('admin/message', array("message" => $message));
     }
     else 
-        $this->load->view('message', array('message' => "Username or password not filled in"));
+        $this->load->view('admin/message', array('message' => "Username or password not filled in"));
     }
 
     function logout(){
@@ -93,7 +94,7 @@ class Admin extends CI_Controller {
         
         $this->data['captcha'] = $this->captcha();
         
-        $this->load->view('registrationview', $this->data);
+        $this->load->view('admin/registration', $this->data);
     }
     
     public function captcha() {
