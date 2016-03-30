@@ -1,22 +1,39 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
-class KeyService {
-    private $ci;
+require_once 'Service.php';
+
+class KeyService extends Service {
     
     public function __construct() {
-        $this->ci =& get_instance();
-        $this->ci->load->helper('curl');
+        parent::__construct();
     }
     
     public function getKeyMetadata($keyid) {
-        $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/key_meta/' . $keyid;
+        $url = $this->ws_url() . 'ws/key_meta_get/' . $keyid;
         $result = doCurl($url, FALSE, TRUE);
         return json_decode($result);
     }
     
     public function search($searchstring) {
-        $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/search_items/' . $searchstring;
+        $url = $this->ws_url() . 'ws/search_items/' . $searchstring;
         $result = doCurl($url, FALSE, TRUE);
         return json_decode($result);
     }
+    
+    public function editKey($key, $data) {
+        $url = $this->ws_url() . 'ws/key_post/' . $key;
+        $data['keybase_user_id'] = $this->ci->session->userdata('id');
+        $response = curl_post($url, $data, TRUE);
+        return json_decode($response);
+    }
+    
+    public function deleteKey($key) {
+        $url = $this->ws_url() . 'ws/key_delete';
+        $data = array('keybase_user_id' => $this->ci->session->userdata('id'));
+        $response = curl_delete($url, $key, $data, TRUE);
+        return json_decode($response);
+    }
 }
+
+/* End of file KeyService.php */
+/* Location: ./libraries/KeyService.php */

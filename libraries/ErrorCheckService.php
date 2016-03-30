@@ -1,8 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
-class ErrorCheckService {
-    private $ci;
-    
+require_once 'Service.php';
+
+class ErrorCheckService extends Service {
     private $fromnodes;
     private $tonodes;
     private $numpaths;
@@ -10,7 +10,7 @@ class ErrorCheckService {
     private $loops;
     
     public function __construct() {
-        $this->ci =& get_instance();
+        parent::__construct();
     }
     
     public function checkForErrors($keyid, $tempfilename, $delimiter) {
@@ -213,6 +213,7 @@ class ErrorCheckService {
         $htmltable[] = '</table>';
         return implode('', $htmltable);
     }
-    
-    
 }
+
+/* End of file ErrorCheckService.php */
+/* Location: ./libraries/ErrorCheckService.php */

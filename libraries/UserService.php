@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed'); 
 
-class UserService {
-    private $ci;
+require_once 'Service.php';
+
+class UserService extends Service {
     
     public function __construct() {
-        $this->ci =& get_instance();
-        $this->ci->load->helper('curl');
+        parent::__construct();
     }
     
     public function getProjectUsers($project) {
@@ -14,3 +14,6 @@ class UserService {
         return json_decode($result);
     }
 }
+
+/* End of file UserService.php */
+/* Location: ./libraries/UserService.php */
