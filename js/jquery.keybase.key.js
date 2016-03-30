@@ -64,7 +64,6 @@
 
     var rootNodeID;
     var next_id;
-    //var nested_sets;
     var keyNodes;
     var current_node;
 
@@ -192,9 +191,7 @@
                     }
 
                     if (action === "bracketedKey") {
-                        console.log(action);
                         bracketedKey();
-                        console.log(filter_items);
                         settings.bracketedKeyDisplay(json);
                     }
 
