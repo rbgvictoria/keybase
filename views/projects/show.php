@@ -169,9 +169,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <?php if ($userid && in_array($userid, $prmanagers)): ?>
-                                <p>
-                                    <?=anchor('key/addprojectuser/' . $project->project_id, 'Add another user', array('class'=>'btn btn-default')); ?>
-                                </p>
+                                <button class="btn btn-default" data-toggle="modal" data-target="#addProjectUserModal">Add another user</button>
                                 <?php endif; ?>
                             </div>
                             <div class="col-md-8">
@@ -181,7 +179,7 @@
                                         <td><?=$user->full_name?></td>
                                         <td><?=$user->role?></td>
                                         <?php if (in_array($userid, $prmanagers)): ?>
-                                        <td><?=anchor('key/deleteprojectuser/' . $user->project_user_id, '<i class="fa fa-trash-o"></i>', array('title' => 'Remove ' . $user->full_name)); ?></td>
+                                        <td><?=anchor('#' . $user->project_user_id, '<i class="fa fa-trash-o"></i>', array('class' => 'delpu', 'title' => 'Remove ' . $user->full_name)); ?></td>
                                         <?php endif; ?>
                                     </tr>
                                     <?php endforeach; ?>

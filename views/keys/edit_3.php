@@ -5,7 +5,8 @@
                         'projectid' => $key->project->project_id,
                         'tempfilename' => $tempfilename,
                         'delimiter' => $delimiter,
-                        'referer' => $referer
+                        'referer' => $referer,
+                        'key_metadata' => $key_metadata
                     ));
                 ?>
                 <?php if ($errors): ?>

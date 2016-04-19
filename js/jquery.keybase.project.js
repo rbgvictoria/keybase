@@ -54,7 +54,7 @@
     };
 
     $.fn.keybaseProject.defaults = {
-        baseUrl: "http://data.rbg.vic.gov.au/dev/keybase-ws/ws/project_get/",
+        baseUrl: "http://data.rbg.vic.gov.au/keybase-ws/ws/project_get/",
         filter: [],
         treeDiv: 'tree',
         listDiv: 'list',

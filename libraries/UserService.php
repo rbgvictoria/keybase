@@ -9,7 +9,7 @@ class UserService extends Service {
     }
     
     public function getProjectUsers($project) {
-        $url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/project_users/' . $project;
+        $url = $this->ws_url() . 'ws/project_users/' . $project;
         $result = doCurl($url, FALSE, TRUE);
         return json_decode($result);
     }

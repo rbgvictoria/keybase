@@ -96,13 +96,13 @@
             <?php endif;?>
             
             <div class="tab-pane" role="tabpanel" id="export">
-                <?php $wsUrl = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/'; ?>
+                <?php $wsUrl = $this->config->item('ws_url'); ?>
                 <div class="btn-group" role="group">
-                    <a href="<?=$wsUrl?>export/csv/<?=$key->key_id?>/" class="btn btn-default">CSV</a>
-                    <a href="<?=$wsUrl?>export/txt/<?=$key->key_id?>/" class="btn btn-default">TXT</a>
-                    <a href="<?=$wsUrl?>export/lpxk/<?=$key->key_id?>/" class="btn btn-default">LPXK</a>
-                    <a href="<?=$wsUrl?>export/sdd/<?=$key->key_id?>/" class="btn btn-default">SDD</a>
-                    <a href="<?=$wsUrl?>key/<?=$key->key_id?>/" class="btn btn-default">KeyBase format (JSON)</a>
+                    <a href="<?=$wsUrl?>ws/export/csv/<?=$key->key_id?>/" class="btn btn-default">CSV</a>
+                    <a href="<?=$wsUrl?>ws/export/txt/<?=$key->key_id?>/" class="btn btn-default">TXT</a>
+                    <a href="<?=$wsUrl?>ws/export/lpxk/<?=$key->key_id?>/" class="btn btn-default">LPXK</a>
+                    <a href="<?=$wsUrl?>ws/export/sdd/<?=$key->key_id?>/" class="btn btn-default">SDD</a>
+                    <a href="<?=$wsUrl?>ws/key_get/<?=$key->key_id?>/" class="btn btn-default">KeyBase format (JSON)</a>
                 </div>
             </div>
             

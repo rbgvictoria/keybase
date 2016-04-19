@@ -19,6 +19,8 @@ class KeyBase extends CI_Controller {
         $this->data['js'] = array();
         $this->data['iehack'] = FALSE;
         
+        $this->output->enable_profiler();
+        
     }
     
     public function index() {
@@ -37,7 +39,7 @@ class KeyBase extends CI_Controller {
     }
 
     public function ws_url() {
-        return 'http://data.rbg.vic.gov.au/dev/keybase-ws/';
+        return $this->config->item('ws_url');
     }
     
     public function st() {
@@ -71,7 +73,7 @@ class KeyBase extends CI_Controller {
         if (!(isset($this->session->userdata['id']) && in_array($this->session->userdata('id'), array(1, 2)))) exit;
         if ($this->input->post('submit')) {
             $this->staticcontent->createNewStaticPage($this->input->post());
-            redirect('key/st/' . $this->input->post('uri') . '/_edit');
+            redirect('keybase/st/' . $this->input->post('uri') . '/_edit');
         }
         
         $this->load->view('static/create', $this->data);

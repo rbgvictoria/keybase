@@ -9,7 +9,7 @@ class Service {
     }
     
     public function ws_url() {
-        return 'http://data.rbg.vic.gov.au/dev/keybase-ws/';
+        return $this->ci->config->item('ws_url');
     }
 }
 

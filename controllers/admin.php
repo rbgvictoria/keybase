@@ -45,7 +45,7 @@ class Admin extends CI_Controller {
                 redirect($this->input->post('referer'));
             }
             else 
-                redirect('key');
+                redirect(site_url());
         else $message = 'Authentication failed';
         $this->load->view('admin/message', array("message" => $message));
     }

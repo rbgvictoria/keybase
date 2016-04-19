@@ -105,7 +105,7 @@ $(function() {
      */
     if (location.href.indexOf('keys/show/') > -1) {
         $.fn.keybaseProject.defaults.projectIconBaseUrl = base_url + "images/projecticons/";
-        $.fn.keybaseProject.defaults.baseUrl = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/project_get/';
+        $.fn.keybaseProject.defaults.baseUrl = wsUrl + '/ws/project_get/';
         
         var key = new Key();
         
@@ -142,7 +142,7 @@ $(function() {
         if ($.isNumeric(proj.project)) {
             if ($('[name=keybase-user-id]').length > 0) {
                 proj.keybase_user_id = $('[name=keybase-user-id]').val();
-                var url = 'http://data.rbg.vic.gov.au/dev/keybase-ws/ws/project_user_get/' + proj.project;
+                var url = wsUrl + '/ws/project_user_get/' + proj.project;
                 $.ajax({
                     url: url,
                     success: function(data) {
@@ -203,6 +203,8 @@ $(function() {
                     contentType: 'application/x-www-form-urlencoded; charset=utf-8'
                 });
             });
+            
+            proj.addProjectUserModal();
         }
     }
     
@@ -250,23 +252,6 @@ $(function() {
                 $(this).parents('div.key').find('ul').css('display', 'none');
                 $(this).html('[+]');
             }
-        });
-
-        $('input#import').click(function(e) {
-            e.preventDefault();
-            $(this).colorbox({
-                opacity: 0.40, 
-                transition: 'elastic', 
-                speed: 100,
-                href: site_url + '/key/importglobalfilter',
-                innerWidth: 860,
-                innerHeight: 580,
-                close: 'close',
-                onLoad: function() {
-                    $('#cboxClose').hide();
-                }
-            });
-
         });
 
         $('select#filter').focus();
@@ -327,7 +312,7 @@ var Key = function() {
         }
 
         $.fn.keybase(action, {
-            baseUrl: base_url + "ws/keyJSON",
+            baseUrl: wsUrl + "/ws/key_get",
             playerDiv: '#keybase-player',
             indentedKeyDiv: '#keybase-indented',
             bracketedKeyDiv: '#keybase-bracketed',
@@ -716,6 +701,7 @@ var Project = function() {
 
     this.keysHierarchical = function(filter) {
         $.fn.keybaseProject('keysHierarchical', {
+            baseUrl: wsUrl + '/ws/project_get/',
             project: that.project,
             filter: filter,
             keyLinkClick: that.keyLinkClick
@@ -725,6 +711,7 @@ var Project = function() {
 
     this.keysAlphabetical = function(filter) {
         $.fn.keybaseProject('keysAlphabetical', {
+            baseUrl: wsUrl + '/ws/project_get/',
             project: that.project,
             filter: filter,
             keyLinkClick: that.keyLinkClick,
@@ -948,6 +935,99 @@ var Project = function() {
             return FALSE;
         });
     };
+    
+    this.addProjectUserModal = function() {
+        var template = heredoc(function() {/*
+            <div class="modal fade" id="addProjectUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Add project user</h4>
+                  </div>
+                  <div class="modal-body">
+                    <p><select id="user_id" class="form-control"></select></p>
+                    <p><select id="role" class="form-control">
+                      <option value="User">User</option>
+                      <option value="Manager">Manager</option>
+                    </select></p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default add-project-user">OK</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            */});
+        $('<div/>', {
+            html: template
+        }).appendTo('body');
+        
+        var projectUserModal = $('#addProjectUserModal');
+        
+        // http://stackoverflow.com/questions/25464562/load-json-data-into-a-bootstrap-modal
+        $.ajax({
+            url: wsUrl + '/ws/users_get',
+            success: function(data) {
+                var options = [];
+                options.push('<option/>');
+                $.each(data, function(index, item) {
+                    var option = '<option value="' + item.user_id + '">' + item.full_name + '</option>';
+                    options.push(option);
+                });
+                projectUserModal.find('#user_id').html(options);
+            }
+        });
+        
+        $('button.add-project-user').on('click', function() {
+            var user = $('#addProjectUserModal #user_id').val();
+            var role = $('#addProjectUserModal #role').val();
+            if (user.length) {
+                var data = {
+                    user: user,
+                    role: role,
+                    project: that.project,
+                    keybase_user_id: that.keybase_user_id
+                };
+                $.ajax({
+                    url: wsUrl + '/ws/project_user_put',
+                    type: 'POST',
+                    data: data,
+                    success: function(data) {
+                        if (data !== undefined) {
+                            var name = projectUserModal.find('#user_id').eq(0).children('[value=' + user + ']').eq(0).html();
+                            var rol = role === 'User' ? 'Contributor' : role;
+                            var row = '<tr>';
+                            row += '<td>' + name + '</td>';
+                            row += '<td>' + rol + '</td>';
+                            row += '<td><a href="#' + user + '" class="delpu" title="Remove ' + data + '"><i class="fa fa-trash-o"></i></a>';
+                            row += '</tr>';
+                            $('#projectusers table').append(row);
+                        }
+                        projectUserModal.modal('hide');
+                    }
+                });
+            }
+        });
+        
+        $('#projectusers').on('click', '.delpu', function(e) {
+            e.preventDefault();
+            var target = $(this);
+            var href = target.attr('href');
+            var id = href.substring(1);
+            $.ajax({
+                url: wsUrl + '/ws/project_user_delete/' + id,
+                type: 'POST',
+                data: {
+                    keybase_user_id: that.keybase_user_id,
+                    project: that.project
+                }
+            });
+            target.parents('tr').eq(0).remove();
+        });
+        
+    };
 };
 
 var Filter = function() {
@@ -1148,3 +1228,13 @@ var Filter = function() {
         return arr.join('&');
     };
 })(jQuery);
+
+/**
+ * @description HEREDOC for Javascript; source:
+ *   http://stackoverflow.com/questions/4376431/javascript-heredoc#answer-14496573
+ * @param {string} f
+ * @returns (string)
+ */
+var heredoc = function(f) {
+    return f.toString().match(/\/\*\s*([\s\S]*?)\s*\*\//m)[1];
+};

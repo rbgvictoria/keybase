@@ -90,7 +90,7 @@
                 <?php if ($this->session->userdata('name')): ?>
                     <?=form_hidden('keybase-user-id', $this->session->userdata('id')); ?>
                     <?=$this->session->userdata['name']?> |
-                    <?=anchor(base_url() . 'key/st/manage-account', 'Manage account')?> |
+                    <?=anchor(base_url() . 'keybase/st/manage-account', 'Manage account')?> |
                     <?=anchor(base_url() . 'admin/logout', 'Log out')?>
                 <?php else: ?>
                     <?=anchor(base_url() . 'admin/login', 'Log in')?> |

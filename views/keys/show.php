@@ -35,13 +35,7 @@
             </div>
         </div> <!-- /.col -->
 
-        <!--div class="col-md-12">
-            <?php //require_once 'views/includes/globalfilter.php'; ?>
-        </div --> <!-- /.col -->
-
         <div class="col-md-12">    
-
-
             <div id="keypage_header" class="clearfix">
                 <?php if($key->project): ?>
                 <div id="projecticon" class="pull-left">
