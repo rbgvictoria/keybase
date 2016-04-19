@@ -113,7 +113,7 @@
             <div class="form-group is_required">
                 <?php
                     $data = array(
-                        'name' => 'changes_comment',
+                        'name' => 'change_comment',
                         'id' => 'change_comment',
                         'class' => 'form-control'
                     );
