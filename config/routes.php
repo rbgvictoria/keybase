@@ -38,7 +38,7 @@
 |
 */
 
-$route['default_controller'] = "key";
+$route['default_controller'] = "keybase";
 $route['404_override'] = '';
 
 

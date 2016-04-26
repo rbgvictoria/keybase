@@ -36,7 +36,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.toolbarStartupExpanded = true;
     
     config.stylesSet = 'custom_styles';
-    config.contentsCss = 'http://keybase.rbg.vic.gov.au/dev/css/ckeditor_styles.css';
+    config.contentsCss = base_url + 'css/ckeditor_styles.css';
     
     //config.pasteFromWordRemoveStyles = false;
 };

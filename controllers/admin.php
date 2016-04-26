@@ -20,7 +20,8 @@ class Admin extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('captcha');
-        $this->output->enable_profiler(true);
+        $this->load->helper('versioning');
+        $this->output->enable_profiler(false);
         $this->load->model('authenticationmodel');
     }
 
@@ -33,7 +34,7 @@ class Admin extends CI_Controller {
             $this->data['referer'] = $_SERVER['HTTP_REFERER'];
         else
             $this->data['referer'] = FALSE;
-        $this->load->view('login', $this->data);
+        $this->load->view('admin/login', $this->data);
     }
 
     function authenticate(){
@@ -44,12 +45,12 @@ class Admin extends CI_Controller {
                 redirect($this->input->post('referer'));
             }
             else 
-                redirect('key');
+                redirect(site_url());
         else $message = 'Authentication failed';
-        $this->load->view('message', array("message" => $message));
+        $this->load->view('admin/message', array("message" => $message));
     }
     else 
-        $this->load->view('message', array('message' => "Username or password not filled in"));
+        $this->load->view('admin/message', array('message' => "Username or password not filled in"));
     }
 
     function logout(){
@@ -93,7 +94,7 @@ class Admin extends CI_Controller {
         
         $this->data['captcha'] = $this->captcha();
         
-        $this->load->view('registrationview', $this->data);
+        $this->load->view('admin/registration', $this->data);
     }
     
     public function captcha() {
@@ -101,8 +102,10 @@ class Admin extends CI_Controller {
             'word' => $this->authenticationmodel->getCaptchaWord(),
             'img_path' => './captcha/',
             'img_url' => base_url() . 'captcha/',
-            'img_width' => 200,
-            'img_height' => 30
+            'img_width' => 280,
+            'img_height' => 40,
+            'font_size' => 20,
+            'font_path' => '/var/www/lib/CodeIgniter_2.1.4/system/fonts/texb.ttf'
         );
         $captcha = create_captcha($vals);
         $this->authenticationmodel->storeCaptcha($captcha);

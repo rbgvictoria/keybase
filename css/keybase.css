@@ -1,9 +1,636 @@
-@import url('default.css');
-@import url('banner.css');
-@import url('footer.css');
-@import url('tabmenu.css');
-@import url('keypanel.css');
-@import url('htmlkeys.css');
-@import url('homepage.css');
-@import url('projectpage.css');
-@import url('localfilter.css');
+
+
+h3 {
+    font-size: 20px;
+}
+
+a {
+    clor: #88a4cb;
+}
+
+/* Bootstrap sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 80px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+  margin-top: 20px;
+  background-color: #eeeeee;
+}
+
+a {
+    color: #6599C1;
+}
+
+
+/* Override bootstrap
+**************************************/
+.text-left {
+    text-align: left !important;
+}
+
+select.form-control option {
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Bootstrap form
+**************************************/
+.is-required {
+    position: relative;
+}
+
+.is-required .form-control {
+    padding-right: 42.5px;
+}
+
+.is-required label~.form-control-required {
+    top: 25px;
+}
+
+.is_required label~div>.form-control-required {
+    right: 10px;
+}
+
+.form-control-required {
+    font-size: 50%;
+}
+
+.form-control-required {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    display: block;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Top navigation
+**************************************/
+#keybase-navigation {
+    margin-bottom: 0;
+}
+
+/* Login
+**************************************/
+div.login {
+    float: right;
+    color: #fff;
+}
+
+.login a {
+    color: #fff;
+}
+
+/* Page header/banner
+**************************************/
+.keybase .page-header {
+    margin-top: 0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.keybase .page-header, .keybase-player-window h3 {
+    background-image: url('media/banner_gradient.jpg'); background-repeat: repeat-x; /* fallback image */
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#2688c9), to(#89a1bb)); /* Safari 4+, Chrome 1-9 */
+    background-image: -webkit-linear-gradient(top, #2688c9, #89a1bb); /* Safari 5.1+, Mobile Safari, Chrome 10+ */
+    background-image: -moz-linear-gradient(top, #2688c9, #89a1bb); /* Firefox 3.6+ */
+    background-image: -ms-linear-gradient(top, #2688c9, #89a1bb); /* IE 10+ */
+    background-image: -o-linear-gradient(top, #2688c9, #89a1bb); /* Opera 11.10+ */
+    background-image: linear-gradient(top, #89a1bb, #2688c9);
+}
+
+#logo, #name-and-subtitle {
+    float: left;
+}
+
+#logo {
+    margin-top: 15px;
+    margin-right: 15px;
+}
+
+#logo img {
+    height: 100px;
+}
+
+#name-and-subtitle {
+    padding: 0 0 2rem 0;
+}
+
+.keybase #site-name {
+    margin-top: -10px;
+}
+
+.keybase #site-name a {
+    font-size: 80px;
+    color: #fff;
+    letter-spacing: -2px;
+}
+
+#site-name a:hover {
+    text-decoration: none;
+}
+
+#subtitle {
+    color: #fff;
+    font-size: 30px;
+    line-height: 0;
+}
+
+/* Home page
+*********************************/
+#project-box {
+    height: 400px;
+}
+
+#project-box .project {
+    clear: both;
+}
+
+.project a.project_link {
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: none;
+}
+
+.project .projectbutton {
+    display: block;
+    float: left;
+    width: 82px;
+    height: 82px;
+    background-image: url('media/project_button_face.jpg');
+    background-repeat: no-repeat; 
+}
+
+.project .projectbutton img {
+    padding: 11px;
+}
+
+.project .projectdata {
+    display: block;
+    float: left;
+    padding-left: 10px;
+    height: 100%;
+}
+
+.project .pstats, .project .pname {
+    display: block;
+}
+
+span.pname {
+    color: #2688cb;
+    font-weight: bold;
+    padding-top: 15px;
+}
+
+span.pstats {
+    color: #88a4cb;
+    padding-top: 15px;
+    padding-bottom: 20px;
+}
+
+/* Key and project page headers
+********************************/
+#keypage_header #projecticon, #project-page-header #projecticon {
+    width: 60px;
+    margin: 15px 15px 15px 0;
+}
+
+#project-page-header>div {
+    float: left;
+}
+
+#keypage_header img, #project-page-header img {
+    margin-top: 15px;
+}
+
+#project-page-header {
+    margin-bottom: 20px;
+}
+
+#keypage_header #keyid {
+    display: none;
+}
+
+
+/* Project tabs
+**********************************/
+.keybase .tab-pane {
+    margin-top: 20px;
+}
+
+.add-key {
+    margin-top: 5px;
+}
+
+.nav-tabs.navbar-right {
+    border-bottom: none;
+}
+
+.nav-tabs.navbar-right~.tab-content {
+    clear: both;
+    border-top: solid 1px #ddd;
+}
+
+.keybase .nav-tabs li {
+    width: 144px;
+    border: none;
+    outline-color: transparent;
+}
+
+.keybase .nav-tabs li.active {
+    /*background-image: url('media/tab_active.png');*/
+}
+
+.keybase .nav-tabs li a {
+    padding-left: 40px;
+    background-position: 8px 10px;
+    background-repeat: no-repeat;
+}
+
+#project_tabs .nav-tabs li a[href="#about"], #key_tabs .nav-tabs li a[href="#about"] {
+    background-image: url('media/tab_icon_about.png');
+}
+
+#project_tabs .nav-tabs li a[href="#keys_alphabetical"] {
+    background-image: url('media/tab_icon_list.png');
+}
+
+#project_tabs .nav-tabs li a[href="#keys_hierarchy"], #key_tabs .nav-tabs li a[href="#indented"] {
+    background-image: url('media/tab_icon_indented.png');
+}
+
+#project_tabs .nav-tabs li a[href="#projectusers"] {
+    background-image: url('media/tab_icon_contributors.png');
+}
+
+#key_tabs .nav-tabs li a[href="#projectusers"] {
+    background-image: url('media/tab_icon_contributors.png');
+}
+
+#key_tabs .nav-tabs li a[href="#player"] {
+    background-image: url('media/tab_icon_player.png');
+}
+
+#key_tabs .nav-tabs li a[href="#bracketed"] {
+    background-image: url('media/tab_icon_bracketed.png');
+}
+
+
+/* Project: keys hierarchy
+********************************************/
+#tree ul.dynatree-container {
+    border: 0;
+}
+
+/* Project: keys list
+********************************************/
+.edit-key, .delete-key {
+    color: #666;
+}
+
+/* Search: limit max. height of auto-complete list
+********************************************/
+ul.ui-autocomplete {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Search result
+********************************************/
+body.search .search-result {
+    margin: 5px 0 15px;
+    padding: 5px 0;
+}
+
+body.keybase.search .search-result .project-icon {
+    float: left;
+    margin-right: 15px;
+    margin-top: 15px;
+}
+
+/* File upload for Bootstrap 3
+********************************************/
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+#selected-file {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* Delete key
+******************************************/
+#key-to-delete {
+    margin: 20px auto;
+}
+
+#key-to-delete span {
+    display: inline-block;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+/* CK Editor 
+******************************************/
+span.cke_toolgroup {
+    height: 28px;
+}
+
+/* KeyBase player
+******************************************/
+#keybase-player {
+    margin: 20px 0;
+}
+
+.keybase-player-menu .keybase-player-startover,
+.keybase-player-menu .keybase-player-stepback,
+.keybase-player-filter, .keybase-player-filter-remove {
+    background-image: none;
+    background-color: #ddd;
+    border: solid 1px #999;
+    border-radius: 5px;
+    margin-left: 3px;
+}
+
+.keybase-player-menu .keybase-player-startover a,
+.keybase-player-menu .keybase-player-stepback a,
+.keybase-player-filter a, .keybase-player-filter-remove a {
+    position: relative;
+    top: -2px;
+    background-image: none;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    color: #5093c3
+}
+
+/* KeyBase footer
+*******************************************/
+span.powered-by~a {
+    color: #d7bb44;
+    font-size: 18px;
+}
+
+span.powered-by {
+    position: relative;
+    top: -5px;
+    margin-right: 10px;
+    color: #777;
+}
+
+/* Error checking
+******************************************/
+table.detect-delimiter td:last-child,
+.error_table td:last-child {
+    text-align: right;
+    vertical-align: bottom;
+}
+
+.errors, .warnings {
+    padding-top: 5px;
+}
+
+.errors td, .warnings td {
+    width: 140px;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.errors td:first-child, .warnings td:first-child {
+    width: 90px;
+    text-align: left;
+}
+
+tr.too-few-columns>td, td.too-few-columns {
+    background-color: #ff0000;
+}
+
+td.loops {
+    background-color: rgb(225, 75, 75);
+}
+
+td.singleton-leads {
+    background-color: rgb(225, 150, 75);
+}
+
+td.polytomies {
+    background-color: rgb(110, 225, 125);
+}
+
+td.orphan-couplets {
+    background-color: rgb(240,240,125);
+}
+
+td.dead-ends {
+    background-color: rgb(220, 75, 175);
+}
+
+td.possible-dead-ends {
+    background-color: rgb(220, 196, 75);
+}
+
+td.reticulations {
+    background-color: rgb(100, 150, 200);
+}
+
+td.endnode {
+    font-weight: bold;
+    color: #104e88;
+}
+
+td.will-not-key-out {
+    font-weight: bold;
+    color: #c300ff;
+}
+
+.error_table {
+    padding-top: 10px;
+}
+
+/* Filters page
+***************************************/
+select#filter {
+    border: none;
+    overflow: visible;
+}
+
+ul.keybase-filter {
+    height: 100%;
+    overflow-y: auto;
+    padding-left: 0;
+    font-size: 14px;
+    font-family: helvetica, arial;
+}
+
+ul.keybase-filter ul {
+    padding-left: 18px;
+}
+
+ul.keybase-filter li {
+    list-style-type: none;
+    line-height: 1.3;
+}
+
+.keybase-filter-key-name {
+    display: inline-block;
+}
+
+.keybase-filter a {
+    color: #6599C1;
+}
+
+.keybase-filter-key-num-items {
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.keybase-filter-key-num-items.collapse {
+    display: inline;
+}
+
+.keybase-filter-key-items {
+    display: none;
+    padding-left: 40px;
+    font-size: 13px;
+}
+
+.fa.expand, .fa.collapse, .fa.no-children {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 80%;
+}
+
+.fa.no-children {
+    color: transparent;
+}
+
+.keybase-filter .fa-folder-open-o, .keybase-filter .fa-folder-o {
+    color: #666;
+    /*margin-right: 3px;
+    margin-left: 3px;*/
+}
+
+.keybase-filter-first>span {
+    font-weight: bold;
+}
+
+#globalfilter-keys .fa-spinner {
+    color: #6599C1;
+}
+
+div#keybase-filter-item-toggle {
+    position: absolute;
+    right: 15px;
+}
+
+ul#project-filters, ul#my-filters {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ul#project-filters li, ul#my-filters li {
+    color: #6599C1;
+}
+
+ul#project-filters>li>a, ul#my-filters>li>a {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+ul#project-filters>li>ul a {
+    padding: 5px;
+}
+
+ul#project-filters>li>ul {
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+#project-filters>li>ul>li>a:focus {
+    outline: solid 1px #337ab7;
+}
+
+div#project-filters {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#globalfilter-keys .fa-minus-square-o~span, 
+#globalfilter-keys .fa-plus-square-o~span {
+    margin-left: 2px;
+}
+
+.keybase-spinner {
+    color: #0088cc;
+}
+
+/* Make sure buttons that are first or last  in a form-group align properly 
+***************************************/
+.form-group .btn:first-child, .form-group .checkbox:first-child {
+    margin-left: 15px;
+}
+
+.form-group .btn:last-child {
+    margin-right: 15px;
+}
+
+/* Key metadata about
+***************************************/
+.kb-meta {
+    margin-top: 30px;
+    border-top: solid 1px #ccc;
+    padding-top: 10px;
+}
+
+/* Project table
+****************************************/
+.keybase-project-table tr td:first-child {
+    width: 40px;
+}
+
+.keybase-project-table tr td:first-child img {
+    width: 40px;
+    height: 40px;
+}
+
+.keybase-project-table.table td {
+    vertical-align: middle;
+}

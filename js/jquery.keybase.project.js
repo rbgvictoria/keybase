@@ -1,341 +1,231 @@
-var json;
-var hierarchy;
+/**
+ * Created by NKlaze on 10/04/2015.
+ */
+;(function ( $ ) {
+    var json;
+    var settings;
+    var hierarchy;
+    var alphabetical;
+    
+    $.fn.keybaseProject = function(action, options) {
+        $.fn.keybaseProject.getters = {
+            projectKeyTree: function() { return hierarchy; },
+            projectKeyList: function() { return alphabetical; }
+        };
 
+        settings = $.extend({}, $.fn.keybaseProject.defaults, options);
 
-
-$(function(){
-    var href = location.href;
-    var base_url;
-    var site_url = href.substr(0, href.indexOf('/key/project'));
-    if (site_url.indexOf('index.php') > 0) {
-        base_url = site_url.substr(0, site_url.indexOf('index.php'));
-    }
-    else {
-        base_url = site_url + '/';
-    }
-    var project = href.substr(href.indexOf('/project/')+9);
-    
-    var tab = $.QueryString['tab'];
-    if (!tab || tab > 3) {
-        tab = 1;
-    }
-    
-    $(function() {
-        $( "#project_tabs" ).tabs({
-            active: tab,
-            heightStyle: "auto" 
-        });
-    });
-    
-    $.fn.keybaseProject.defaults.keyLinkClick = function(keyID) {
-        location.href = site_url + '/key/nothophoenix/' + keyID; 
-    };
-    
-    $.fn.keybaseProject.defaults.projectIconBaseUrl = base_url + "images/projecticons/";
-    
-    $.fn.keybaseProject.defaults.baseUrl = site_url + '/ws/projects/';
-    
-    $('#tree').keybaseProject('keysHierarchical', {
-        params: {
-            project: project
-        }
-    });
-    
-    $('#tree').contextMenu({
-        selector: 'a', 
-        items: {
-            "player": {
-                name: "Key player",
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/nothophoenix/' + hash;
-                }
-            },
-            "bracketed": {
-                name: "Bracketed key",
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/bracketedkey/' + hash;
-                }
-            },
-            "indented": {
-                name: "Indented key",
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/indentedkey/' + hash;
-                }
-            },
-            "about": {
-                name: "About",
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    window.location.href = site_url + '/key/keydetail/' + hash;
-                }
-            },
-            "sep1": "---------",
-            "edit": {
-                name: "Edit", 
-                icon: "edit", 
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    href = site_url + '/key/editkey/' + hash + '/cbox';
-                   $.colorbox({
-                        href: href,
-                        opacity: 0.40, 
-                        transition: 'elastic', 
-                        speed: 100,
-                        innerWidth: 860,
-                        innerHeight: "80%",
-                        close: 'close',
-                        onLoad: function() {
-                            $('#cboxClose').hide();
-                        },
-                        onComplete: function() {
-                            $('#colorbox').addClass('edit-project');
-                            $('#colorbox input[name="cancel"]').click(function(e) {
-                                e.preventDefault();
-                                $.colorbox.close();
-                            });
-                            $('input[type="submit"]').button();
-                        }
-                    });
-                
-                }
-            },
-            "delete": {
-                name: "Delete", 
-                icon: "delete",
-                callback: function(key, options) {
-                    var hash = $(this).attr('href').substr(1);
-                    href = site_url + '/key/deletekey/' + hash + '/cbox';
-                    $.colorbox({
-                        href: href,
-                        opacity: 0.40, 
-                        transition: 'elastic', 
-                        speed: 100,
-                        innerWidth: 400,
-                        innerHeight: 165,
-                        close: 'close',
-                        onLoad: function() {
-                            $('#cboxClose').hide();
-                        },
-                        onComplete: function() {
-                            $('#colorbox').addClass('edit-project');
-                            $('#colorbox button.cancel').click(function(e) {
-                                e.preventDefault();
-                                $.colorbox.close();
-                            });
-                            $('input[type="submit"], button').button();
-                            $('input.ok').focus();
-                            //$('input.ok').click(function(e) {
-                            //    $('form').submit();
-                            //});
-                        }
-                    });
-                }
-            },
-        }
-    });
-    
-    var url = site_url + "/ajax/projectkeys_alphabetical/" + project;
-    $.getJSON(url, function(data) {
-        var list = [];
-        $.each(data, function(index, item) {
-            var entity;
-            entity = "<li class=\"list\"><span class=\"keybase-dynatree-key\"><span class=\"dynatree-icon\"></span><a href=\"" + site_url + "/key/nothophoenix/" + item.KeysID + "\">" + item.Name + "</a></span>";
-            if (item.Edit == 1) {
-                entity += "&nbsp;<a class=\"edit-key\" href=\"" + site_url + "/key/editkey/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_edit.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
-            }
-            if (item.Delete == 1) {
-                entity += "&nbsp;<a class=\"delete-key\" href=\"" + site_url + "/key/deletekey/" + item.KeysID + "\"><img src=\"" + base_url + "css/images/icon_delete.png\" width=\"10\" height=\"12\" alt=\"\"/>" + "</a>";
-            }
-            entity += "</li>";
-            list.push(entity);
-        });
-        $('#list').html('<ul>' + list.join('') + '</ul>');
-
-        /*$("a.edit-key").on('click', function () {
-            var cbox_href = $(this).attr('href');
-            $(this).attr('href', cbox_href + '/cbox');
-            $(this).colorbox({
-                opacity: 0.40, 
-                transition: 'elastic', 
-                speed: 100,
-                innerWidth: 860,
-                innerHeight: "80%",
-                close: 'close',
-                onLoad: function() {
-                    $('#cboxClose').hide();
-                },
-                onComplete: function() {
-                    $('#colorbox').addClass('edit-project');
-                    $('#colorbox input[name="cancel"]').click(function(e) {
-                        e.preventDefault();
-                        $.colorbox.close();
-                    });
-                    $('input[type="submit"]').button();
-                }
-            });
-        });*/
-        
-        $("a.delete-key").on('click', function() {
-            var cbox_href = $(this).attr('href');
-            $(this).attr('href', cbox_href + '/cbox');
-            $(this).colorbox({
-                opacity: 0.40, 
-                transition: 'elastic', 
-                speed: 100,
-                innerWidth: 400,
-                innerHeight: 165,
-                close: 'close',
-                onLoad: function() {
-                    $('#cboxClose').hide();
-                },
-                onComplete: function() {
-                    $('#colorbox').addClass('edit-project');
-                    $('#colorbox button.cancel').click(function(e) {
-                        e.preventDefault();
-                        $.colorbox.close();
-                    });
-                    $('input[type="submit"], button').button();
-                    $('input.ok').focus();
-                    /*$('input.ok').click(function(e) {
-                        $('form').submit();
-                    });*/
-                }
-            });
-            
-            return FALSE;
-            
-        });
-    });
-    
-    $('a[href="#"]').parents('li.key').css('display', 'none');
-    $('a[href!="#"]').parents('li.key').css('display', 'list-item');
-    
-    $('form[name="find_in_tree"]').submit(function(event) {
-        var string = $('#findkey_h').val();
-        $('a.dynatree-title:contains("' + string + '")').first().focus();
-        return false;
-    });
-    
-    $('form[name="find_in_list"]').submit(function(event) {
-        var string = $('#findkey_a').val();
-        $('.list a:contains("' + string + '")').first().focus();
-        return false;
-    });
-    
-    $( "#findkey_h, #findkey_a" ).autocomplete({
-            source: site_url + "/autocomplete/findprojecttaxa/" + project,
-            minLength: 2
-    });
-    
-    $("#edit-project a").click(function () {
-        var cbox_href = $(this).attr('href');
-        $(this).attr('href', cbox_href + '/cbox');
-        $(this).colorbox({
-            opacity: 0.40, 
-            transition: 'elastic', 
-            speed: 100,
-            innerWidth: 860,
-            innerHeight: 580,
-            close: 'close',
-            onLoad: function() {
-                $('#cboxClose').hide();
-            },
-            onComplete: function() {
-                CKEDITOR.replace("description", {
-                    toolbarGroups: [
-                            { groups: ['undo'] },
-                            { items:['Bold', 'Italic', 'RemoveFormat']},
-                            { name: 'links' },
-                            { name: 'document',	   groups: [ 'mode', 'document' ] }
-                    ],
-                    height: 230,
-                    contentsCss: '<?=base_url();?>css/ckeditor_styles.css',
-                    removePlugins: 'autogrow'
-                });
-        
-                $('#colorbox').addClass('edit-project');
-                $('#colorbox input[name="cancel"]').click(function(e) {
-                    e.preventDefault();
-                    $.colorbox.close();
-                });
-                $('input[type="submit"]').button();
-            }
-        });
-    });
-
-    /*$(".add-key a").click(function () {
-        var cbox_href = $(this).attr('href');
-        $(this).attr('href', cbox_href + '/cbox');
-        $(this).colorbox({
-            opacity: 0.40, 
-            transition: 'elastic', 
-            speed: 100,
-            innerWidth: 860,
-            innerHeight: "80%",
-            close: 'close',
-            onLoad: function() {
-                $('#cboxClose').hide();
-            },
-            onComplete: function() {
-                $('#colorbox').addClass('edit-project');
-                $('#colorbox input[name="cancel"]').click(function(e) {
-                    e.preventDefault();
-                    $.colorbox.close();
-                });
-                $('input[type="submit"]').button();
-            }
-        });
-    });*/
-    
-    tabSize();
-    $(window).resize(function() {
-        tabSize();
-    });
-});
-
-function tabSize() {
-    var tabheight = window.innerHeight-345;
-    if (tabheight > 300) {
-        $('.content-right').css({'height': tabheight + 'px', 'overflow': 'auto'});
-    }
-    else {
-        $('.content-right').css({'height': '300px', 'overflow': 'auto'});
-    }
-}
-
-
-
-(function($) {
-    $.QueryString = (function(a) {
-        if (a == "") return {};
-        var b = {};
-        for (var i = 0; i < a.length; ++i)
-        {
-            var p=a[i].split('=');
-            if (p.length != 2) continue;
-            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-        }
-        return b;
-    })(window.location.search.substr(1).split('&'))
-})(jQuery);
-
-$(function(){
-    $.extend({
-        getValues: function(url) {
-            var result = null;
+        if (!json) {
+            var url = settings.baseUrl + settings.project;
+            console.log(url);
             $.ajax({
                 url: url,
-                type: 'get',
-                dataType: 'html',
-                async: false,
-                success: function(data) {
-                    result = data;
+                success:function(data){
+                    json = data;
+
+                    searchList();
+
+                    if (action === "keysHierarchical") {
+                        hierarchical();
+                    }
+                    else {
+                        if (action === "keysAlphabetical") {
+                            alphabeticalList();
+                        }
+                    }
+
+                },
+                complete: function() {
+                    settings.onComplete(json);
                 }
             });
-           return result;
+
         }
-    });    
-});
+        else {
+            if (action === "keysHierarchical") {
+                hierarchical();
+            }
+            else {
+                if (action === "keysAlphabetical") {
+                    alphabeticalList();
+                }
+            }
+        }
+    };
+
+    $.fn.keybaseProject.defaults = {
+        baseUrl: "http://data.rbg.vic.gov.au/keybase-ws/ws/project_get/",
+        filter: [],
+        treeDiv: 'tree',
+        listDiv: 'list',
+        onComplete: function() {}
+    };
+
+    $.fn.keybaseProject.defaults.keyLinkClick = function(keyID) {
+        location.href = '/keybase/keys/show/' + keyID;
+    };
+
+    var hierarchical = function() {
+        if (undefined === hierarchy || !hierarchy) {
+            hierarchy = [];
+            root = {};
+            root.title = json.project_name;
+            root.isFolder = true;
+            root.expand = true;
+            root.children = [];
+
+            if (json.first_key.id !== null) {
+                first_key = JSPath('.keys{.id==' + json.first_key.id + '}', json)[0];
+                var first = $.extend({}, first_key);
+                first.title = first_key.name;
+                first.href = '#' + first_key.id;
+                first.expand = true;
+                delete first.id;
+                delete first.name;
+                delete first.parent_id;
+                root.children.push(first);
+                hierarchicalListNode(first_key.id, first);
+
+                orphan_keys = JSPath('.keys{!.parent_id && .id!=' + first_key.id + '}', json);
+            }
+            else {
+                orphan_keys = JSPath('.keys{!.parent_id}', json);
+            }
+
+            if (orphan_keys) {
+                $.each(orphan_keys, function (index, item) {
+                    var child = $.extend({}, item);
+                    child.title = item.name;
+                    child.href = '#' + item.id;
+                    child.expand = true;
+                    if (settings.filter.length > 0 && settings.filter.indexOf(item.id) === -1) {
+                        child.addClass = 'collapse';
+                    }
+                    delete child.id;
+                    delete child.name;
+                    delete child.name;
+                    delete child.parent_id;
+                    root.children.push(child);
+                    hierarchicalListNode(item.id, child);
+                });
+            }
+
+            hierarchy.push(root);
+            settings.hierarchyDisplay();
+        }
+    };
+    
+    $.fn.keybaseProject.defaults.hierarchyDisplay = function() {
+        elem = $('#' + settings.treeDiv);
+        elem.dynatree({
+            children: hierarchy,
+            data: {mode: "all"},
+            expand: true
+        });
+
+        elem.on('click', 'a.dynatree-title', function (e) {
+            e.preventDefault();
+            var key_id = $(this).attr('href').substr(1);
+            settings.keyLinkClick(key_id);
+        });
+    }
+
+    var hierarchicalListNode = function(parent_id, parent) {
+        var children = JSPath('.keys{.parent_id==' + parent_id + '}', json);
+        parent.children = [];
+        if (children.length > 0) {
+            $.each(children, function(index, key) {
+                if (settings.filter.length === 0 || settings.filter.indexOf(key.id) > -1) {
+                    var child = $.extend({}, key);
+                    child.title = key.name;
+                    child.href = "#" + key.id;
+                    child.expand = true;
+                    delete child.id;
+                    delete child.name;
+                    delete child.parent_id;
+                    parent.children.push(child);
+                    hierarchicalListNode(key.id, child);
+                }
+            });
+        }
+    };
+
+    var  alphabeticalList = function() {
+        alphabetical = [];
+        var root = {};
+        root.title = json.project_name;
+        root.isFolder = true;
+        root.expand = true;
+        root.children = [];
+
+        $.each(JSPath('.keys', json), function(index, item) {
+            if (settings.filter.length === 0 || settings.filter.indexOf(item.id) > -1) {
+                var key = $.extend({}, item);
+                key.title = item.name;
+                delete key.name;
+                key.href = '#' + item.id;
+                delete key.id;
+                delete key.parent_id;
+                key.expand = true;
+                root.children.push(key);
+            }
+        });
+
+        alphabetical.push(root);
+        settings.alphabeticalListDisplay();
+    };
+    
+    $.fn.keybaseProject.defaults.alphabeticalListDisplay = function() {
+        elem = $('#' + settings.listDiv);
+        elem.dynatree({
+            children: alphabetical,
+            data: {mode: "all"},
+            expand: true
+        });
+
+        elem.on('click', 'a.dynatree-title', function(e) {
+            e.preventDefault();
+            var key_id = $(this).attr('href').substr(1);
+            settings.keyLinkClick(key_id);
+        });
+    }
+
+    var  searchList = function() {
+        autocomplete = [];
+        $.each(JSPath('.keys', json), function(index, item) {
+            var term = $.extend({}, item);
+            term.value = item.id;
+            term.label = item.taxonomic_scope.name;
+            delete term.id;
+            delete term.parent_id;
+            delete term.name;
+            delete term.taxonomic_scope;
+            autocomplete.push(term);
+        });
+
+        autocomplete.sort(function(a, b) {
+            if (a.label < b.label)
+                return -1;
+            if (a.label > b.label)
+                return 1;
+            return 0;
+        });
+
+
+        $( "#taxonomicScopeSearch" ).autocomplete({
+            minLength: 1,
+            source: autocomplete,
+            focus: function( event, ui ) {
+                $( "#taxonomicScopeSearch" ).val( ui.item.label );
+                return false;
+            },
+            select: function( event, ui ) {
+                $( "#taxonomicScopeSearch" ).val( ui.item.label );
+                $( "#search-project-id" ).val( ui.item.value );
+                return false;
+            }
+        });
+    };
+
+
+}( jQuery ));
