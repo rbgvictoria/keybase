@@ -39,8 +39,11 @@
             <div id="keypage_header" class="clearfix">
                 <?php if($key->project): ?>
                 <div id="projecticon" class="pull-left">
-                    <?php $default = base_url() . 'images/projecticons/project_icon_default.png'; ?>
-                    <img src="<?=($key->project->project_icon) ? $key->project->project_icon : $default; ?>" alt=""/>
+                    <?php 
+                        $default = base_url() . 'images/projecticons/project_icon_default.png'; 
+                        $src = ($key->project->project_icon) ? $key->project->project_icon : '/images/projecticons/project_icon_default.png';
+                    ?>
+                    <img src="<?=$src?>" alt="" title="<?=$src?>"/>
                 </div>
                 <?php endif; ?>
                 <div id="title">

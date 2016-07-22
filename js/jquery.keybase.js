@@ -19,7 +19,7 @@ else {
     site_url = base_url.substr(0, base_url.length -1);
 }
 
-var wsUrl = 'http://data.rbg.vic.gov.au/dev/keybase-ws';
+var wsUrl = 'http://data.rbg.vic.gov.au/keybase-ws';
 
 
 $(function() {

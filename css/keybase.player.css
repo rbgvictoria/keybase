@@ -328,3 +328,7 @@ select[name=includedItems], select[name=excludedItems] {
     text-align: right;
     margin-bottom: -25px;
 }
+
+.keybase-to-item {
+    font-weight: bold;
+}

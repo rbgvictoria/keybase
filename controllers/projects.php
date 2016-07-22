@@ -34,7 +34,6 @@ class Projects extends KeyBase {
     
     public function edit($project=false, $cbox=false) {
         $this->data['js'][] = 'http://www.rbg.vic.gov.au/dbpages/lib/ckeditor/ckeditor.js';
-        $this->data['js'][] = base_url() . autoVersion('js/jquery.keybase.editproject.js');
         $this->output->enable_profiler(false);
         if (!$project) {
             redirect('projects');

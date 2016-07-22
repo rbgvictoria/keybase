@@ -19,8 +19,6 @@ class KeyBase extends CI_Controller {
         $this->data['js'] = array();
         $this->data['iehack'] = FALSE;
         
-        $this->output->enable_profiler();
-        
     }
     
     public function index() {
