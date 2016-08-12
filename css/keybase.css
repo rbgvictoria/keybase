@@ -463,6 +463,10 @@ td.dead-ends {
     background-color: rgb(220, 75, 175);
 }
 
+td.link-to-errors {
+    background-color: #ffcccc;
+}
+
 td.possible-dead-ends {
     background-color: rgb(220, 196, 75);
 }

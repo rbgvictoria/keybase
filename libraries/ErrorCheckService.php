@@ -6,7 +6,8 @@ class ErrorCheckService extends Service {
     private $fromnodes;
     private $tonodes;
     private $numpaths;
-    private $endnotes;
+    private $endnodes;
+    private $linkTos;
     private $loops;
     
     public function __construct() {
@@ -37,6 +38,7 @@ class ErrorCheckService extends Service {
         $path = array();
         $this->numpaths = 0;
         $this->endnodes = array();
+        $this->linkTos = array();
         $this->loops = array();
         
         $this->traverseKey($path, $unique_nodes[0]);
@@ -87,6 +89,9 @@ class ErrorCheckService extends Service {
                     if (is_numeric($row[2])) {
                         $errors['dead-ends'][] = $k;
                     }
+                    elseif (in_array($row[2], $this->linkTos)) {
+                        $errors['link-to-errors'][] = $k;
+                    }
                     elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', str_replace('×', '', $row[2])) || preg_match('/^[A-Z]{1,1}[a-z]+$/', str_replace('×', '', $row[2])))) {
                         $warnings['possible-dead-ends'][] = $k;
                     }
@@ -128,6 +133,12 @@ class ErrorCheckService extends Service {
                     //echo implode('->', $endpath) . '<br/>';
                     $this->numpaths++;
                     $this->endnodes[$lead] = $goto;
+                    if (strpos($goto, '{')) {
+                        $linkTo = trim(substr($goto, strpos($goto, '{') + 1, strpos($goto, '}') - strpos($goto, '{') - 1));
+                        if (!in_array($linkTo, $this->linkTos)) {
+                            $this->linkTos[] = $linkTo;
+                        }
+                    }
                 }
             }
         }
@@ -181,7 +192,7 @@ class ErrorCheckService extends Service {
                 $htmltablerow[] = '<td>' . $lead[1] . '</td>';
                 
                 if (in_array($lead[3], array(
-                    'loops', 'reticulations',
+                    'loops', 'reticulations', 'link-to-errors',
                     'dead-ends',
                     'possible-dead-ends',
                     'will-not-key-out'
