@@ -98,11 +98,11 @@
             <div class="tab-pane" role="tabpanel" id="export">
                 <?php $wsUrl = $this->config->item('ws_url'); ?>
                 <div class="btn-group" role="group">
-                    <a href="<?=$wsUrl?>ws/export/csv/<?=$key->key_id?>/" class="btn btn-default">CSV</a>
-                    <a href="<?=$wsUrl?>ws/export/txt/<?=$key->key_id?>/" class="btn btn-default">TXT</a>
-                    <a href="<?=$wsUrl?>ws/export/lpxk/<?=$key->key_id?>/" class="btn btn-default">LPXK</a>
-                    <a href="<?=$wsUrl?>ws/export/sdd/<?=$key->key_id?>/" class="btn btn-default">SDD</a>
-                    <a href="<?=$wsUrl?>ws/key_get/<?=$key->key_id?>/" class="btn btn-default">KeyBase format (JSON)</a>
+                    <a href="<?=site_url()?>keys/export/<?=$key->key_id?>?format=csv" class="btn btn-default">CSV</a>
+                    <a href="<?=site_url()?>keys/export/<?=$key->key_id?>?format=txt" class="btn btn-default">TXT</a>
+                    <a href="<?=site_url()?>keys/export/<?=$key->key_id?>?format=lpxk" class="btn btn-default">LPXK</a>
+                    <a href="<?=site_url()?>keys/export/<?=$key->key_id?>?format=sdd" class="btn btn-default">SDD</a>
+                    <a href="<?=$wsUrl?>ws/key_get/<?=$key->key_id?>" class="btn btn-default">KeyBase format (JSON)</a>
                 </div>
             </div>
             

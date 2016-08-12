@@ -90,20 +90,37 @@
                                 </div>
 
                                 <div class="form-group">
-                                <?php
-                                    $data = array(
-                                        'name' => 'taxa',
-                                        'id' => 'taxa',
-                                        'value' => '',
-                                        'rows' => 10,
-                                        'placeholder' => 'Enter taxon names, one per line, like you would expect to find them in KeyBase, i.e. without authorship',
-                                        'class' => 'form-control'
-                                    );
-                                ?>
-                                <?=form_label('Taxa', 'taxa', array('class' => 'col-sm-2 form-label'))?>
-                                <div class="col-sm-10">
-                                    <?=form_textarea($data)?>
-                                </div>
+                                    <?php
+                                        $data = array(
+                                            'name' => 'taxa',
+                                            'id' => 'taxa',
+                                            'value' => '',
+                                            'rows' => 10,
+                                            'placeholder' => 'Enter taxon names, one per line, like you would expect to find them in KeyBase, i.e. without authorship',
+                                            'class' => 'form-control'
+                                        );
+                                    ?>
+                                    <?=form_label('Taxa', 'taxa', array('class' => 'col-sm-2 form-label'))?>
+                                    <div class="col-sm-10">
+                                        <?=form_textarea($data)?>
+                                    </div>
+
+                                    <?php if (isset($filterid) && $filterid): ?>
+                                    <?php
+                                        $data = array(
+                                            'name' => 'items_not_found',
+                                            'id' => 'items_not_found',
+                                            'value' => '',
+                                            'rows' => 10,
+                                            'placeholder' => 'Not in any key in selected project(s)',
+                                            'class' => 'form-control'
+                                        );
+                                    ?>
+                                    <?=form_label('Not found', 'items_not_found', array('class' => 'col-sm-2 form-label'))?>
+                                    <div class="col-sm-10">
+                                        <?=form_textarea($data)?>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <div class="text-right">

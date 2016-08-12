@@ -43,15 +43,21 @@ class Filters extends KeyBase {
     private function edit() {
         if (!$this->input->post('taxa')) return FALSE;
         
-        $taxa = preg_split("/[\r|\n]+/", trim($this->input->post('taxa')));
-        foreach ($taxa as $key=>$value) {
-            $taxa[$key] = trim($value);
+        $found = preg_split("/[\r|\n]+/", trim($this->input->post('taxa')));
+        $notfound = preg_split("/[\r|\n]+/", trim($this->input->post('items_not_found')));
+        $taxa = array();
+        foreach ($found as $key=>$value) {
+            $taxa[] = trim($value);
+        }
+        foreach ($notfound as $key=>$value) {
+            $taxa[] = trim($value);
         }
         
         $projects = $this->input->post('projects');
         if (!$projects[0]) $projects = FALSE;
         
         $data = $this->input->post();
+        $data['taxa'] = implode("\r\n", $taxa);
         $filter = $data['filterid'];
         if ($filter) {
             unset($data['filterid']);

@@ -552,7 +552,7 @@ ul.keybase-filter li {
     font-weight: bold;
 }
 
-#globalfilter-keys .fa-spinner {
+#globalfilter-keys .fa-spinner, #processing .fa-spinner {
     color: #6599C1;
 }
 

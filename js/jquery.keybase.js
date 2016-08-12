@@ -19,7 +19,7 @@ else {
     site_url = base_url.substr(0, base_url.length -1);
 }
 
-var wsUrl = 'http://data.rbg.vic.gov.au/keybase-ws';
+var wsUrl = 'http://data.rbg.vic.gov.au/dev/keybase-ws';
 
 
 $(function() {
@@ -321,7 +321,9 @@ var Key = function() {
             source: false,
             reset: true,
             filter_items: filter,
+            beforeSend: that.keybaseBeforeSend,
             onLoad: that.keybaseOnLoad,
+            onComplete: that.keybaseOnComplete,
             onIndentedKeyComplete: that.onIndentedKeyComplete,
             onFilterWindowOpen: that.onFilterWindowOpen,
             renderItemLink: that.renderItemLink,
@@ -577,8 +579,8 @@ var Key = function() {
 
     this.interactiveKey = function () {
         $.fn.keybase('player', {
-            bracketedKeyDiv: '#keybase-player',
-            renderItemLink: that.enderItemLink
+            playerDiv: '#keybase-player',
+            renderItemLink: that.renderItemLink
         });
     };
 
@@ -646,6 +648,10 @@ var Key = function() {
             $('body').css('height', contentHeight);
         }
     };
+    
+    this.keybaseBeforeSend = function() {
+        $('#keybase-player').before('<div id="processing"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    };
 
     this.keybaseOnLoad = function(json) {
         that.showItems(json);
@@ -653,6 +659,10 @@ var Key = function() {
             $.fn.keybase.setActiveFilter($.QueryString.filter_id);
             $('.keybase-player-filter').css('background-color', '#ffcc00');
         }
+    };
+    
+    this.keybaseOnComplete = function() {
+        $('#processing').remove();
     };
 
     this.showItems = function(json) {
@@ -1111,9 +1121,25 @@ var Filter = function() {
         $.getJSON(wsUrl + '/ws/filter_projects_get/' + that.filterid, function(data) {
             $('select#projects').val(data);
         });
-
-        $('textarea#taxa').load(wsUrl + '/ws/filter_keys_get/' + that.filterid);
-    }
+        
+        $.getJSON(wsUrl + '/ws/filter_items_original_get/' + that.filterid, function(data) {
+            var items = [];
+            $.each(data, function(index, item) {
+                items.push(item.itemName);
+            });
+            $('label[for=taxa]').append('<span> (' + items.length + ')</span>');
+            $('textarea#taxa').html(items.join("\r\n"));
+        });
+        
+        $.getJSON(wsUrl + '/ws/filter_items_not_found/' + that.filterid, function(data) {
+            var items = [];
+            $.each(data, function(index, item) {
+                items.push(item);
+            });
+            $('label[for=items_not_found]').append('<span> (' + items.length + ')</span>');
+            $('textarea#items_not_found').html(items.join("\r\n"));
+        });
+    };
 
     this.filter = function() {
         that.filterHtml = '<ul class="keybase-filter">';

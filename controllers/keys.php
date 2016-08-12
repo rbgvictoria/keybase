@@ -229,6 +229,54 @@ class Keys extends KeyBase {
         }
     }
     
+    public function export($keyid) {
+        $this->load->library('ExportService');
+        $format = 'json';
+        if ($this->input->get('format')) {
+            $format = $this->input->get('format');
+        }
+        
+        switch ($format) {
+            case 'json':
+                $this->load->helper('json');
+                $key = $this->exportservice->export($keyid, 'json');
+                echo json_output(json_decode($key));
+                break;
+
+            case 'sdd':
+                $key = $this->exportservice->export($keyid, 'sdd');
+                header('Content-type: text/xml');
+                echo $key;
+                break;
+
+            case 'lpxk':
+                $key = $this->exportservice->export($keyid, 'lpxk');
+                header('Content-type: text/xml');
+                echo $key;
+                break;
+            
+            case 'csv':
+                $filename = 'keybase_export_' . $keyid . '_' . time() . '.csv';
+                $key = $this->exportservice->export($keyid, 'csv');
+                header('Content-type: text/csv');
+                header('Content-disposition: attachment;filename=' . $filename);
+                echo $key;
+                break;
+           
+            case 'txt':
+                $filename = 'keybase_export_' . $keyid . '_' . time() . '.txt';
+                $key = $this->exportservice->export($keyid, 'txt');
+                header('Content-type: text/plain');
+                header('Content-disposition: attachment;filename=' . $filename);
+                echo $key;
+                break;
+           
+            default:
+                break;
+        }
+        
+    }
+    
 }
 
 /* End of file keys.php */

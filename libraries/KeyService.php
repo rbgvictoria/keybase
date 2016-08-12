@@ -8,6 +8,12 @@ class KeyService extends Service {
         parent::__construct();
     }
     
+    public function getKey($keyid) {
+        $url = $this->ws_url() . 'ws/key_get/' . $keyid;
+        $result = doCurl($url, FALSE, TRUE);
+        return json_decode($result);
+    }
+    
     public function getKeyMetadata($keyid) {
         $url = $this->ws_url() . 'ws/key_meta_get/' . $keyid;
         $result = doCurl($url, FALSE, TRUE);
