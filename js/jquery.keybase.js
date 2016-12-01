@@ -174,7 +174,7 @@ $(function() {
             $('a[href="#"]').parents('li.key').css('display', 'none');
             $('a[href!="#"]').parents('li.key').css('display', 'list-item');
 
-            $('#find-key').on('change', function(event) {
+            $('#keys-control-panel').on('change', '#find-key', function(event) {
                 proj.findKey();
             });
 
@@ -771,7 +771,10 @@ var Project = function() {
         var data = JSPath.apply('.keys', json);
         that.auto_complete_list = [];
         $.each(data, function(index, item) {
-            that.auto_complete_list.push(item.taxonomic_scope.name);
+            if (item.taxonomic_scope.name) { // not sure why the condition is necessay,
+                // but the auto-complete breaks because of null values without it
+                that.auto_complete_list.push(item.taxonomic_scope.name);
+            }
         });
         that.auto_complete_list.sort();
         that.searchAutoComplete();
@@ -795,6 +798,7 @@ var Project = function() {
      */
     this.autoCompleteSource = function (request, response) {
         var items = [];
+        console.log(that.auto_complete_list);
         $.each(that.auto_complete_list, function(index, item) {
             if (item.substr(0, request.term.length).toLowerCase() === request.term.toLowerCase()) {
                 items.push(item);

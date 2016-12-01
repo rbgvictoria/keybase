@@ -21,7 +21,7 @@ class KeyService extends Service {
     }
     
     public function search($searchstring) {
-        $url = $this->ws_url() . 'ws/search_items/' . $searchstring;
+        $url = $this->ws_url() . 'ws/search_items/' . urlencode($searchstring);
         $result = doCurl($url, FALSE, TRUE);
         return json_decode($result);
     }

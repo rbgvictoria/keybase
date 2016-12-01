@@ -161,6 +161,7 @@
                 },
                 success: function(data){
                     json = data;
+                    settings.onJson();
                     
                     if (settings.title) {
                         settings.keyTitle(json);
@@ -227,6 +228,8 @@
 
             // root node
             rootNodeID = json.first_step.root_node_id;
+            console.log(typeof next_id);
+            console.log(next_id);
             next_id = rootNodeID;
 
             nestedSets();
@@ -271,6 +274,7 @@
         },
         reset: false,
         beforeSend: function() {},
+        onJson: function() {}, 
         onLoad: function() {},
         onComplete: function() {},
         onFilterWindowOpen: function() {},
@@ -301,8 +305,8 @@
         $('.' + settings.cssClass.stepBack).off('click', 'a', stepBackHandler);
         $('.' + settings.cssClass.stepBack).on('click', 'a', stepBackHandler);
 
-        $('.' + settings.cssClass.startOver).off('click', 'a.first-node', startOverHandler);
-        $('.' + settings.cssClass.startOver).on('click', 'a.first-node', startOverHandler);
+        $('.' + settings.cssClass.startOver).off('click', 'a', startOverHandler);
+        $('.' + settings.cssClass.startOver).on('click', 'a', startOverHandler);
         
         $('body').off('click', '.keybase-player-filter a', filterHandler);
         $('body').on('click', '.keybase-player-filter a', filterHandler);
@@ -361,7 +365,7 @@
      */
     var startOverHandler = function( event ) {
         event.preventDefault();
-        next_id = $(event.target).attr('href').replace("#l_", "");
+        next_id = $(event.target).parents('a').eq(0).attr('href').replace("#l_", "");
         nextCouplet();
     };
     
@@ -452,9 +456,9 @@
 
         // Resize Player panes
         var position;
-        $('.keybase-player-window').on('mousedown', '.keybase-player-drag-leftright', dragLeftRight);
-        $('.keybase-player-leftpane').on('mousedown', '.keybase-player-drag-updown', dragUpDownLeftPane);
-        $('.keybase-player-rightpane').on('mousedown', '.keybase-player-drag-updown', dragUpDownRightPane);
+        $('.keybase-player-window').on('mousedown', '.keybase-player-drag-leftright', $.fn.keybase.dragLeftRight);
+        $('.keybase-player-leftpane').on('mousedown', '.keybase-player-drag-updown', $.fn.keybase.dragUpDownLeftPane);
+        $('.keybase-player-rightpane').on('mousedown', '.keybase-player-drag-updown', $.fn.keybase.dragUpDownRightPane);
 
         $(document).mouseup(function(e){
             $(document).unbind('mousemove');
@@ -500,9 +504,9 @@
         $('.' + settings.cssClass.path + ', .' + settings.cssClass.discardedItems).css({
             'top': (($('.keybase-player-window').height() * 0.5) + 3) + 'px'
         });
-    }
+    };
     
-    var dragLeftRight = function(event) {
+    $.fn.keybase.dragLeftRight = function(event) {
         event.preventDefault();
         position = $('.keybase-player-window').offset();
         $(document).mousemove(function(e){
@@ -516,7 +520,7 @@
         });
     };
     
-    var dragUpDownLeftPane = function(event) {
+    $.fn.keybase.dragUpDownLeftPane = function(event) {
         event.preventDefault();
         position = $('.keybase-player-leftpane').offset();
         $(document).mousemove(function(e) {
@@ -542,7 +546,7 @@
         });
     }
     
-    var dragUpDownRightPane = function(event) {
+    $.fn.keybase.dragUpDownRightPane = function(event) {
         event.preventDefault();
         position = $('.keybase-player-rightpane').offset();
         $(document).mousemove(function(e) {
@@ -1702,7 +1706,8 @@
             var removeLeads = [];
             $.each(json.leads, function(index, lead) {
                 if (lead.lead_text === "[link through]") {
-                    var parent_lead = JSPath.apply('.leads{.lead_id==' + lead.parent_id + '}', json)[0];
+                    console.log(lead);
+                    var parent_lead = JSPath.apply('.leads{.lead_id=="' + lead.parent_id + '"}', json)[0];
                     if (link_item_ids.indexOf(lead.item) === -1) {
                         link_item_ids.push(lead.item);
                         var link_item = {

@@ -34,7 +34,6 @@ class Keys extends KeyBase {
         $searchstring = $this->input->post('searchbox');
         $this->data['search_string'] = $searchstring;
         $this->data['result'] = $this->keyservice->search($searchstring);
-        
         $this->load->view('keys/search', $this->data);
     }
 
