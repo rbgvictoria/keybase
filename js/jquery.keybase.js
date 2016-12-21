@@ -659,6 +659,9 @@ var Key = function() {
             $.fn.keybase.setActiveFilter($.QueryString.filter_id);
             $('.keybase-player-filter').css('background-color', '#ffcc00');
         }
+        if (json.created_by_id == $('[name=userId]').val()) {
+            that.editLink(json.key_id);
+        }
     };
     
     this.keybaseOnComplete = function() {
@@ -668,8 +671,11 @@ var Key = function() {
     this.showItems = function(json) {
         var list = this.keybaseItemsDisplay(json.items);
         $('#items').html('<ul>' + list.join('') + '</ul>');
-
-    };    
+    };
+    
+    this.editLink = function(id) {
+        $('#about-pills>.nav-pills').append('<li role="presentation"><a href="' + site_url + '/keys/edit/' + id + '">Edit</a></li>');
+    };
 };
 
 var Project = function() {
@@ -1029,16 +1035,19 @@ var Project = function() {
             e.preventDefault();
             var target = $(this);
             var href = target.attr('href');
-            var id = href.substring(1);
+            var id = href.substring(href.indexOf('#') + 1);
             $.ajax({
                 url: wsUrl + '/ws/project_user_delete/' + id,
                 type: 'POST',
                 data: {
                     keybase_user_id: that.keybase_user_id,
                     project: that.project
+                },
+                success: function(data) {
+                    console.log(data);
+                    target.parents('tr').eq(0).remove();
                 }
             });
-            target.parents('tr').eq(0).remove();
         });
         
     };

@@ -17,7 +17,7 @@
 
     require_once 'views/header.php';
 ?>
-
+<?=form_hidden('userId', $userid);?>
 <div class="container">
     <div class="row">
         
