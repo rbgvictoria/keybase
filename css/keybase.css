@@ -475,6 +475,10 @@ td.reticulations {
     background-color: rgb(100, 150, 200);
 }
 
+td.incorrect-link-to-format {
+    background-color: #ddd;
+}
+
 td.endnode {
     font-weight: bold;
     color: #104e88;

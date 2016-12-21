@@ -50,9 +50,12 @@ class ErrorCheckService extends Service {
             $fromnode = array_search(array_search($row[0], $unique_nodes), $unique_node_keys);
             if (isset($row[2])) {
                 $key = array_search($row[2], $unique_nodes);
-                if ($key !== FALSE)
+                if ($key !== FALSE) {
                     $tonode = array_search($key, $unique_node_keys);
-                else $tonode = FALSE;
+                }
+                else {
+                    $tonode = FALSE;
+                }
             }
             
             $htmltablerow = array();
@@ -86,11 +89,15 @@ class ErrorCheckService extends Service {
                     }
                 }
                 else {
+                    $pattern = '/\{(.+)\}/';
                     if (is_numeric($row[2])) {
                         $errors['dead-ends'][] = $k;
                     }
                     elseif (in_array($row[2], $this->linkTos)) {
                         $errors['link-to-errors'][] = $k;
+                    }
+                    elseif (strpos($row[2], '{') !== FALSE && !preg_match($pattern, $row[2], $matches)) {
+                        $warnings['incorrect-link-to-format'][] = $k;
                     }
                     elseif (!(preg_match('/^[A-Z]{1,1}[a-z]+ {1,1}/', str_replace('×', '', $row[2])) || preg_match('/^[A-Z]{1,1}[a-z]+$/', str_replace('×', '', $row[2])))) {
                         $warnings['possible-dead-ends'][] = $k;
@@ -195,7 +202,8 @@ class ErrorCheckService extends Service {
                     'loops', 'reticulations', 'link-to-errors',
                     'dead-ends',
                     'possible-dead-ends',
-                    'will-not-key-out'
+                    'will-not-key-out',
+                    'incorrect-link-to-format'
                 ))) {
                     $htmltablerow[] = '<td class="' . $lead[3] . '">' . $lead[2]. '</td>';
                 }

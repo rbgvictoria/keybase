@@ -99,9 +99,9 @@ class Keys extends KeyBase {
         $this->data['key_metadata'] = $this->input->post('key_metadata');
         $errors = $this->_checkForErrors($this->input->post('keyid'), 
                 $this->input->post('tempfilename'), $this->input->post('delimiter'));
-        if (!$errors) {
+        /*if (!$errors) {
             $this->edit_save_key($key);
-        }
+        }*/
     }
     
     private function edit_save_key($key=FALSE) {
