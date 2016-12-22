@@ -659,7 +659,7 @@ var Key = function() {
             $.fn.keybase.setActiveFilter($.QueryString.filter_id);
             $('.keybase-player-filter').css('background-color', '#ffcc00');
         }
-        if (json.created_by_id == $('[name=userId]').val()) {
+        if (json.created_by_id === $('[name=userId]').val() && $('[href*="/keys/edit/"]').length === 0) {
             that.editLink(json.key_id);
         }
     };
