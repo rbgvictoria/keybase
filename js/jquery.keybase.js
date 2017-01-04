@@ -1145,12 +1145,14 @@ var Filter = function() {
         });
         
         $.getJSON(wsUrl + '/ws/filter_items_not_found/' + that.filterid, function(data) {
-            var items = [];
-            $.each(data, function(index, item) {
-                items.push(item);
-            });
-            $('label[for=items_not_found]').append('<span> (' + items.length + ')</span>');
-            $('textarea#items_not_found').html(items.join("\r\n"));
+            if (data) {
+                var items = [];
+                $.each(data, function(index, item) {
+                    items.push(item);
+                });
+                $('label[for=items_not_found]').append('<span> (' + items.length + ')</span>');
+                $('textarea#items_not_found').html(items.join("\r\n"));
+            }
         });
     };
 
@@ -1164,9 +1166,10 @@ var Filter = function() {
             that.filterHtml += '<span><a href="' + site_url + '/projects/show/' + project.projectID + '?filter_id=' + that.json.filterID + '">' + project.projectName + '</a></span>';
             var projectKeys = JSPath.apply('.{.projectID===$projectID}', that.json.keys, {projectID: project.projectID});
             var itemIDs = JSPath.apply('.items', projectKeys);
-
             var rootKey = JSPath.apply('.{.taxonomicScopeID==="' + project.taxonomicScopeID + '"}', projectKeys);
-            that.filterKey(rootKey[0]);
+            if (rootKey.length) {
+                that.filterKey(rootKey[0]);
+            }
 
             var orphans = [];
             $.each(projectKeys, function(index,key) {
@@ -1175,10 +1178,10 @@ var Filter = function() {
                 }
             });
             orphans.sort(function(a, b) {
-                if (a.keyName < b.keyName) {
+                if (a.keyTitle < b.keyTitle) {
                     return -1;
                 }
-                if (a.keyName > b.keyName) {
+                if (a.keyTitle > b.keyTitle) {
                     return 1;
                 }
                 return 0;
@@ -1198,7 +1201,7 @@ var Filter = function() {
     this.filterKey = function(key) {
         that.filterHtml += '<ul>';
         that.filterHtml += '<li class="keybase-filter-key">';
-        that.filterHtml += '<span class="keybase-filter-key-name"><a href="' + site_url + '/keys/show/' + key.keyID + '?filter_id=' + that.json.filterID + '">' + key.keyName + '</a> <span class="keybase-filter-key-num-items">' + key.items.length + ' items <i class="fa fa-caret-right"></i></span></span>';
+        that.filterHtml += '<span class="keybase-filter-key-name"><a href="' + site_url + '/keys/show/' + key.keyID + '?filter_id=' + that.json.filterID + '">' + key.keyTitle + '</a> <span class="keybase-filter-key-num-items">' + key.items.length + ' items <i class="fa fa-caret-right"></i></span></span>';
 
         var items = JSPath.apply('.{.itemID==$itemID}', that.json.items, {itemID: key.items});
 
@@ -1214,10 +1217,10 @@ var Filter = function() {
 
         var keys = JSPath.apply('.{.taxonomicScopeID==$itemID}', that.json.keys, {itemID: itemIDs});
         keys.sort(function(a, b) {
-            if (a.keyName < b.keyName) {
+            if (a.keyTitle < b.keyTitle) {
                 return -1;
             }
-            if (b.keyName < a.keyName) {
+            if (b.keyTitle < a.keyTitle) {
                 return 1;
             }
             return 0;

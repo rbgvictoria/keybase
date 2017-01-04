@@ -14,8 +14,8 @@
                         echo anchor('projects/show/' . $key->project->project_id, $key->project->project_name) . ': ';
                         echo '</span>';
                     }
-                    if (isset($key->key_name)) {
-                        echo anchor(site_url() . 'keys/show/' . $key->key_id . '?tab=3', $key->key_name, array('class'=>'keydetaillink'));
+                    if (isset($key->key_title)) {
+                        echo anchor(site_url() . 'keys/show/' . $key->key_id . '?tab=3', $key->key_title, array('class'=>'keydetaillink'));
                     }
                     else
                         echo 'Add a new key';

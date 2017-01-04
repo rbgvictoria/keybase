@@ -77,11 +77,10 @@
             if (json.first_key.id !== null) {
                 first_key = JSPath('.keys{.id==' + json.first_key.id + '}', json)[0];
                 var first = $.extend({}, first_key);
-                first.title = first_key.name;
+                first.title = first_key.title;
                 first.href = '#' + first_key.id;
                 first.expand = true;
                 delete first.id;
-                delete first.name;
                 delete first.parent_id;
                 root.children.push(first);
                 hierarchicalListNode(first_key.id, first);
@@ -95,15 +94,13 @@
             if (orphan_keys) {
                 $.each(orphan_keys, function (index, item) {
                     var child = $.extend({}, item);
-                    child.title = item.name;
+                    child.title = item.title;
                     child.href = '#' + item.id;
                     child.expand = true;
                     if (settings.filter.length > 0 && settings.filter.indexOf(item.id) === -1) {
                         child.addClass = 'collapse';
                     }
                     delete child.id;
-                    delete child.name;
-                    delete child.name;
                     delete child.parent_id;
                     root.children.push(child);
                     hierarchicalListNode(item.id, child);
@@ -137,11 +134,10 @@
             $.each(children, function(index, key) {
                 if (settings.filter.length === 0 || settings.filter.indexOf(key.id) > -1) {
                     var child = $.extend({}, key);
-                    child.title = key.name;
+                    child.title = key.title;
                     child.href = "#" + key.id;
                     child.expand = true;
                     delete child.id;
-                    delete child.name;
                     delete child.parent_id;
                     parent.children.push(child);
                     hierarchicalListNode(key.id, child);
@@ -161,8 +157,7 @@
         $.each(JSPath('.keys', json), function(index, item) {
             if (settings.filter.length === 0 || settings.filter.indexOf(item.id) > -1) {
                 var key = $.extend({}, item);
-                key.title = item.name;
-                delete key.name;
+                key.title = item.title;
                 key.href = '#' + item.id;
                 delete key.id;
                 delete key.parent_id;
@@ -198,7 +193,6 @@
             term.label = item.taxonomic_scope.name;
             delete term.id;
             delete term.parent_id;
-            delete term.name;
             delete term.taxonomic_scope;
             autocomplete.push(term);
         });

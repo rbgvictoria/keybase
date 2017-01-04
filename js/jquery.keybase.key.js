@@ -727,7 +727,7 @@
 
         $('<h1>', {
             style: "float:left;",
-            html: '<a href="/keybase/project/show/' + json.project.project_id + '"<span class="keybase-project-name">' + json.project.project_name + '</span></a>: <span class="keybase-key-name">' + json.key_name + '</span>'
+            html: '<a href="/keybase/project/show/' + json.project.project_id + '"<span class="keybase-project-name">' + json.project.project_name + '</span></a>: <span class="keybase-key-name">' + json.key_title + '</span>'
         }).appendTo(settings.titleDiv);
 
     };
@@ -1032,7 +1032,7 @@
     var indentedKey = function() {
         indented_key = [];
         var root = {};
-        root.title = json.key_name;
+        root.title = json.key_title;
         root.isFolder = true;
         root.expand = true;
         root.children = [];
@@ -1215,7 +1215,7 @@
         var nodes = [];
 
         var root = {};
-        root.title = json.key_name;
+        root.title = json.key_title;
         root.isFolder = true;
         root.expand = true;
         root.children = [];

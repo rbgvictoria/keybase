@@ -28,7 +28,16 @@
                             <p class="form-control-static"><?=$key->geographic_scope?></p>
                         </div>
                     </div>
-                   <?php if ($key->description): ?>
+                    <?php if ($key->key_author): ?>
+                    <div class="form-group">
+                        <label class="control-label col-md-2 col-sm-4 text-left"></label>
+                        <div class="col-sm-8 col-md-10">
+                            <p class="form-control-static"><b><?=$key->key_author?> (<?=date('Y', strtotime($key->timestamp_created))?>).</b> 
+                            <?=$key->key_title?>, <?=$key->project->project_name?>, &lt;<?=anchor(site_url() . 'keys/show/' . $key->key_id, site_url() . 'keys/show/' . $key->key_id)?>&gt;</p>
+                        </div>
+                    </div>
+                    <?php endif;?>
+                    <?php if ($key->description): ?>
                     <div class="form-group">
                         <label class="control-label col-md-2 col-sm-4 text-left">Description</label>
                         <div class="col-sm-8 col-md-10">
@@ -57,7 +66,7 @@
                 <?php endif; ?>
 
                 <h3>Cite this key</h3>
-                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$key->project->project_name?>: <?=$key->key_name?>. <?=anchor(site_url() . 'keys/show/' . $key->key_id, site_url() . 'keys/show/' . $key->key_id)?> [Seen: <?=date('d-m-Y')?>].</p>
+                <p><b>KeyBase</b> (<?=date('Y')?>). <?=$key->project->project_name?>: <?=$key->key_title?>. <?=anchor(site_url() . 'keys/show/' . $key->key_id, site_url() . 'keys/show/' . $key->key_id)?> [Seen: <?=date('d-m-Y')?>].</p>
                 
                 <div class="kb-meta">
                     <div class="row">

@@ -6,13 +6,6 @@
                     $key = json_decode(json_encode($this->input->post()));
                 }
             
-                $data = array(
-                    'name' => 'key_name',
-                    'id' => 'key_name',
-                    'size' => 80,
-                    'tabindex' => 0,
-                    'class' => 'form-control'
-                );
                 if (isset($key)) {
                     $project = FALSE;
                     if (isset($key->project_id)) {
@@ -28,37 +21,13 @@
                         'taxonomic_scope_old'=>(isset($key->taxonomic_scope)) ? $key->taxonomic_scope : FALSE,
                         'referer'=>$referer
                     ));
-                    $data['value'] = (isset($key->key_name)) ? $key->key_name : FALSE;
+                    $data['value'] = (isset($key->key_title)) ? $key->key_title : FALSE;
                 }
                 else {
                     echo form_hidden(array('project[project_id]'=>$key->project->project_id, 'created_by_id'=>$this->session->userdata['id']));
                 }
             ?>
-            <div class="form-group is_required">
-                <?=form_label('Name', 'key_name', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-6">
-                    <?=form_input($data);?>
-                    <span class="form-control-required" aria-hidden="true"><i class="fa fa-asterisk"></i></span>
-                    <span class="sr-only">(required)</span>
-                </div>
-            </div>
             
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'description',
-                        'id' => 'description',
-                        'value' => (isset($key->description)) ? $key->description : FALSE,
-                        'rows' => 3,
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Description: ', 'description', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_textarea($data);?>
-                </div>
-            </div>
-        
             <?php
                 $data = array(
                     'name' => 'taxonomic_scope',
@@ -93,6 +62,58 @@
                 </div>
             </div>
 
+            <?php 
+                $data = array(
+                    'name' => 'key_title',
+                    'id' => 'key_title',
+                    'value' => (isset($key->key_title)) ? $key->key_title : FALSE,
+                    'size' => 80,
+                    'class' => 'form-control'
+                );
+            ?>
+            <div class="form-group is_required">
+                <?=form_label('Title', 'key_title', array('class' => 'form-label col-md-2'));?>
+                <div class="col-md-6">
+                    <?=form_input($data);?>
+                    <span class="form-control-required" aria-hidden="true"><i class="fa fa-asterisk"></i></span>
+                    <span class="sr-only">(required)</span>
+                </div>
+            </div>
+            
+            <?php 
+                $data = array(
+                    'name' => 'key_author',
+                    'id' => 'key_author',
+                    'value' => (isset($key->key_author)) ? $key->key_author : FALSE,
+                    'size' => 80,
+                    'class' => 'form-control'
+                );
+            ?>
+            <div class="form-group is_required">
+                <?=form_label('Author(s)', 'key_author', array('class' => 'form-label col-md-2'));?>
+                <div class="col-md-6">
+                    <?=form_input($data);?>
+                    <span class="form-control-required" aria-hidden="true"><i class="fa fa-asterisk"></i></span>
+                    <span class="sr-only">(required)</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <?php
+                    $data = array(
+                        'name' => 'description',
+                        'id' => 'description',
+                        'value' => (isset($key->description)) ? $key->description : FALSE,
+                        'rows' => 3,
+                        'class' => 'form-control'
+                    );
+                ?>
+                <?=form_label('Description: ', 'description', array('class' => 'form-label col-md-2'));?>
+                <div class="col-md-10">
+                    <?=form_textarea($data);?>
+                </div>
+            </div>
+        
             <div class="form-group">
                 <?php
                     $data = array(

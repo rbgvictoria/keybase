@@ -27,9 +27,9 @@
             <?php if (isset($key->breadcrumbs) && $key->breadcrumbs): ?>
                 <ol class="breadcrumb">
                 <?php foreach ($key->breadcrumbs as $crumb): ?>
-                    <li><?=anchor(site_url() . 'keys/show/' . $crumb->key_id . $qstr, $crumb->key_name)?></li>
+                    <li><?=anchor(site_url() . 'keys/show/' . $crumb->key_id . $qstr, $crumb->key_title)?></li>
                 <?php endforeach; ?>
-                <li class="active"><?=$key->key_name?></li>
+                <li class="active"><?=$key->key_title?></li>
                 </ol>
             <?php endif; ?>
             </div>
@@ -55,7 +55,7 @@
                                 echo '</span>';
                             }
                         ?>
-                        <?=$key->key_name?> <span id="keyid"><?=$key->key_id?></span>
+                        <?=$key->key_title?> <span id="keyid"><?=$key->key_id?></span>
                     </h2>
 
                     <?php if ($key->source->citation): ?>
