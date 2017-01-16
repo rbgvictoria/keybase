@@ -111,7 +111,7 @@ $(function() {
         
         key.checkFilter();
         
-        $('[href=#player]').on('show.bs.tab', function() {
+        $('[href="#player"]').on('show.bs.tab', function() {
             if ($('.keybase-player-window').length === 0) {
                 key.interactiveKey();
             }
@@ -121,13 +121,13 @@ $(function() {
             key.windowHeight('.keybase-player-window');
         });
         
-        $('[href=#bracketed]').on('show.bs.tab', function() {
+        $('[href="#bracketed"]').on('show.bs.tab', function() {
             if ($('.keybase-bracketed-key').length === 0) {
                 key.bracketedKey();
             }
         });
         
-        $('[href=#indented]').on('show.bs.tab', function() {
+        $('[href="#indented"]').on('show.bs.tab', function() {
             if ($('.keybase-indented-key').length === 0) {
                 key.indentedKey();
             }
@@ -140,8 +140,8 @@ $(function() {
     if (location.href.substr(base_url.length, 8) === 'projects') {
         var proj = new Project();
         if ($.isNumeric(proj.project)) {
-            if ($('[name=keybase-user-id]').length > 0) {
-                proj.keybase_user_id = $('[name=keybase-user-id]').val();
+            if ($('[name="keybase-user-id"]').length > 0) {
+                proj.keybase_user_id = $('[name="keybase-user-id"]').val();
                 var url = wsUrl + '/ws/project_user_get/' + proj.project;
                 $.ajax({
                     url: url,
@@ -166,7 +166,7 @@ $(function() {
 
             $('#tree li:gt(0)>span').addClass('keybase-dynatree-key');
 
-            $('[data-toggle=tab]:lt(2)').on('shown.bs.tab', function() {
+            $('[data-toggle="tab"]:lt(2)').on('shown.bs.tab', function() {
                 var target = $(this).attr('href') + ' .left-pane';
                 $('#keys-control-panel').appendTo(target);
             });
@@ -182,7 +182,7 @@ $(function() {
                 proj.findKey();
             });
 
-            $('[name=filter-id]').on('change', function(e) {
+            $('[name="filter-id"]').on('change', function(e) {
                 if ($(this).val().length > 0) {
                     location.href = site_url + '/projects/show/' + proj.project + '?filter_id=' + $(this).val();
                 }
@@ -218,17 +218,17 @@ $(function() {
 
         var uri = href.substr(href.indexOf('filters')).split('/');
         if (uri.length > 2 && uri[2].length > 0) {
-            $('[data-toggle=tab]:eq(0)').tab('show');
+            $('[data-toggle="tab"]:eq(0)').tab('show');
             $('li#view').css('display', 'block');
             filter.filterid = uri[2];
 
-            $('[href$=' + filter.filterid + ']').css({'font-weight': 'bold'}).prev('i').removeClass('fa-check-square').addClass('fa-check-square-o');
+            $('[href$="' + filter.filterid + '"]').css({'font-weight': 'bold'}).prev('i').removeClass('fa-check-square').addClass('fa-check-square-o');
 
             filter.getStuff();
         }
         else {
 
-            $('[data-toggle=tab]:eq(1)').tab('show');
+            $('[data-toggle="tab"]:eq(1)').tab('show');
             $('li#view').css('display', 'none');
 
             $('input[name="update"]').val('Create filter');
@@ -345,7 +345,7 @@ var Key = function() {
     };
 
     this.windowHeightTabClick = function(element) {
-        $('a[href=' + element + ']').click(function() {
+        $('a[href="' + element + '"]').click(function() {
             that.windowHeight(element);
         });
     };
@@ -495,7 +495,7 @@ var Key = function() {
 
         $('.keybase-local-filter-ok').on('click', function() {
             if ($.fn.keybase.getters.filterItems().length > 0) {
-                if ($('[name=filter-id]').length > 0 && $('[name=filter-id]').val().length > 0) {
+                if ($('[name="filter-id"]').length > 0 && $('[name="filter-id"]').val().length > 0) {
                     $('.project a, #breadcrumbs a').each(function() {
                         var href = $(this).attr('href');
                         var newHref = that.updateHref(href);
@@ -546,13 +546,13 @@ var Key = function() {
     };
 
     this.sortOptions = function(select) {
-        var options = $('[name=' + select + ']>option');
+        var options = $('[name="' + select + '"]>option');
         options.sort(function(a,b) {
             if (a.text > b.text) return 1;
             else if (a.text < b.text) return -1;
             else return 0;
         });
-        $('[name=' + select + ']').html(options);
+        $('[name="' + select + '"]').html(options);
     };
 
 
@@ -659,7 +659,7 @@ var Key = function() {
             $.fn.keybase.setActiveFilter($.QueryString.filter_id);
             $('.keybase-player-filter').css('background-color', '#ffcc00');
         }
-        if (json.created_by_id === $('[name=userId]').val() && $('[href*="/keys/edit/"]').length === 0) {
+        if (json.created_by_id === $('[name="userId"]').val() && $('[href*="/keys/edit/"]').length === 0) {
             that.editLink(json.key_id);
         }
     };
@@ -701,7 +701,7 @@ var Project = function() {
                 complete: function() {
                     that.keysHierarchical(that.keysInFilter);
                     that.keysAlphabetical(that.keysInFilter);
-                    $('[name=filter-id]').val($.QueryString.filter_id).after('<span class="input-group-addon" id="fdelete"><i class="fa fa-trash"></i></span>');
+                    $('[name="filter-id"]').val($.QueryString.filter_id).after('<span class="input-group-addon" id="fdelete"><i class="fa fa-trash"></i></span>');
                     $('#apply-filter').css('background-color', '#ff9900');
                     $('#fdelete').click(function(e) {
                         location.href = site_url + '/projects/show/' + that.project;
@@ -1016,7 +1016,7 @@ var Project = function() {
                     data: data,
                     success: function(data) {
                         if (data !== undefined) {
-                            var name = projectUserModal.find('#user_id').eq(0).children('[value=' + user + ']').eq(0).html();
+                            var name = projectUserModal.find('#user_id').eq(0).children('[value="' + user + '"]').eq(0).html();
                             var rol = role === 'User' ? 'Contributor' : role;
                             var row = '<tr>';
                             row += '<td>' + name + '</td>';

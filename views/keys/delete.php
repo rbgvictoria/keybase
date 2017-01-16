@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-12">
             <p>You are about to delete:</p>
-            <div id="key-to-delete" class="text-center"><span><?=$key->key_name?></span><br/>(<?=$key->project->project_name?>)</div>
+            <div id="key-to-delete" class="text-center"><span><?=$key->key_title?></span><br/>(<?=$key->project->project_name?>)</div>
 
             <?=form_open()?>
             <?=form_hidden('projectid', $key->project->project_id)?>

@@ -421,7 +421,7 @@ class WebServicesModel extends KeyModel {
     
     private function getGlobalFilterKeys($items, $projects=FALSE) {
         $newItems = array();
-        $this->db->select('k.ProjectsID, k.KeysID, k.TaxonomicScopeID, k.Name AS KeyName, 
+        $this->db->select('k.ProjectsID, k.KeysID, k.TaxonomicScopeID, k.Title AS KeyName, 
             group_concat(DISTINCT cast(l.ItemsID as char)) AS Items', FALSE);
         $this->db->from('keys k');
         $this->db->join('leads l', 'k.KeysID=l.KeysID');

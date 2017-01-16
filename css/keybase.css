@@ -642,3 +642,36 @@ div#project-filters {
 .keybase-project-table.table td {
     vertical-align: middle;
 }
+
+
+
+.keybase-label {
+    font-weight: bold;
+}
+
+/* Source lookup autocomplete
+**************************************************/
+.keybase-source-lookup-autocomplete-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.keybase-source-lookup-autocomplete-list li {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 12px;
+    font-size: 90%;
+}
+
+.keybase-source-lookup-autocomplete-list .ui-state-focus {
+    background-color: #eee;
+    border-top: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+}
+
+.keybase-source-lookup-autocomplete-list li, 
+.keybase-source-lookup-autocomplete-list li a {
+    cursor: pointer;
+    color: #000;
+    text-decoration: none;
+}

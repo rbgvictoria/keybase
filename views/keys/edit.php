@@ -11,7 +11,8 @@
                 <?php
                     if ($key->project->project_id || $key->project->project_name) {
                         echo '<span class="project">';
-                        echo anchor('projects/show/' . $key->project->project_id, $key->project->project_name) . ': ';
+                        echo anchor('projects/show/' . $key->project->project_id, $key->project->project_name, 
+                                array('class' => 'project-link', 'data-project-id' => $key->project->project_id)) . ': ';
                         echo '</span>';
                     }
                     if (isset($key->key_title)) {
@@ -38,7 +39,7 @@
 
             <?php else: ?>
             <?php require_once('views/keys/edit_1.php'); ?>
-
+            <?php require_once('views/keys/source_modal.php'); ?>
             <?php endif; ?>
         </div> <!-- /.col-* -->
     </div> <!-- /.row -->

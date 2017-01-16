@@ -39,6 +39,7 @@ if (!function_exists('curl_post')) {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
         $result = curl_exec($ch);
+        $info = curl_getinfo($ch);
         curl_close($ch);
         return $result;
     }

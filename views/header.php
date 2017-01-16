@@ -19,10 +19,10 @@
         <?php endforeach; ?>
     <?php endif; ?>
     <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/keybase.css'); ?>" />
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/jspath.min.js"></script>
     <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/dynatree/jquery.dynatree.js"></script>
     <script type="text/javascript" src="<?=base_url()?>js/contextMenu/jquery.contextMenu.min.js"></script>
     <script type="text/javascript" src="http://data.rbg.vic.gov.au/ckeditor/ckeditor.js"></script>

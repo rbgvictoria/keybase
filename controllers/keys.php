@@ -9,7 +9,9 @@ class Keys extends KeyBase {
         parent::__construct();
         $this->load->library('KeyService');
         $this->load->library('ProjectService');
+        $this->load->library('SourceService');
         $this->load->library('UserService');
+        $this->load->library('Citation');
         $this->output->enable_profiler(false);
     }
     
@@ -22,6 +24,11 @@ class Keys extends KeyBase {
             redirect(site_url());
         }
         $meta = $this->keyservice->getKeyMetadata($id);
+        $source = NULL;
+        if ($meta->source_id) {
+            $source = $this->sourceservice->getSource($meta->source_id);
+        }
+        $meta->source = $source;
         $this->data['key'] = $meta;
         $this->data['users'] = $this->userservice->getProjectUsers($meta->project->project_id);
         $this->load->view('keys/show', $this->data);
@@ -38,6 +45,7 @@ class Keys extends KeyBase {
     }
 
     public function edit($key=FALSE) {
+        $this->data['js'][] = site_url() . autoVersion('js/jquery.keybase.source.js');
         if (!$key)
             $key = $this->input->post('key_id');
         if (!$key) 
@@ -114,6 +122,7 @@ class Keys extends KeyBase {
     }
     
     public function create($projectid=FALSE) {
+        $this->data['js'][] = site_url() . autoVersion('js/jquery.keybase.source.js');
         $meta = new stdClass();
         $meta->project = new stdClass();
         $meta->project->project_id = ($projectid) ? $projectid : $this->input->post('project_id');
@@ -125,12 +134,11 @@ class Keys extends KeyBase {
         $this->data['key'] = $meta;
         $this->data['referer'] = ($this->input->post('referer')) ? $this->input->post('referer') : $_SERVER['HTTP_REFERER'];
         
-        $this->data['js'][] = base_url() . 'js/jquery.keybase.editkey.js?v=1.0';
         if (!isset($this->session->userdata['id']))
             redirect(site_url());
         
         if ($this->input->post('submit')) {
-            if (!($this->input->post('key_name')  && $this->input->post('taxonomic_scope') 
+            if (!($this->input->post('key_title')  && $this->input->post('taxonomic_scope') 
                     && $this->input->post('geographic_scope'))) {
                 $this->data['message'][] = 'Please enter all required metadata (name, taxonomic scope, geographic scope).';
             }

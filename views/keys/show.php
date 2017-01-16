@@ -22,7 +22,6 @@
     <div class="row">
         
         <div class="col-md-12">
-
             <div id="breadcrumbs">
             <?php if (isset($key->breadcrumbs) && $key->breadcrumbs): ?>
                 <ol class="breadcrumb">
@@ -58,8 +57,17 @@
                         <?=$key->key_title?> <span id="keyid"><?=$key->key_id?></span>
                     </h2>
 
-                    <?php if ($key->source->citation): ?>
-                    <div class="citation"><?=$key->source->citation?></div>
+                    <?php if ($key->key_author): ?>
+                    <div class="key_author">
+                        <span class="keybase-label">By:</span> <?=$key->key_author?>
+                    </div>
+                    <?php endif; ?>
+                    <?php if ($key->source): ?>
+                    <div class="citation">
+                        <span class="keybase-label"><?=(isset($key->modified_from_source) && 
+                            $key->modified_from_source) ? 'Adapted from:' : 'From:';?></span>
+                        <?=$this->citation->createCitation($key->source)?>
+                    </div>
                     <?php endif; ?>
                 </div>
             </div>

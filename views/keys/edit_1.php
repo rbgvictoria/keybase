@@ -1,6 +1,5 @@
             <?=form_open_multipart('', 'class="form-horizontal"')?>
             <h3>Key metadata</h3>
-            <hr />
             <?php 
                 if ($this->input->post()) {
                     $key = json_decode(json_encode($this->input->post()));
@@ -93,8 +92,6 @@
                 <?=form_label('Author(s)', 'key_author', array('class' => 'form-label col-md-2'));?>
                 <div class="col-md-6">
                     <?=form_input($data);?>
-                    <span class="form-control-required" aria-hidden="true"><i class="fa fa-asterisk"></i></span>
-                    <span class="sr-only">(required)</span>
                 </div>
             </div>
             
@@ -130,261 +127,69 @@
                 </div>
             </div>
 
-            <?php if (isset($key)): ?>
-            <div class="form-group is_required">
-                <?php
-                    $data = array(
-                        'name' => 'change_comment',
-                        'id' => 'change_comment',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Change comment', 'change_comment', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            <?php endif; ?>
-            
             <h3>Source:</h3>
-            <hr/>
             <?php 
                 if (!isset($key->source)) {
                     $key->source = FALSE;
                 }
             ?>
-            <div class="form-group">
-                <div class="checkbox">
-                    <?php
-                        $data = array(
-                            'name' => 'source[is_modified]',
-                            'id' => 'modified',
-                            'value' => '1',
-                            'checked' => FALSE,
-                        );
-                        if ($this->input->post()) {
-                            if ($this->input->post('source')) {
-                                $source = $this->input->post('source');
-                                if (isset($source['is_modified']) && $source['is_modified']) {
+            
+            <div class="col-md-12">
+                <div class="form-horizontal">
+                    <div class="form-group clearfix">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <?=form_input(array('name' => FALSE, 'id' => 'source-search', 'class' => 'form-control')); ?>
+                                    <?=form_input(array('type' => 'hidden', 'name' => 'source_id', 'id' => 'source-id', 'value' => (isset($key->source_id)) ? $key->source_id : FALSE)); ?>
+                                    <div class="input-group-addon"><i class="fa fa-search fa-lg"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" id="edit-source" class="btn btn-primary" 
+                                        data-toggle="modal" data-target="#sourceModal" data-modal-type="edit">
+                                    <i class="fa fa-pencil-square-o fa-lg"></i>
+                                </button>
+                                <button type="button" id="create-source" class="btn btn-primary" 
+                                        data-toggle="modal" data-target="#sourceModal" data-modal-type="create">
+                                    <i class="fa fa-plus fa-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group clearfix">
+                        <div id="source-citation"></div>
+
+                        <div class="checkbox">
+                            <?php
+                                $data = array(
+                                    'name' => 'modified_from_source',
+                                    'id' => 'modified',
+                                    'value' => '1',
+                                    'checked' => FALSE,
+                                );
+                                if ($this->input->post()) {
+                                    if ($this->input->post('source')) {
+                                        if (isset($key->modified_from_source) && $key->modified_from_source) {
+                                            $data['checked'] = 'checked';
+                                        }
+                                    }
+                                }
+                                elseif (isset($key->modified_from_source) && $key->modified_from_source == 1) {
                                     $data['checked'] = 'checked';
                                 }
-                            }
-                        }
-                        elseif (isset($key->source->is_modified) && $key->source->is_modified == 1) {
-                            $data['checked'] = 'checked';
-                        }
-                    ?>
-                    <label>
-                        <?=form_checkbox($data);?>
-                        Modified
-                    </label>
-                </div>
-            </div>
+                            ?>
+                            <label>
+                                <?=form_checkbox($data);?>
+                                Modified
+                            </label>
+                        </div>
+                    </div>
+                </div> <!-- /.form-horizontal -->
+            </div> <!-- /.col -->
+            <br />
             
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[author]',
-                        'id' => 'author',
-                        'value' => ($key->source) ? $key->source->author : FALSE,
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Authors: ', 'author', array('class'=>'col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_input($data);?>
-                </div>
-                
-            </div>
-
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[publication_year]',
-                        'id' => 'publication_year',
-                        'value' => ($key->source) ? $key->source->publication_year : FALSE,
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Year: ', 'publication_year', array('class'=>'col-md-2'));?>
-                <div class="col-md-2">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[title]',
-                        'id' => 'title',
-                        'value' => ($key->source) ? $key->source->title : FALSE,
-                        'rows' => 2,
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Title: ', 'title', array('class'=>'col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_textarea($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[in_author]',
-                        'id' => 'in_author',
-                        'value' => ($key->source) ? $key->source->in_author : FALSE,
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('In (author): ', 'in_author', array('class'=>'col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[in_title]',
-                        'id' => 'in_title',
-                        'value' => ($key->source) ? $key->source->in_title : FALSE,
-                        'rows' => 2,
-                        'class' => 'form-control',
-                    );
-                ?>
-                <?=form_label('<span style="color: #ffffff;">In</span> (title): ', 'in_title', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_textarea($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[edition]',
-                        'id' => 'edition',
-                        'value' => ($key->source) ? $key->source->edition : FALSE,
-                        'class' => 'form-control',
-                    );
-                ?>
-                <?=form_label('Edition: ', 'edition', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-2">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[journal]',
-                        'id' => 'journal',
-                        'value' => ($key->source) ? $key->source->journal : FALSE,
-                        'class' => 'form-control',
-                    );
-                ?>
-                <?=form_label('Journal: ', 'journal', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[volume]',
-                        'id' => 'volume',
-                        'value' => ($key->source) ? $key->source->volume : FALSE,
-                        'size' => '6',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Volume: ', 'volume', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-2">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[part]',
-                        'id' => 'part',
-                        'value' => ($key->source) ? $key->source->part : FALSE,
-                        'size' => '6',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Part: ', 'part', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-2">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[page]',
-                        'id' => 'page',
-                        'value' => ($key->source) ? $key->source->page : FALSE,
-                        'size' => '12',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Page(s): ', 'page', array('class'=>'form-label col-md-2'));?>
-                <div class="col-md-2">
-                     <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[publisher]',
-                        'id' => 'publisher',
-                        'value' => ($key->source) ? $key->source->publisher : FALSE,
-                        'size' => '40',
-                        'class' => 'form-control'
-                    );
-               ?>
-                <?=form_label('Publisher: ', 'publisher', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-6">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[place_of_publication]',
-                        'id' => 'place_of_publication',
-                        'value' => ($key->source) ? $key->source->place_of_publication : FALSE,
-                        'size' => '40',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('Place of publication: ', 'place_of_publication', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-6">
-                    <?=form_input($data);?>
-                </div>
-            </div class="form-group">
-            
-            <div class="form-group">
-                <?php
-                    $data = array(
-                        'name' => 'source[url]',
-                        'id' => 'url',
-                        'value' => ($key->source) ? $key->source->url : FALSE,
-                        'size' => '80',
-                        'class' => 'form-control'
-                    );
-                ?>
-                <?=form_label('URL: ', 'url', array('class' => 'form-label col-md-2'));?>
-                <div class="col-md-10">
-                    <?=form_input($data);?>
-                </div>
-            </div>
-
             <h3>Upload new key file</h3>
             <div id="upload-key-file-pills">
                 <ul class="nav nav-pills">
@@ -415,6 +220,22 @@
                     </div>
                 </div>
             </div>
+            <?php if (isset($key)): ?>
+            <div class="form-group">
+                <?php
+                    $data = array(
+                        'name' => 'change_comment',
+                        'id' => 'change_comment',
+                        'class' => 'form-control'
+                    );
+                ?>
+                <?=form_label('Change comment', 'change_comment', array('class' => 'form-label col-md-2'));?>
+                <div class="col-md-10">
+                    <?=form_input($data);?>
+                </div>
+            </div>
+            <?php endif; ?>
+            
             
 
             <?php /* <p>&nbsp;</p>
