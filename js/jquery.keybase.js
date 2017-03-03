@@ -968,7 +968,7 @@ var Project = function() {
                   <div class="modal-body">
                     <p><select id="user_id" class="form-control"></select></p>
                     <p><select id="role" class="form-control">
-                      <option value="User">User</option>
+                      <option value="Contributor">Contributor</option>
                       <option value="Manager">Manager</option>
                     </select></p>
                   </div>
