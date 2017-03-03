@@ -290,7 +290,7 @@ class WebServicesModel extends KeyModel {
      */
     public function getProjectStats($project=FALSE) {
         $this->db->select('p.ProjectsID, p.Name AS ProjectName, p.TaxonomicScopeID, p.TaxonomicScope,
-            p.GeographicScope, p.ProjectIcon, fk.KeysID AS FirstKeyID, fk.Name AS FirstKeyName, count(DISTINCT k.KeysID) AS NumKeys, 
+            p.GeographicScope, p.ProjectIcon, fk.KeysID AS FirstKeyID, fk.Title AS FirstKeyName, count(DISTINCT k.KeysID) AS NumKeys, 
             count(DISTINCT coalesce(gi.MemberID, l.ItemsID)) AS NumTaxa', FALSE);
         $this->db->from('projects p');
         $this->db->join('keys k', 'p.ProjectsID=k.ProjectsID');
