@@ -1,0 +1,380 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: KeyBase Web Services
+host: keybase.rbg.vic.gov.au
+basePath: /ws
+produces: 
+  - application/json
+
+paths:
+  /projects:
+    get:
+      summary: Gets `Project` objects.
+      tags:
+        - Project
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: Projects
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+  /projects/{id}:
+    get:
+      summary: Gets `Project` object.
+      tags:
+        - Project
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Project` that needs to be fetched
+          required: true
+          type: integer
+        - in: query
+          name: items
+          description: include items
+          required: false
+          type: boolean
+          default: true
+        - in: query
+          name: keys
+          description: include keys
+          required: false
+          type: boolean
+          default: true
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: array
+            items: 
+              $ref: "#/definitions/Project"
+  /keys:
+    get:
+      summary: Gets `Key`s for a project
+      description: |
+        Note: either the `project` or `tscope` parameter is required
+        
+        Example: http://keybase.rbg.vic.gov.au/ws/keys?tscope=Banksia
+      tags:
+        - Key
+      parameters: 
+        - in: query
+          name: project
+          description: ID of the `Project` for which the keys need to be fetched
+          type: integer
+          required: false
+        - in: query
+          name: tscope
+          description: Name of the `Item` for which keys need to be fetched
+          type: integer
+          required: false
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successful response
+          schema: 
+            type: object
+            properties: 
+              ProjectsID:
+                type: integer
+              ProjectName:
+                type: string
+              ItemsID:
+                type: integer
+              ItemName:
+                type: string
+              Scope:
+                type: string
+              numberOfKeys:
+                type: integer
+              TimestampDownLoaded:
+                type: string
+                format: date-time
+              Items:
+                type: array
+                items: 
+                  $ref: "#/definitions/KeyBrief"
+  /keyJSON/{id}:
+    get: 
+      summary: Gets `Key` object
+      description: |
+        Example: http://keybase.rbg.vic.gov.au/ws/keyJSON/2411
+      tags:
+        - Key
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Key` that needs to be fetched
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Successful response
+          schema: 
+            $ref: "#/definitions/Key"
+  /items:
+    get:
+      summary: Gets `Item`s for a project or key
+      description: |
+        Note: either the `project` or `key` parameter is required
+        
+        Example: http://keybase.rbg.vic.gov.au/ws/items?key=2413
+      tags:
+        - Item
+      parameters:
+        - in: query
+          name: project
+          description: ID of the `Project` for which items need to be fetched
+          type: integer
+          required: false
+        - in: query
+          name: key
+          description: ID of the `Key` for which items need to be fetched
+          type: integer
+          required: false
+      produces:
+        - application/json
+        - text/csv
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              ProjectsID:
+                type: integer
+              ProjectName:
+                type: string
+              numberOfItems:
+                type: integer
+              TimestampDownloaded:
+                type: string
+                format: date-time
+              Items:
+                type: array
+                items:
+                  $ref: "#/definitions/Item"
+definitions:
+  Project:
+    type: object
+    properties:
+      project_id: 
+        type: integer
+        example: 10
+      project_name:
+        type: string
+        example: "Flora of Victoria"
+      number_of_items:
+        type: integer
+      number_of_keys:
+        type: integer
+      taxonamic_scope:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      geographic_scope:
+        type: string
+      project_icon:
+        type: string
+      first_key:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      items:
+        type: array
+        title: ProjectItems
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+      keys:
+        title: ProjectKeys
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+  ProjectBrief:
+    type: object
+    properties:
+      project_id:
+        type: integer
+      project_name:
+        type: string
+      project_icon:
+        type: string
+  Item:
+    type: object
+    properties:
+      ItemsID:
+        type: integer
+      ItemName:
+        type: string
+      ItemUrl:
+        type: string
+      KeysID: 
+        type: integer
+      KeyName:
+        type: string
+      TaxonomicScope:
+        type: string
+      ProjectsID:
+        type: integer
+      ProjectName:
+        type: string
+  KeyBrief:
+    type: object
+    properties:
+      ProjectsID:
+        type: integer
+      ProjectName: 
+        type: string
+      KeysID:
+        type: integer
+      KeyName:
+        type: string
+      TaxonomicScope:
+        type: string
+  Key: 
+    type: object
+    properties: 
+      key_id:
+        type: integer
+      key_name:
+        type: string
+      key_title:
+        type: string
+      key_author:
+        type: string
+      UID:
+        type: string
+      description:
+        type: string
+      rank:
+        type: string
+      taxonomic_scope:
+        $ref: "#/definitions/KeyItem"
+      geographic_scope:
+        type: string
+      notes:
+        type: string
+      created_by_id:
+        type: integer
+      timestamp_created:
+        type: string
+        format: date-time
+      modified_by_id:
+        type: integer
+      timestamp_modified:
+        type: string
+        format: date-time
+      source_id: 
+        type: integer
+      modified_from_source:
+        type: boolean
+      project:
+        $ref: "#/definitions/ProjectBrief"
+      breadcrumbs:
+        type: array
+        items:
+          $ref: "#/definitions/Crumb"
+      source:
+        $ref: "#/definitions/Source"
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/KeyItem"
+      first_step:
+        type: object
+        properties:
+          root_node_id: 
+            type: integer
+      leads:
+        type: array
+        items:
+          $ref: "#/definitions/Lead"
+  KeyItem: 
+    type: object
+    properties: 
+      item_id:
+        type: integer
+      item_name:
+        type: string
+      url:
+        type: string
+      to_key:
+        type: integer
+  Lead:
+    type: object
+    properties:
+      lead_id: 
+        type: integer
+      parent_id:
+        type: integer
+      lead_text:
+        type: string
+      item: 
+        type: integer
+  Crumb:
+    type: object
+    properties:
+      key_id: 
+        type: integer
+      key_title:
+        type: string
+  Source:
+    type: object
+    properties:
+      id:
+        type: integer
+      author:
+        type: string
+      publication_year:
+        type: integer
+      title:
+        type: string
+      in_author:
+        type: string
+      in_title:
+        type: string
+      edition:
+        type: string
+      journal:
+        type: string
+      series:
+        type: string
+      volume:
+        type: string
+      part:
+        type: string
+      publisher:
+        type: string
+      page:
+        type: string
+      is_modified:
+        type: boolean
+      url:
+        type: string
+      citation:
+        type: string
+      
+        

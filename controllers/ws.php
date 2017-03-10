@@ -17,7 +17,7 @@ class WS extends CI_Controller {
     }
     
     public function index() {
-        $this->load->view('ws_view', $this->data);
+        redirect('api');
     }
     
     public function projects() {

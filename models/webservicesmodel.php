@@ -109,7 +109,7 @@ class WebServicesModel extends KeyModel {
     
     public function ws_getItems($params) {
         $this->db->select('i.ItemsID, i.Name AS ItemName, pi.Url AS ItemUrl, 
-            k.KeysID, k.Name AS KeyName, ts.Name AS TaxonomicScope,
+            k.KeysID, k.Title AS KeyName, ts.Name AS TaxonomicScope,
             p.ProjectsID, p.Name AS ProjectName');
         $this->db->from('keys k');
         $this->db->join('projects p', 'k.ProjectsID=p.ProjectsID');
@@ -143,7 +143,7 @@ class WebServicesModel extends KeyModel {
     }
     
     public function ws_getKeys($params) {
-        $this->db->select('p.ProjectsID, p.Name AS ProjectName, k.KeysID, k.Name AS KeyName, ts.Name AS TaxonomicScope');
+        $this->db->select('p.ProjectsID, p.Name AS ProjectName, k.KeysID, k.Title AS KeyName, ts.Name AS TaxonomicScope');
         $this->db->from('projects p');
         $this->db->join('keys k', 'p.ProjectsID=k.ProjectsID');
         $this->db->join('items ts', 'k.TaxonomicScopeID=ts.ItemsID');
