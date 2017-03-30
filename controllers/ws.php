@@ -74,7 +74,6 @@ class WS extends CI_Controller {
     }
     
     private function projectKeys($project) {
-        $this->load->model('projectmodel');
         $filter = false;
         $data = $this->ws->getProjectKeys($project, $filter);
         $keys = array();

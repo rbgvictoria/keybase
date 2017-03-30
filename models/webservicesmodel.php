@@ -345,10 +345,10 @@ class WebServicesModel extends KeyModel {
         if ($filter) {
             $andWhere = ' AND k.KeysID IN (' . implode(',', $filter) . ')';
         }
-        $query = $this->db->query("SELECT k.KeysID, k.Name, k.TaxonomicScopeID, i.Name AS TaxonomicScope, s.KeysID AS ParentKeyID, s.Name AS ParentKeyName
+        $query = $this->db->query("SELECT k.KeysID, k.Title AS Name, k.TaxonomicScopeID, i.Name AS TaxonomicScope, s.KeysID AS ParentKeyID, s.Title AS ParentKeyName
             FROM `keys` k
             LEFT JOIN (
-            SELECT coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) AS KeyID, sk.KeysID, sk.Name, sk.TaxonomicScopeID
+            SELECT coalesce(slk.KeysID, sgk.KeysID, sglk.KeysID) AS KeyID, sk.KeysID, sk.Title, sk.TaxonomicScopeID
             FROM `keys` sk
             JOIN leads sl ON sk.KeysID=sl.KeysID
             LEFT JOIN `keys` slk ON sl.ItemsID=slk.TaxonomicScopeID AND slk.ProjectsID=$project
@@ -360,7 +360,7 @@ class WebServicesModel extends KeyModel {
             ) as s ON k.KeysID=s.KeyID
             LEFT JOIN items i ON k.TaxonomicScopeID=i.ItemsID
             WHERE k.ProjectsID=$project{$andWhere}
-            ORDER BY k.Name");
+            ORDER BY k.Title");
         return $query->result();
     }
     

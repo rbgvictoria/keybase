@@ -4,34 +4,21 @@ info:
   version: "1.0.0"
   title: KeyBase Web Services
 host: keybase.rbg.vic.gov.au
-basePath: /ws
+basePath: /dev/ws
 produces: 
   - application/json
 
 paths:
   /projects:
     get:
-      summary: Gets `Project` objects.
-      tags:
-        - Project
-      responses:
-        200:
-          description: Successful response
-          schema:
-            title: Projects
-            type: array
-            items:
-              $ref: "#/definitions/Project"
-  /projects/{id}:
-    get:
       summary: Gets `Project` object.
       tags:
         - Project
       parameters:
-        - in: path
-          name: id
+        - in: query
+          name: project
           description: ID of the `Project` that needs to be fetched
-          required: true
+          required: false
           type: integer
         - in: query
           name: items
