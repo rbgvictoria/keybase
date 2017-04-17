@@ -61,7 +61,9 @@
           <ul class="nav navbar-nav">
             <li class="home-link"><a href="<?=site_url()?>"><span class="glyphicon glyphicon-home"></span></a></li>
             <li><a href="<?=site_url()?>projects">Projects</a></li>
+            <?php if ($this->session->userdata('id')):?>
             <li><a href="<?=site_url()?>filters">Filters</a></li>
+            <?php endif; ?>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">

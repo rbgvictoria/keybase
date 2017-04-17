@@ -9,6 +9,9 @@ class Filters extends KeyBase {
         parent::__construct();
         $this->load->library('FilterService');
         $this->load->library('ProjectService');
+        if (!$this->session->userdata('id')) {
+            redirect(site_url());
+        }
     }
     
     function index() {

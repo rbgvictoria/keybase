@@ -78,7 +78,7 @@ class KeyBase extends CI_Controller {
     }
     
     public function loadimage() {
-        $this->output->enable_profiler(FALSE);
+        $this->output->enable_profiler(false);
         if ($this->input->post('submit') && $_FILES['st_image']['tmp_name']) {
             move_uploaded_file($_FILES['st_image']['tmp_name'], getcwd() . '/images/st/' . $_FILES['st_image']['name']);
             if ($this->input->post('loadedimages'))
