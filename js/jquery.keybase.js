@@ -320,7 +320,7 @@ var Key = function() {
             title: false,
             source: false,
             reset: true,
-            filter_items: filter,
+            filterItems: filter,
             beforeSend: that.keybaseBeforeSend,
             onLoad: that.keybaseOnLoad,
             onComplete: that.keybaseOnComplete,

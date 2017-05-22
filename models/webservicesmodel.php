@@ -300,7 +300,7 @@ class WebServicesModel extends KeyModel {
         if ($project) {
             $this->db->where('p.ProjectsID', $project);
         }
-        $this->db->group_by('p.ProjectsID');
+        $this->db->group_by('p.ProjectsID, fk.KeysID');
         $this->db->order_by('NumKeys', 'desc');
         $query = $this->db->get();
         if ($query->num_rows()) {

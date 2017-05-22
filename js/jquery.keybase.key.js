@@ -45,7 +45,10 @@
  *   playerWindow: function(),
  *   remainingItemsDisplay: function(items, itemsDiv),
  *   resultDisplay: function(result, resultDiv),
- *   renderItemLink: function(item)
+ *   renderItemLink: function(item),
+ *   filterItems: []|undefined,     // array of item IDs
+ *   filterItemNames: []|undefined  // array of item names
+ *   
  * };
  *
  * Possible actions are 'player', 'indentedKey' and 'bracketedKey'. Action is optional: if no action is given, 'player'
@@ -114,12 +117,17 @@
 
         settings = $.extend(true, {}, $.fn.keybase.defaults, settings, options);
         
-        if (settings.filter_items.length > 0) {
-            filter_items = settings.filter_items;
+        if (settings.filterItems.length > 0) {
+            filter_items = settings.filterItems;
         }
         else {
-            if (!(filter_items !== undefined && filter_items.length > 0 && settings.reset !== true)) {
-                filter_items = [];
+            if (settings.filterItemNames.length > 0) {
+                filter_items = JSPath.apply('.items{.item_name===$item_name}.item_id', $.fn.keybase.getters.jsonKey(), {item_name: settings.filterItemNames});
+            }
+            else {
+                if (!(filter_items !== undefined && filter_items.length > 0 && settings.reset !== true)) {
+                    filter_items = [];
+                }
             }
         }
         $.fn.keybase.setActiveFilter = function(filter) {
@@ -278,7 +286,7 @@
         onLoad: function() {},
         onComplete: function() {},
         onFilterWindowOpen: function() {},
-        filter_items: [],
+        filterItems: [],
         onBracketedKeyComplete: function() {},
         onIndentedKeyComplete: function() {}
     };
