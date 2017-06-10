@@ -47,8 +47,13 @@
 
     <script>
         $(function () {
+            var yaml = 'keybase-api-1.0.yaml';
+            if (location.href.indexOf('?') > -1 && location.href.substr(location.href.indexOf('?') + 1) === "version=1.1.0") {
+                yaml = 'keybase-api-1.1.0.yaml';
+            }
+            
             window.swaggerUi = new SwaggerUi({
-                url: '<?=base_url()?>keybase-api-1.0.yaml',
+                url: '<?=base_url()?>' + yaml,
                 dom_id: 'swagger-ui-container',
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
                 onComplete: function() {

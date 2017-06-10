@@ -285,6 +285,7 @@
         onComplete: function() {},
         onFilterWindowOpen: function() {},
         filterItems: [],
+        filterItemNames: [],
         onBracketedKeyComplete: function() {},
         onIndentedKeyComplete: function() {}
     };

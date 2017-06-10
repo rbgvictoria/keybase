@@ -1,0 +1,744 @@
+swagger: '2.0'
+info:
+  version: 1.1.0@dev
+  title: KeyBase Web Services
+host: data.rbg.vic.gov.au
+basePath: /keybase-ws/ws
+produces:
+  - application/json
+paths:
+  /projects_get:
+    get:
+      summary: Gets `Project` objects.
+      tags:
+        - Project
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            title: Projects
+            type: array
+            items:
+              $ref: '#/definitions/Project'
+  '/project_get/{id}':
+    get:
+      summary: Gets `Project` object.
+      tags:
+        - Project
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Project` that needs to be fetched
+          required: true
+          type: integer
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProjectWithKeys'
+  '/project_meta_get/{id}':
+    get:
+      summary: Gets `Project` metadata.
+      tags:
+        - Project
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Project` for which metadata needs to be fetched
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Project'
+  '/project_keys_get/{id}':
+    get:
+      summary: Gets `Key`s belonging to a`Project` metadata.
+      tags:
+        - Project
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Project` for which keys needs to be fetched
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ProjectKey'
+  /project_post:
+    post:
+      summary: Create a new `Project`
+      tags:
+        - Project
+      consumes:
+        - multipart/form-data
+        - application/json
+      parameters:
+        - name: userid
+          in: formData
+          type: integer
+          required: true
+        - name: name
+          in: formData
+          type: string
+          required: false
+        - name: taxonomicscope
+          in: formData
+          type: string
+          required: true
+        - name: geographicscope
+          in: formData
+          type: string
+          required: true
+        - name: description
+          in: formData
+          type: string
+          required: false
+      responses:
+        '201':
+          description: Successfully created Project
+          schema:
+            type: integer
+            description: ID of the created Project
+        '400':
+          description: Invalid input
+        '404':
+          description: Resource not found
+  '/project_post/{projectid}':
+    put:
+      summary: Edit a `Project`
+      tags:
+        - Project
+      consumes:
+        - multipart/form-data
+        - application/json
+      parameters:
+        - name: projectid
+          in: path
+          type: integer
+          required: true
+        - name: userid
+          in: formData
+          type: integer
+          required: true
+        - name: name
+          in: formData
+          type: string
+          required: false
+        - name: taxonomicscope
+          in: formData
+          type: string
+          required: true
+        - name: geographicscope
+          in: formData
+          type: string
+          required: true
+        - name: description
+          in: formData
+          type: string
+          required: false
+      responses:
+        '200':
+          description: '`Project` updated'
+          schema:
+            type: integer
+            description: ID of the created Project
+        '400':
+          description: Invalid input
+        '404':
+          description: Resource not found
+  '/project_delete/{id}':
+    delete:
+      tags:
+        - Project
+      operationId: deleteProject
+      summary: Delete a `Project`
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        '204':
+          description: '`Project` deleted'
+        '404':
+          description: Resource not found
+  '/search_items/{term}':
+    get:
+      summary: Find `Key`s for a taxon
+      tags:
+        - Key
+      parameters:
+        - name: term
+          description: the taxon name
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                key_id:
+                  type: integer
+                key_name:
+                  type: string
+                taxonomic_scope:
+                  type: string
+                geographic_scope:
+                  type: string
+                project:
+                  $ref: '#/definitions/ProjectBrief'
+  '/key_get/{id}':
+    get:
+      tags:
+        - Key
+      summary: Gets `Key` object
+      parameters:
+        - in: path
+          name: id
+          description: ID of the `Key` that needs to be fetched
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Key'
+  '/key_meta_get/{id}':
+    get:
+      tags:
+        - Key
+      summary: Gets `Key` metadata
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/KeyMetadata'
+  /key_post:
+    post:
+      tags:
+        - Key
+      summary: Create a new `Key`
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: project_id
+          in: formData
+          type: integer
+          required: true
+        - name: created_by_id
+          in: formData
+          type: string
+          required: true
+        - name: taxonomic_scope
+          in: formData
+          type: string
+          required: true
+        - name: geographic_scope
+          in: formData
+          type: string
+          required: true
+        - name: key_title
+          in: formData
+          type: string
+          required: true
+        - name: key_author
+          in: formData
+          type: string
+          required: false
+        - name: description
+          in: formData
+          type: string
+          required: true
+        - name: notes
+          in: formData
+          type: string
+          required: true
+        - name: source_id
+          in: formData
+          type: integer
+          required: false
+        - name: delimitedtext
+          description: The file with the leads
+          in: formData
+          type: file
+          required: false
+      responses:
+        '202':
+          description: '`Key` created'
+          schema:
+            type: integer
+            description: ID of the new Key
+        '400':
+          description: Invalid input
+        '404':
+          description: Resource not found
+  '/key_post/{key_id}':
+    put:
+      tags:
+        - Key
+      summary: Create a new `Key`
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: key_id
+          in: path
+          type: integer
+          required: true
+        - name: project_id
+          in: formData
+          type: integer
+          required: true
+        - name: created_by_id
+          in: formData
+          type: string
+          required: true
+        - name: taxonomic_scope
+          in: formData
+          type: string
+          required: true
+        - name: geographic_scope
+          in: formData
+          type: string
+          required: true
+        - name: key_title
+          in: formData
+          type: string
+          required: true
+        - name: key_author
+          in: formData
+          type: string
+          required: false
+        - name: description
+          in: formData
+          type: string
+          required: true
+        - name: notes
+          in: formData
+          type: string
+          required: true
+        - name: source_id
+          in: formData
+          type: integer
+          required: false
+        - name: delimitedtext
+          description: The file with the leads
+          in: formData
+          type: file
+          required: false
+      responses:
+        '200':
+          description: '`Key` updated'
+          schema:
+            type: integer
+            description: ID of the updated Key
+        '400':
+          description: Invalid input
+        '404':
+          description: Resource not found
+  '/source_get/{id}':
+    get:
+      tags:
+        - Source
+      summary: Get `Source`
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: '#/definitions/Source'
+  /source_post:
+    post:
+      summary: Add or edit a `Source`
+      tags:
+        - Source
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: id
+          in: formData
+          type: integer
+          required: false
+        - name: author
+          in: formData
+          type: string
+          required: false
+        - name: publication_year
+          in: formData
+          type: string
+          required: false
+        - name: title
+          in: formData
+          type: string
+          required: false
+        - name: in_author
+          in: formData
+          type: string
+          required: false
+        - name: in_title
+          in: formData
+          type: string
+          required: false
+        - name: edition
+          in: formData
+          type: string
+          required: false
+        - name: journal
+          in: formData
+          type: string
+          required: false
+        - name: series
+          in: formData
+          type: string
+          required: false
+        - name: volume
+          in: formData
+          type: string
+          required: false
+        - name: part
+          in: formData
+          type: string
+          required: false
+        - name: page
+          in: formData
+          type: string
+          required: false
+        - name: publisher
+          in: formData
+          type: string
+          required: false
+        - name: place_of_publication
+          in: formData
+          type: string
+          required: false
+      responses:
+        '200':
+          description: '`Source` created or updated'
+          schema:
+            type: integer
+            description: ID of the created or updated Source
+  /source_autocomplete:
+    get:
+      summary: Suggest possible sources based on letters typed in
+      tags:
+        - Source
+      parameters:
+        - name: term
+          description: start of author name
+          in: query
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                value:
+                  type: integer
+                  description: The ID of the Source
+                  example: 1847
+                label:
+                  type: string
+                  description: The author and publication year of the source
+                  example: 'Walsh, N.G. (1994)'
+                description:
+                  type: string
+                  description: The remainder of the reference
+                  example: >-
+                    Poaceae. In: Walsh, N.G.; Entwisle, T.J. (eds), <i>Flora of
+                    Victoria. Vol. 2. Ferns and Allied Plants, Conifers and
+                    Monocotyledons</i>. Inkata Press,  Melbourne.
+  /autocomplete_item_name:
+    get:
+      summary: Suggest item names based on letters typed in
+      tags:
+        - Item
+      parameters:
+        - name: term
+          description: start of item name
+          in: query
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: string
+              description: Item name
+definitions:
+  Project:
+    type: object
+    properties:
+      project_id:
+        type: integer
+        example: 10
+      project_name:
+        type: string
+        example: Flora of Victoria
+      project_icon:
+        type: string
+        example: epacris.png
+      num_keys:
+        type: integer
+        example: 1037
+      num_items:
+        type: integer
+        example: 6867
+      num_users:
+        type: integer
+        example: 8
+  ProjectWithKeys:
+    allOf:
+      - $ref: '#/definitions/Project'
+      - properties:
+          first_key:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              title:
+                type: string
+          keys:
+            type: array
+            items:
+              $ref: '#/definitions/ProjectKey'
+  ProjectKey:
+    type: object
+    properties:
+      id:
+        type: integer
+      parent_id:
+        type: integer
+      title:
+        type: string
+      taxonomic_scope:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+      created_by:
+        $ref: '#/definitions/Agent'
+  Agent:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  ProjectBrief:
+    type: object
+    properties:
+      project_id:
+        type: integer
+      project_name:
+        type: string
+      project_icon:
+        type: string
+  Key:
+    type: object
+    properties:
+      key_id:
+        type: integer
+      key_name:
+        type: string
+      key_title:
+        type: string
+      key_author:
+        type: string
+      UID:
+        type: string
+      description:
+        type: string
+      rank:
+        type: string
+      taxonomic_scope:
+        $ref: '#/definitions/KeyItem'
+      geographic_scope:
+        type: string
+      notes:
+        type: string
+      created_by_id:
+        type: integer
+      timestamp_created:
+        type: string
+        format: date-time
+      modified_by_id:
+        type: integer
+      timestamp_modified:
+        type: string
+        format: date-time
+      source_id:
+        type: integer
+      modified_from_source:
+        type: boolean
+      project:
+        $ref: '#/definitions/ProjectBrief'
+      breadcrumbs:
+        type: array
+        items:
+          $ref: '#/definitions/Crumb'
+      source:
+        $ref: '#/definitions/Source'
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/KeyItem'
+      first_step:
+        type: object
+        properties:
+          root_node_id:
+            type: integer
+      leads:
+        type: array
+        items:
+          $ref: '#/definitions/Lead'
+  KeyMetadata:
+    type: object
+    properties:
+      key_id:
+        type: integer
+      key_name:
+        type: string
+      key_title:
+        type: string
+      key_author:
+        type: string
+      UID:
+        type: string
+      description:
+        type: string
+      rank:
+        type: string
+      TaxonomicScopeID:
+        type: integer
+      taxonomic_scope:
+        type: string
+      geographic_scope:
+        type: string
+      notes:
+        type: string
+      timestamp_created:
+        type: string
+        format: date-time
+      timestamp_modified:
+        type: string
+        format: date-time
+      source_id:
+        type: integer
+      modified_from_source:
+        type: boolean
+      created_by:
+        $ref: '#/definitions/Agent'
+      modified_by:
+        $ref: '#/definitions/Agent'
+      project:
+        $ref: '#/definitions/ProjectBrief'
+      breadcrumbs:
+        type: array
+        items:
+          $ref: '#/definitions/Crumb'
+      changes:
+        type: array
+        items:
+          type: object
+          properties:
+            full_name:
+              type: string
+            timestamp_modified:
+              type: string
+              format: date-time
+            comment:
+              type: string
+  KeyItem:
+    type: object
+    properties:
+      item_id:
+        type: integer
+      item_name:
+        type: string
+      url:
+        type: string
+      to_key:
+        type: integer
+  Lead:
+    type: object
+    properties:
+      lead_id:
+        type: integer
+      parent_id:
+        type: integer
+      lead_text:
+        type: string
+      item:
+        type: integer
+  Crumb:
+    type: object
+    properties:
+      key_id:
+        type: integer
+      key_title:
+        type: string
+  Source:
+    type: object
+    properties:
+      id:
+        type: integer
+      author:
+        type: string
+      publication_year:
+        type: string
+      title:
+        type: string
+      in_author:
+        type: string
+      in_title:
+        type: string
+      edition:
+        type: string
+      journal:
+        type: string
+      series:
+        type: string
+      volume:
+        type: string
+      part:
+        type: string
+      publisher:
+        type: string
+      place_of_publication:
+        type: string
+      page:
+        type: string
+      url:
+        type: string
