@@ -418,7 +418,7 @@ var Key = function() {
                                 $.ajax({
                                     url: site_url + '/ws/filterItems',
                                     data: {
-                                        key_id: keyId,
+                                        key_id: that.keyId,
                                         filter_id: $(this).val()
                                     },
                                     success: function(data) {
@@ -515,7 +515,7 @@ var Key = function() {
         var qstr;
         var path;
         if (href.indexOf('?') > -1) {
-            qstr = href.substr(href.indexOf('?')+1);
+            qstr = href.substr(href.indexOf('?') + 1);
             path = href.substr(0, href.indexOf('?'));
         }
         else {
@@ -601,12 +601,19 @@ var Key = function() {
     };
 
     this.renderItemLink = function(item) {
-        var mode = '';
+        var q = [];
+        if (location.href.indexOf('?') > -1) {
+            q.push(location.href.substr(location.href.indexOf('?') + 1));
+        }
         if ($('.nav-tabs .active').text() === 'Bracketed') {
-            mode = '?mode=bracketed';
+            q.push('mode=bracketed');
         }
         if ($('.nav-tabs .active').text() === 'Indented') {
-            mode = '?mode=indented';
+            q.push('mode=indented');
+        }
+        qString = '';
+        if (q.length) {
+            qString = '?' + q.join('&');
         }
 
         var link = '';
@@ -617,7 +624,7 @@ var Key = function() {
             link += item.item_name;
         }
         if (item.to_key) {
-            link += '<a href="' + item.to_key + mode + '"><span class="keybase-player-tokey"></span></a>';
+            link += '<a href="' + item.to_key + qString + '" class="keybase-player-tokey-link"><span class="keybase-player-tokey"></span></a>';
         }
 
         if (item.link_to_item_id) {
@@ -629,7 +636,7 @@ var Key = function() {
                 link += item.link_to_item_name;
             }
             if (item.link_to_key) {
-                link += '<a href="' + item.link_to_key + mode + '"><span class="keybase-player-tokey"></span></a>';
+                link += '<a href="' + item.link_to_key + qString + '" class="keybase-player-tokey-link"><span class="keybase-player-tokey"></span></a>';
             }
         }
         return link;
@@ -804,7 +811,6 @@ var Project = function() {
      */
     this.autoCompleteSource = function (request, response) {
         var items = [];
-        console.log(that.auto_complete_list);
         $.each(that.auto_complete_list, function(index, item) {
             if (item.substr(0, request.term.length).toLowerCase() === request.term.toLowerCase()) {
                 items.push(item);
@@ -1044,7 +1050,6 @@ var Project = function() {
                     project: that.project
                 },
                 success: function(data) {
-                    console.log(data);
                     target.parents('tr').eq(0).remove();
                 }
             });

@@ -236,8 +236,6 @@
 
             // root node
             rootNodeID = json.first_step.root_node_id;
-            console.log(typeof next_id);
-            console.log(next_id);
             next_id = rootNodeID;
 
             nestedSets();
@@ -1129,13 +1127,6 @@
             }
             else {
                 lead = children[0];
-                /*var furtherNodes = JSPath.apply('.{.left>' + lead.left + ' && .right<=' + lead.right + ' && .parent_id==$nodes}', nested_sets, {nodes: filter_nodes});
-                if (furtherNodes.length === 0) {
-                    var path = '.{.item && .left>' + lead.left + ' && .right<=' + lead.right + ' && .lead_id==$leads}';
-                    console.log(path);
-                    var item = JSPath.apply(path, nested_sets, {leads: filter_leads})[0];
-                    parent.item = item.item;
-                }*/
                 if (lead.item !== null) {
                     parent.item = lead.item;
                 }
@@ -1714,7 +1705,6 @@
             var removeLeads = [];
             $.each(json.leads, function(index, lead) {
                 if (lead.lead_text === "[link through]") {
-                    console.log(lead);
                     var parent_lead = JSPath.apply('.leads{.lead_id=="' + lead.parent_id + '"}', json)[0];
                     if (link_item_ids.indexOf(lead.item) === -1) {
                         link_item_ids.push(lead.item);
@@ -1730,7 +1720,7 @@
             });
             
             json.leads = $.grep(json.leads, function(n, i) {
-                return $.inArray(i, removeLeads) ==-1;
+                return $.inArray(i, removeLeads) === -1;
             });
             
             $.each(json.items, function(index, item) {
@@ -1754,15 +1744,13 @@
                 if (keyed_out_items.indexOf(item.item_id) === -1) {
                     removeItems.push(index);
                 }
-            })
-            
-            json.items = $.grep(json.items, function(n, i) {
-                return $.inArray(i, removeItems) ==-1;
             });
             
-            //console.log(JSON.stringify(json, null, 4));
+            json.items = $.grep(json.items, function(n, i) {
+                return $.inArray(i, removeItems) === -1;
+            });
         }
-    }
+    };
     
     var sortItems = function() {
         json.items.sort(function(a, b) {
