@@ -12,8 +12,8 @@
                 <?php if ($filters): ?>
                 <h3>My filters</h3>
                 <ul id="my-filters">
-                    <?php foreach($filters as $id => $name): ?>
-                    <li><i class="fa fa-check-square"></i><?=anchor(site_url() . 'filters/show/' . $id, $name)?></li>
+                    <?php foreach($filters as $filter): ?>
+                    <li><i class="fa fa-check-square"></i><?=anchor(site_url() . 'filters/show/' . $filter->filter_id, $filter->filter_name)?></li>
                     <?php endforeach; ?>
                 </ul>
                 <?php endif; ?>
@@ -68,14 +68,15 @@
                                 <div class="form-group">
                                     <?php 
                                         $options = array();
+                                        $options[] = 'Select project';
                                         foreach ($projects as $project) {
                                             $options[$project->project_id] = $project->project_name;
                                         }
                                     ?>
                                     
-                                    <?=form_label('Project(s)', 'project', array('class' => 'col-sm-2 form-label')); ?>
-                                    <div class="col-sm-10">
-                                         <?=form_multiselect('projects[]', $options, $this->input->post('projects'), "id=\"projects\" class=\"form-control\"");?>
+                                    <?=form_label('Project', 'project', array('class' => 'col-sm-2 form-label')); ?>
+                                    <div class="col-md-10">
+                                         <?=form_dropdown('project', $options, false, "id=\"project\" class=\"form-control\"");?>
                                     </div>
                                 </div>
 
@@ -83,7 +84,7 @@
                                     <span class="col-md-2"></span>
                                     <div class="checkbox col-md-10">
                                         <label>
-                                            <input type="checkbox" name="isProjectFilter" value="">
+                                            <input type="checkbox" name="isProjectFilter" value="1"/>
                                             Is project filter
                                         </label>
                                     </div>

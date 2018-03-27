@@ -8,7 +8,7 @@
             <hr/>
         </div>
         <div class="col-md-6">
-            <div id="project-box">
+            <div id="project-box" class="clearfix">
                 <?php foreach ($ProjectStats as $project): ?>
                 <div class="project">
                     <a class="project_link" href="<?=site_url()?>projects/show/<?=$project->project_id?>">

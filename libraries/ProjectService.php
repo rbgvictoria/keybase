@@ -51,6 +51,14 @@ class ProjectService extends Service {
         return json_decode($response);
     }
     
+    public function loadItems($project, $data)
+    {
+        $url = $this->ws_url() . 'ws/project_item_post/' . $project;
+        $data['keybase_user_id'] = $this->ci->session->userdata('id');
+        $response = curl_post($url, $data, true);
+        return json_decode($response);
+    }
+    
 }
 
 /* End of file ProjectService.php */

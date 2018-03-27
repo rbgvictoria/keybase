@@ -183,6 +183,11 @@ paths:
           in: path
           type: string
           required: true
+        - name: project
+          description: Identifier for the project
+          in: query
+          type: integer
+          required: false
       responses:
         '200':
           description: Successful response

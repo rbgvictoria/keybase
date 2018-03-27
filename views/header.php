@@ -88,7 +88,8 @@
     
     <div class="page-header">
         <div class="container">
-            <div id="login" class="login">
+            <!-- Place for alert -->
+            <div id="login" class="login clearfix">
                 <?php if ($this->session->userdata('name')): ?>
                     <?=form_hidden('keybase-user-id', $this->session->userdata('id')); ?>
                     <?=$this->session->userdata['name']?> |

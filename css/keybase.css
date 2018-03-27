@@ -156,10 +156,6 @@ div.login {
 
 /* Home page
 *********************************/
-#project-box {
-    height: 400px;
-}
-
 #project-box .project {
     clear: both;
 }

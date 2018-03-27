@@ -1,7 +1,7 @@
             <?=form_open()?>
                 <?php   
                     echo form_hidden(array(
-                        'keyid' => $key->key_id,
+                        'keyid' => $keyid,
                         'projectid' => $key->project->project_id,
                         'tempfilename' => $tempfilename,
                         'delimiter' => $delimiter,

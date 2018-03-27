@@ -192,6 +192,7 @@ $(function() {
             });
 
             $('.is-project-filter').on('click', function(e) {
+                console.log('tada');
                 var filter_id = $(this).parents('tr').eq(0).attr('data-keybase-filter-id');
                 var postData = {
                     is_project_filter: ($(this).prop('checked')) ? true : null
@@ -958,7 +959,7 @@ var Project = function() {
                     $('input.ok').focus();
                 }
             });
-            return FALSE;
+            return false;
         });
     };
     
@@ -1067,8 +1068,14 @@ var Filter = function() {
     
     this.getStuff = function() {
         $.getJSON(wsUrl + '/ws/filter_meta_get/' + that.filterid, function(data) {
-            $('input#filterid').val(data.FilterID);
-            $('input#filtername').val(data.FilterName);
+            console.log(data);
+            $('input#filterid').val(data.id);
+            $('input#filtername').val(data.name);
+            $('[name="project"] option[value="' + 
+                    data.project + '"]').prop('selected', true);
+            if (data.isProjectFilter) {
+                $('[name="isProjectFilter"]').prop('checked', true);
+            }
         });
 
         $('#globalfilter-keys').html('<i class="fa fa-spinner fa-spin fa-lg"></i>');

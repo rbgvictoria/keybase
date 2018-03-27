@@ -171,7 +171,7 @@ class WS extends CI_Controller {
                     $item = $this->keymodel->getItemInfo($itemid);
                     $out['ItemsID'] = $item->ItemsID;
                     $out['ItemName'] = $item->ItemName;
-                    $out['ItemLSID'] = $item->ItemLSID;
+                    //$out['ItemLSID'] = $item->ItemLSID;
                     $out['Scope'] = 'Key(s) to members of item';
                 }
                 

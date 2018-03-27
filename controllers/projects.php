@@ -9,6 +9,7 @@ class Projects extends KeyBase {
         parent::__construct();
         $this->load->library('ProjectService');
         $this->load->library('FilterService');
+        //$this->output->enable_profiler();
     }
     
     function index() {
@@ -26,7 +27,11 @@ class Projects extends KeyBase {
         $this->data['projectid'] = $project;
         $this->data['project'] = $this->projectservice->getProjectMetadata($project);
         $this->data['users'] = $this->projectservice->getProjectUsers($project);
-        $this->data['myFilters'] = $this->filterservice->getFilters($project);
+        $this->data['myFilters'] = array();
+        if ($this->session->userdata('id')) {
+            $this->data['myFilters'] = $this->filterservice->getFilters($project, 
+                    $this->session->userdata('id'));
+        }
         $this->data['projectFilters'] = $this->filterservice->getProjectFilters($project);
         $this->data['manageFilters'] = $this->filterservice->getManageFilters($project);
         $this->load->view('projects/show', $this->data);
@@ -70,7 +75,7 @@ class Projects extends KeyBase {
             $this->load->view('projects/edit', $this->data);
         }
         else {
-                redirect('projects');
+            redirect('projects');
         }
     }
     
@@ -79,6 +84,24 @@ class Projects extends KeyBase {
         if ($response) {
             redirect('projects');
         }
+    }
+    
+    public function load_items($project)
+    {
+        if ($this->input->post('submit')) {
+            $temp_file = $_FILES['file_content']['tmp_name'];
+            $handle = fopen($temp_file, 'r');
+            $csv = array();
+            while(!feof($handle)) {
+                $csv[] = fgetcsv($handle);
+            }
+            fclose($handle);
+            $data = array();
+            $data['items'] = json_encode($csv);
+            $this->projectservice->loaditems($project, $data);
+            redirect('projects/show/' . $project);
+        }
+        $this->load->view('projects/load_items', $this->data);
     }
     
 }

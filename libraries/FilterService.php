@@ -9,20 +9,20 @@ class FilterService extends Service {
     }
     
     public function getFilters($project=FALSE, $user=FALSE, $session=FALSE) {
-        $uri = '/';
+        $uri = array();
         if ($project) {
-            $uri .= 'project/' . $project;
+            $uri[] = 'project/' . $project;
         }
         if ($user) {
-            $uri .= 'user/' . $user;
+            $uri[] = 'user/' . $user;
         }
-        if ($session) {
-            $uri .= 'session/' . $session;
+        elseif ($session) {
+            $uri[] = 'session/' . $session;
         }
         if (!$uri) {
             return FALSE;
         }
-        $url = $this->ws_url() . 'ws/filters_get' . $uri;
+        $url = $this->ws_url() . 'ws/filters_get/' . implode('/', $uri);
         $response = doCurl($url, FALSE, TRUE);
         return json_decode($response);
     }

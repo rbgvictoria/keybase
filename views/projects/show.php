@@ -42,6 +42,7 @@
                     <li role="presentation" class="active"><a href="#keys_hierarchy" aria-controls="hierarchy" role="tab" data-toggle="tab">Keys (tree)</a></li>
                     <li role="presentation"><a href="#keys_alphabetical" aria-controls="alphabetical" role="tab" data-toggle="tab">Keys (list)</a></li>
                     <?php if ($userid && in_array($userid, $prmanagers)): ?>
+                        <li role="presentation"><a href="#items" aria-controls="items" rol="tab" data-toggle="tab">Items</a></li>
                         <li role="presentation"><a href="#filters" aria-controls="filters" rol="tab" data-toggle="tab">Filters</a></li>
                     <?php endif; ?>
                     <li role="presentation"><a href="#about" aria-controls="about" role="tab" data-toggle="tab">About</a></li>
@@ -50,6 +51,10 @@
 
                 <div class="tab-content clearfix">
                     <?php if ($userid && in_array($userid, $prmanagers)): ?>
+                    <div role="tabpanel" class="tab-pane" id="items">
+                        <a class="btn btn-default" href="<?=site_url()?>projects/load_items/<?=$project->project_id?>">Upload project items</a>
+                    </div> <!-- /#items -->
+                    
                     <div role="tabpanel" class="tab-pane" id="filters">
                         <?php if ($manageFilters): ?>
                         <table class="table-bordered table-condensed">
