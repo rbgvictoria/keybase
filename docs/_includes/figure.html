@@ -1,0 +1,4 @@
+<figure>
+  <img src="{{ include.src | absolute_url }}" alt="{{ include.caption | strip_html }}" class="img-responsive"/>
+  <figurecaption>{{ include.caption | esacpe }} {% if include.creator %}Photo: {{ include.creator | escape }}{% endif %}</figurecaption>
+</figure>
