@@ -47,7 +47,7 @@ paths:
       description: |
         Note: either the `project` or `tscope` parameter is required
         
-        Example: http://keybase.rbg.vic.gov.au/ws/keys?tscope=Banksia
+        Example: https://keybase.rbg.vic.gov.au/ws/keys?tscope=Banksia
       tags:
         - Key
       parameters: 
@@ -92,7 +92,7 @@ paths:
     get: 
       summary: Gets `Key` object
       description: |
-        Example: http://keybase.rbg.vic.gov.au/ws/keyJSON/2411
+        Example: https://keybase.rbg.vic.gov.au/ws/keyJSON/2411
       tags:
         - Key
       parameters:
@@ -112,7 +112,7 @@ paths:
       description: |
         Note: either the `project` or `key` parameter is required
         
-        Example: http://keybase.rbg.vic.gov.au/ws/items?key=2413
+        Example: https://keybase.rbg.vic.gov.au/ws/items?key=2413
       tags:
         - Item
       parameters:

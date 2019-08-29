@@ -54,6 +54,9 @@ class WS extends CI_Controller {
         }
         
         $json = json_encode($prep);
+        header('Access-Control-Allow-Origin: *');  
+        header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
         header('Content-type: application/json');
         if (isset($_GET['callback']) && $_GET['callback'])
             echo $_GET['callback'] . '(' . $json . ')';
@@ -135,6 +138,9 @@ class WS extends CI_Controller {
                 $out['Items'] = $data;
                 
                 $json = json_encode((object) $out);
+                header('Access-Control-Allow-Origin: *');  
+                header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+                header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
                 header("Content-Disposition: inline; filename=\"$filename.json\"");
                 header('Content-type: application/json');
                 echo $json;
@@ -190,6 +196,9 @@ class WS extends CI_Controller {
                 $out['Items'] = $data;
                 
                 $json = json_encode((object) $out);
+                header('Access-Control-Allow-Origin: *');  
+                header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+                header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
                 header("Content-Disposition: inline; filename=\"$filename.json\"");
                 header('Content-type: application/json');
                 echo $json;
@@ -214,6 +223,9 @@ class WS extends CI_Controller {
         }
         else {
             $json = json_encode($data);
+            header('Access-Control-Allow-Origin: *');  
+            header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+            header('Access-Control-Allow-Headers: Content-Type, Content-Range, Content-Disposition, Content-Description');
             header('Content-type: application/json');
             echo $json;
         }

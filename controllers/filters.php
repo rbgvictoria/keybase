@@ -56,9 +56,6 @@ class Filters extends KeyBase {
             $taxa[] = trim($value);
         }
         
-        $projects = $this->input->post('projects');
-        if (!$projects[0]) $projects = FALSE;
-        
         $data = $this->input->post();
         $data['taxa'] = implode("\r\n", $taxa);
         $filter = $data['filterid'];

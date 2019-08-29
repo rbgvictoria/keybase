@@ -117,7 +117,7 @@ class WebServicesModel extends KeyModel {
         $this->db->join('items i', 'l.ItemsID=i.ItemsID');
         $this->db->join('projectitems pi', 'i.ItemsID=pi.ItemsID AND p.ProjectsID=pi.ProjectsID', 'left');
         $this->db->join('items ts', 'k.TaxonomicScopeID=ts.ItemsID', 'left');
-        $this->db->group_by('i.ItemsID, k.KeysID');
+        $this->db->group_by('i.ItemsID, k.KeysID, pi.ProjectItemsID');
         $this->db->order_by('KeyName, ItemName');
         
         if (!empty($params['project'])) 

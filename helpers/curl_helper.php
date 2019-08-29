@@ -11,11 +11,10 @@ if ( ! function_exists('doCurl')) {
         }
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         
-        if ($proxy) {
+        /*if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 
             curl_setopt($ch, CURLOPT_PROXYPORT, 8080); 
-            curl_setopt ($ch, CURLOPT_PROXYUSERPWD, "helpdesk:glass3d");
-        }
+        }*/
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
         $result = curl_exec($ch);
@@ -31,11 +30,10 @@ if (!function_exists('curl_post')) {
         curl_setopt($ch, CURLOPT_POST, TRUE);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if ($proxy) {
+        /*if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 
             curl_setopt($ch, CURLOPT_PROXYPORT, 8080); 
-            curl_setopt ($ch, CURLOPT_PROXYUSERPWD, "helpdesk:glass3d");
-        }
+        }*/
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
         $result = curl_exec($ch);
@@ -53,11 +51,10 @@ if (!function_exists('curl_delete')) {
         curl_setopt($ch,CURLOPT_POST, TRUE);
         curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        if ($proxy) {
+        /*if ($proxy) {
             curl_setopt($ch, CURLOPT_PROXY, "http://10.15.14.4:8080"); 
             curl_setopt($ch, CURLOPT_PROXYPORT, 8080); 
-            curl_setopt ($ch, CURLOPT_PROXYUSERPWD, "helpdesk:glass3d");
-        }
+        }*/
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($ch, CURLOPT_TIMEOUT, 300);
         $result = curl_exec($ch);

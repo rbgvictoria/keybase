@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>KeyBase API</title>
-    <link rel="shortcut icon" href="http://keybase.rbg.vic.gov.au/favicon.ico">
+    <link rel="shortcut icon" href="https://keybase.rbg.vic.gov.au/favicon.ico">
 
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
@@ -47,9 +47,9 @@
 
     <script>
         $(function () {
-            var yaml = 'keybase-api-1.0.yaml';
-            if (location.href.indexOf('?') > -1 && location.href.substr(location.href.indexOf('?') + 1) === "version=1.1.0") {
-                yaml = 'keybase-api-1.1.0.yaml';
+            var yaml = 'keybase-api-1.1.0.yaml';
+            if (location.href.indexOf('?') > -1 && location.href.substr(location.href.indexOf('?') + 1) === "version=1.0") {
+                yaml = 'keybase-api-1.0.yaml';
             }
             
             window.swaggerUi = new SwaggerUi({

@@ -18,7 +18,6 @@ class KeyBase extends CI_Controller {
         $this->data['css'] = array();
         $this->data['js'] = array();
         $this->data['iehack'] = FALSE;
-        
     }
     
     public function index() {
@@ -78,7 +77,7 @@ class KeyBase extends CI_Controller {
     }
     
     public function loadimage() {
-        $this->output->enable_profiler(false);
+        $this->output->enable_profiler(FALSE);
         if ($this->input->post('submit') && $_FILES['st_image']['tmp_name']) {
             move_uploaded_file($_FILES['st_image']['tmp_name'], getcwd() . '/images/st/' . $_FILES['st_image']['name']);
             if ($this->input->post('loadedimages'))

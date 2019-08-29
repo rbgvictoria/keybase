@@ -2,6 +2,7 @@ swagger: '2.0'
 info:
   version: 1.1.0@dev
   title: KeyBase Web Services
+  description: Web services that KeyBase uses internally and can also be used by other applications. KeyBase is still very much under development (albeit intermittently), but reasonable efforts are made to keep web services up and running, so as not to break existing applications. The previous version of the API, which is no longer used by KeyBase, but is still working, is documented in https://keybase.rbg.vic.gov.au/api?version=1.0.
 host: data.rbg.vic.gov.au
 basePath: /keybase-ws/ws
 produces:
@@ -74,104 +75,104 @@ paths:
             type: array
             items:
               $ref: '#/definitions/ProjectKey'
-  /project_post:
-    post:
-      summary: Create a new `Project`
-      tags:
-        - Project
-      consumes:
-        - multipart/form-data
-        - application/json
-      parameters:
-        - name: userid
-          in: formData
-          type: integer
-          required: true
-        - name: name
-          in: formData
-          type: string
-          required: false
-        - name: taxonomicscope
-          in: formData
-          type: string
-          required: true
-        - name: geographicscope
-          in: formData
-          type: string
-          required: true
-        - name: description
-          in: formData
-          type: string
-          required: false
-      responses:
-        '201':
-          description: Successfully created Project
-          schema:
-            type: integer
-            description: ID of the created Project
-        '400':
-          description: Invalid input
-        '404':
-          description: Resource not found
-  '/project_post/{projectid}':
-    put:
-      summary: Edit a `Project`
-      tags:
-        - Project
-      consumes:
-        - multipart/form-data
-        - application/json
-      parameters:
-        - name: projectid
-          in: path
-          type: integer
-          required: true
-        - name: userid
-          in: formData
-          type: integer
-          required: true
-        - name: name
-          in: formData
-          type: string
-          required: false
-        - name: taxonomicscope
-          in: formData
-          type: string
-          required: true
-        - name: geographicscope
-          in: formData
-          type: string
-          required: true
-        - name: description
-          in: formData
-          type: string
-          required: false
-      responses:
-        '200':
-          description: '`Project` updated'
-          schema:
-            type: integer
-            description: ID of the created Project
-        '400':
-          description: Invalid input
-        '404':
-          description: Resource not found
-  '/project_delete/{id}':
-    delete:
-      tags:
-        - Project
-      operationId: deleteProject
-      summary: Delete a `Project`
-      parameters:
-        - name: id
-          in: path
-          type: integer
-          required: true
-      responses:
-        '204':
-          description: '`Project` deleted'
-        '404':
-          description: Resource not found
+#  /project_post:
+#    post:
+#      summary: Create a new `Project`
+#      tags:
+#        - Project
+#      consumes:
+#        - multipart/form-data
+#        - application/json
+#      parameters:
+#        - name: userid
+#          in: formData
+#          type: integer
+#          required: true
+#        - name: name
+#          in: formData
+#          type: string
+#          required: false
+#        - name: taxonomicscope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: geographicscope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: description
+#          in: formData
+#          type: string
+#          required: false
+#      responses:
+#        '201':
+#          description: Successfully created Project
+#          schema:
+#            type: integer
+#            description: ID of the created Project
+#        '400':
+#          description: Invalid input
+#        '404':
+#          description: Resource not found
+#  '/project_post/{projectid}':
+#    put:
+#      summary: Edit a `Project`
+#      tags:
+#        - Project
+#      consumes:
+#        - multipart/form-data
+#        - application/json
+#      parameters:
+#        - name: projectid
+#          in: path
+#          type: integer
+#          required: true
+#        - name: userid
+#          in: formData
+#          type: integer
+#          required: true
+#        - name: name
+#          in: formData
+#          type: string
+#          required: false
+#        - name: taxonomicscope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: geographicscope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: description
+#          in: formData
+#          type: string
+#          required: false
+#      responses:
+#        '200':
+#          description: '`Project` updated'
+#          schema:
+#            type: integer
+#            description: ID of the created Project
+#        '400':
+#          description: Invalid input
+#        '404':
+#          description: Resource not found
+#  '/project_delete/{id}':
+#    delete:
+#      tags:
+#        - Project
+#      operationId: deleteProject
+#      summary: Delete a `Project`
+#      parameters:
+#        - name: id
+#          in: path
+#          type: integer
+#          required: true
+#      responses:
+#        '204':
+#          description: '`Project` deleted'
+#        '404':
+#          description: Resource not found
   '/search_items/{term}':
     get:
       summary: Find `Key`s for a taxon
@@ -237,128 +238,128 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/KeyMetadata'
-  /key_post:
-    post:
-      tags:
-        - Key
-      summary: Create a new `Key`
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: project_id
-          in: formData
-          type: integer
-          required: true
-        - name: created_by_id
-          in: formData
-          type: string
-          required: true
-        - name: taxonomic_scope
-          in: formData
-          type: string
-          required: true
-        - name: geographic_scope
-          in: formData
-          type: string
-          required: true
-        - name: key_title
-          in: formData
-          type: string
-          required: true
-        - name: key_author
-          in: formData
-          type: string
-          required: false
-        - name: description
-          in: formData
-          type: string
-          required: true
-        - name: notes
-          in: formData
-          type: string
-          required: true
-        - name: source_id
-          in: formData
-          type: integer
-          required: false
-        - name: delimitedtext
-          description: The file with the leads
-          in: formData
-          type: file
-          required: false
-      responses:
-        '202':
-          description: '`Key` created'
-          schema:
-            type: integer
-            description: ID of the new Key
-        '400':
-          description: Invalid input
-        '404':
-          description: Resource not found
-  '/key_post/{key_id}':
-    put:
-      tags:
-        - Key
-      summary: Create a new `Key`
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: key_id
-          in: path
-          type: integer
-          required: true
-        - name: project_id
-          in: formData
-          type: integer
-          required: true
-        - name: created_by_id
-          in: formData
-          type: string
-          required: true
-        - name: taxonomic_scope
-          in: formData
-          type: string
-          required: true
-        - name: geographic_scope
-          in: formData
-          type: string
-          required: true
-        - name: key_title
-          in: formData
-          type: string
-          required: true
-        - name: key_author
-          in: formData
-          type: string
-          required: false
-        - name: description
-          in: formData
-          type: string
-          required: true
-        - name: notes
-          in: formData
-          type: string
-          required: true
-        - name: source_id
-          in: formData
-          type: integer
-          required: false
-        - name: delimitedtext
-          description: The file with the leads
-          in: formData
-          type: file
-          required: false
-      responses:
-        '200':
-          description: '`Key` updated'
-          schema:
-            type: integer
-            description: ID of the updated Key
-        '400':
-          description: Invalid input
-        '404':
-          description: Resource not found
+#  /key_post:
+#    post:
+#      tags:
+#        - Key
+#      summary: Create a new `Key`
+#      consumes:
+#        - multipart/form-data
+#      parameters:
+#        - name: project_id
+#          in: formData
+#          type: integer
+#          required: true
+#        - name: created_by_id
+#          in: formData
+#          type: string
+#          required: true
+#        - name: taxonomic_scope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: geographic_scope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: key_title
+#          in: formData
+#          type: string
+#          required: true
+#        - name: key_author
+#          in: formData
+#          type: string
+#          required: false
+#        - name: description
+#          in: formData
+#          type: string
+#          required: true
+#        - name: notes
+#          in: formData
+#          type: string
+#          required: true
+#        - name: source_id
+#          in: formData
+#          type: integer
+#          required: false
+#        - name: delimitedtext
+#          description: The file with the leads
+#          in: formData
+#          type: file
+#          required: false
+#      responses:
+#        '202':
+#          description: '`Key` created'
+#          schema:
+#            type: integer
+#            description: ID of the new Key
+#        '400':
+#          description: Invalid input
+#        '404':
+#          description: Resource not found
+#  '/key_post/{key_id}':
+#    put:
+#      tags:
+#        - Key
+#      summary: Create a new `Key`
+#      consumes:
+#        - multipart/form-data
+#      parameters:
+#        - name: key_id
+#          in: path
+#          type: integer
+#          required: true
+#        - name: project_id
+#          in: formData
+#          type: integer
+#          required: true
+#        - name: created_by_id
+#          in: formData
+#          type: string
+#          required: true
+#        - name: taxonomic_scope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: geographic_scope
+#          in: formData
+#          type: string
+#          required: true
+#        - name: key_title
+#          in: formData
+#          type: string
+#          required: true
+#        - name: key_author
+#          in: formData
+#          type: string
+#          required: false
+#        - name: description
+#          in: formData
+#          type: string
+#          required: true
+#        - name: notes
+#          in: formData
+#          type: string
+#          required: true
+#        - name: source_id
+#          in: formData
+#          type: integer
+#          required: false
+#        - name: delimitedtext
+#          description: The file with the leads
+#          in: formData
+#          type: file
+#          required: false
+#      responses:
+#        '200':
+#          description: '`Key` updated'
+#          schema:
+#            type: integer
+#            description: ID of the updated Key
+#        '400':
+#          description: Invalid input
+#        '404':
+#          description: Resource not found
   '/source_get/{id}':
     get:
       tags:
@@ -374,76 +375,76 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Source'
-  /source_post:
-    post:
-      summary: Add or edit a `Source`
-      tags:
-        - Source
-      consumes:
-        - multipart/form-data
-      parameters:
-        - name: id
-          in: formData
-          type: integer
-          required: false
-        - name: author
-          in: formData
-          type: string
-          required: false
-        - name: publication_year
-          in: formData
-          type: string
-          required: false
-        - name: title
-          in: formData
-          type: string
-          required: false
-        - name: in_author
-          in: formData
-          type: string
-          required: false
-        - name: in_title
-          in: formData
-          type: string
-          required: false
-        - name: edition
-          in: formData
-          type: string
-          required: false
-        - name: journal
-          in: formData
-          type: string
-          required: false
-        - name: series
-          in: formData
-          type: string
-          required: false
-        - name: volume
-          in: formData
-          type: string
-          required: false
-        - name: part
-          in: formData
-          type: string
-          required: false
-        - name: page
-          in: formData
-          type: string
-          required: false
-        - name: publisher
-          in: formData
-          type: string
-          required: false
-        - name: place_of_publication
-          in: formData
-          type: string
-          required: false
-      responses:
-        '200':
-          description: '`Source` created or updated'
-          schema:
-            type: integer
-            description: ID of the created or updated Source
+#  /source_post:
+#    post:
+#      summary: Add or edit a `Source`
+#      tags:
+#        - Source
+#      consumes:
+#        - multipart/form-data
+#      parameters:
+#        - name: id
+#          in: formData
+#          type: integer
+#          required: false
+#        - name: author
+#          in: formData
+#          type: string
+#          required: false
+#        - name: publication_year
+#          in: formData
+#          type: string
+#          required: false
+#        - name: title
+#          in: formData
+#          type: string
+#          required: false
+#        - name: in_author
+#          in: formData
+#          type: string
+#          required: false
+#        - name: in_title
+#          in: formData
+#          type: string
+#          required: false
+#        - name: edition
+#          in: formData
+#          type: string
+#          required: false
+#        - name: journal
+#          in: formData
+#          type: string
+#          required: false
+#        - name: series
+#          in: formData
+#          type: string
+#          required: false
+#        - name: volume
+#          in: formData
+#          type: string
+#          required: false
+#        - name: part
+#          in: formData
+#          type: string
+#          required: false
+#        - name: page
+#          in: formData
+#          type: string
+#          required: false
+#        - name: publisher
+#          in: formData
+#          type: string
+#          required: false
+#        - name: place_of_publication
+#          in: formData
+#          type: string
+#          required: false
+#      responses:
+#        '200':
+#          description: '`Source` created or updated'
+#          schema:
+#            type: integer
+#            description: ID of the created or updated Source
   /source_autocomplete:
     get:
       summary: Suggest possible sources based on letters typed in

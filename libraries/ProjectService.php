@@ -10,7 +10,7 @@ class ProjectService extends Service {
     
     public function getProjects() {
         $url = $this->ws_url() . 'ws/projects_get';
-        $response = doCurl($url, FALSE, TRUE);
+        $response = doCurl($url, FALSE, FALSE);
         return json_decode($response);
     }
     
