@@ -1,4 +1,4 @@
-        <footer class="footer clearfix">
+        <!--footer class="footer clearfix">
             <div class="bottom">
                 <div class="container">
                     <div class="row">
@@ -14,7 +14,7 @@
                     </div>
                 </div>
             </div>
-        </footer>
+        </footer-->
         <?php require_once 'views/includes/analyticstracker.php'; ?>
     </body>
 </html>
